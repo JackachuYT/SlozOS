@@ -23,6 +23,16 @@ FROM ghcr.io/ublue-os/bazzite:stable
 #   • Backlight→ i915 native
 # The only real-world quirks need config, not drivers:
 
+# ── ISO build prep ────────────────────────────────────────────────────────────
+# bootc-image-builder depsolves every enabled repo in the image to assemble the
+# installer. Bazzite's third-party Terra repos point at a GPG key file that
+# isn't shipped (/etc/pki/rpm-gpg/RPM-GPG-KEY-terra44-mesa), which breaks that
+# depsolve. Disable them — the OS ships as this bootc image and Bazzite already
+# bakes in the Terra packages (mesa, etc.); these repos are only for optional
+# local layering.
+RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' \
+        /etc/yum.repos.d/terra*.repo 2>/dev/null || true
+
 # ── Surface Pro 2 hardware quirk fixes ────────────────────────────────────────
 # WiFi: stop USB autosuspend from killing the Marvell adapter (USB variant)
 COPY config/surface/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
