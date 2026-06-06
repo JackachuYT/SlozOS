@@ -5,6 +5,7 @@
 # SlozOS
 
 **A custom gaming OS for Microsoft Surface Pro 1, 2 and Surface Book 1 — built on Bazzite**
+Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
 ![Based on Bazzite](https://img.shields.io/badge/base-Bazzite-blueviolet?logo=fedora)
