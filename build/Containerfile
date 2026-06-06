@@ -1,0 +1,36 @@
+FROM ghcr.io/ublue-os/bazzite:stable
+
+# ── Surface Linux repo ────────────────────────────────────────────────────────
+RUN curl -Lo /etc/yum.repos.d/linux-surface.repo \
+        https://pkg.surfacelinux.com/fedora/linux-surface.repo && \
+    rpm --import https://pkg.surfacelinux.com/fedora/linux-surface.asc
+
+# ── Replace kernel with Surface-patched version ───────────────────────────────
+RUN rpm-ostree override replace \
+        --experimental \
+        --from repo=linux-surface \
+        kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra && \
+    ostree container commit
+
+# ── Surface hardware support packages ────────────────────────────────────────
+RUN rpm-ostree install \
+        iptsd \
+        libwacom-surface \
+        surface-control && \
+    rpm-ostree cleanup -m && \
+    ostree container commit
+
+# ── SlozOS branding ───────────────────────────────────────────────────────────
+COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
+COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
+COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
+COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
+
+RUN echo "slozos" > /etc/hostname && \
+    sed -i \
+        -e 's/^NAME=.*/NAME="SlozOS"/' \
+        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 1.0 (Bazzite)"/' \
+        /usr/lib/os-release 2>/dev/null || true
+
+LABEL org.opencontainers.image.title="SlozOS"
+LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface"

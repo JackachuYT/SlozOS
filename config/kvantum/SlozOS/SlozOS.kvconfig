@@ -1,0 +1,73 @@
+# SlozOS Kvantum Theme — macOS Tahoe Liquid Glass
+# Inherits KvAntum base for SVG shapes; overrides color + opacity for glass look.
+# Requires: kvantum-themes (provides KvAntum base), KWin blur compositor enabled.
+
+[%General]
+author=SlozOS
+comment=macOS Tahoe Liquid Glass dark theme
+inherits=KvAntum
+
+# Glass / translucency core
+translucent_windows=true
+blurring=true
+popup_blurring=true
+composite_windows=true
+no_window_pattern=false
+
+# Remove aggressive decorations for a clean glass look
+shadowless_popup=false
+menu_shadow_depth=8
+tooltip_shadow_depth=5
+spread_progressbar=true
+progressbar_animate=true
+
+# Layout
+remove_extra_frames=true
+group_toolbar_buttons=false
+toolbar_item_spacing=0
+toolbar_interior_spacing=4
+center_toolbar_handle=false
+merge_menubar_with_toolbar=false
+scroll_arrows=false
+transient_scrollbar=true
+scroll_width=6
+scroll_min_extent=40
+tree_branch_line=false
+left_tabs=false
+joined_inactive_tabs=false
+attach_active_tab=false
+mirror_doc_tabs=false
+no_inactiveness=false
+alt_mnemonic=true
+
+[PanelTranslucency]
+# Panels (taskbar / top bar) — highly transparent, strong blur
+window=15
+menubar=15
+toolbar=12
+dock=18
+tooltip=70
+popup=65
+menu=72
+combobox=60
+frame=20
+tabbar=18
+progressbar=90
+scrollbar=40
+slider=70
+button=30
+spinbox=30
+lineedit=25
+treeview=18
+listview=18
+groupbox=12
+tabpage=18
+
+[Hacks]
+transparent_ktitle_label=true
+transparent_dolphin_view=true
+transparent_pcmanfm_sidepanel=false
+lxqtmainmenu_iconsize=0
+blur_konsole=true
+opaque_color_chooser=false
+opaque_file_dialog_sidepanel=false

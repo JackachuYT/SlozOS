@@ -1,0 +1,49 @@
+name: Build SlozOS ISO
+
+on:
+  workflow_dispatch:        # lets you click "Run workflow" manually
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android \
+                      /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune --all --force || true
+          df -h /
+
+      - name: Build SlozOS image (Bazzite + Surface kernel)
+        run: |
+          sudo podman build -t localhost/slozos:latest -f build/Containerfile .
+
+      - name: Generate bootable ISO
+        run: |
+          mkdir -p output
+          sudo podman run --rm --privileged \
+            --security-opt label=type:unconfined_t \
+            -v /var/lib/containers/storage:/var/lib/containers/storage \
+            -v "$(pwd)/output:/output" \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type iso \
+            --local \
+            localhost/slozos:latest
+
+      - name: Rename ISO
+        run: |
+          ISO=$(find output -name '*.iso' | head -1)
+          mv "$ISO" output/SlozOS-1.0-amd64.iso
+          ls -lh output/
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlozOS-ISO
+          path: output/SlozOS-1.0-amd64.iso
+          retention-days: 7

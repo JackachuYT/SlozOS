@@ -1,0 +1,6 @@
+output/
+*.iso
+*.tar
+*.raw
+.DS_Store
+**/.DS_Store

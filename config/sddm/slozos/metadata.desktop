@@ -1,0 +1,12 @@
+[SddmGreeterTheme]
+Name=SlozOS
+Description=SlozOS Liquid Glass login screen
+Author=SlozOS
+License=MIT
+Type=sddm-theme
+Version=1.0
+Website=
+Screenshot=
+MainScript=Main.qml
+ConfigFile=theme.conf
+TranslationsDirectory=translations
