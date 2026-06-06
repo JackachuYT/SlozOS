@@ -3,7 +3,7 @@ FROM ghcr.io/ublue-os/bazzite:stable
 # ── Surface Linux repo ────────────────────────────────────────────────────────
 RUN curl -Lo /etc/yum.repos.d/linux-surface.repo \
         https://pkg.surfacelinux.com/fedora/linux-surface.repo && \
-    rpm --import https://pkg.surfacelinux.com/linux-surface.asc
+    rpm --import https://raw.githubusercontent.com/linux-surface/linux-surface/master/pkg/keys/surface.asc
 
 # ── Replace kernel with Surface-patched version ───────────────────────────────
 RUN rpm-ostree override replace \
