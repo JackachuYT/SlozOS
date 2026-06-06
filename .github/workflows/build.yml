@@ -38,8 +38,10 @@ jobs:
 
       - name: Rename ISO
         run: |
-          ISO=$(find output -name '*.iso' | head -1)
-          mv "$ISO" output/SlozOS-1.0-amd64.iso
+          # bootc-image-builder runs as root, so the ISO is root-owned.
+          ISO=$(sudo find output -name '*.iso' | head -1)
+          sudo mv "$ISO" output/SlozOS-1.0-amd64.iso
+          sudo chown "$USER:$USER" output/SlozOS-1.0-amd64.iso
           ls -lh output/
 
       - name: Upload ISO artifact
