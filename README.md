@@ -4,11 +4,11 @@
 
 # SlozOS
 
-**A custom gaming OS for the Microsoft Surface Pro 2 — built on Bazzite**
+**A custom gaming OS for Microsoft Surface devices — built on Bazzite**
 
-[![Build SlozOS ISO](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
+[![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
 ![Based on Bazzite](https://img.shields.io/badge/base-Bazzite-blueviolet?logo=fedora)
-![Surface Pro 2](https://img.shields.io/badge/device-Surface%20Pro%202-blue?logo=microsoft)
+![Devices](https://img.shields.io/badge/devices-SP1%20%7C%20SP2%20%7C%20SB1-blue?logo=microsoft)
 
 </div>
 
@@ -16,7 +16,7 @@
 
 ## What is SlozOS?
 
-SlozOS is a bootable gaming Linux distribution tailor-made for the **Microsoft Surface Pro 2**. It's built on the rock-solid gaming foundation of **Bazzite** (by Universal Blue), whose kernel already ships with Microsoft Surface hardware support baked in — touchscreen, stylus, type cover and the Surface aggregator modules auto-load at boot.
+SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazzite.gg)** (by Universal Blue), tuned specifically for Microsoft Surface hardware. Bazzite's kernel already ships with Surface support baked in — touchscreen, stylus, type cover, and Surface aggregator modules all auto-load at boot.
 
 ---
 
@@ -43,14 +43,18 @@ Bazzite brings:
 
 ---
 
-## The Device — Microsoft Surface Pro 2
+## Supported Devices
+
+SlozOS comes in three editions — one for each supported Surface device:
+
+---
+
+### 🟦 SlozOS SP2 — Surface Pro 2
 
 <div align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Surface_Pro_2.jpg" alt="Microsoft Surface Pro 2" width="560"/>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Surface_Pro_2.jpg" alt="Microsoft Surface Pro 2" width="600"/>
-
-*Microsoft Surface Pro 2 — given new life as a gaming tablet*
-
+*Microsoft Surface Pro 2 (2013) — given new life as a gaming tablet*
 </div>
 
 | Spec | Details |
@@ -58,35 +62,112 @@ Bazzite brings:
 | CPU | Intel Core i5-4300U (Haswell) |
 | GPU | Intel HD Graphics 4400 |
 | RAM | 4 GB / 8 GB LPDDR3 |
-| Storage | 64 / 128 / 256 / 512 GB SSD |
+| Storage | 64 – 512 GB SSD |
 | Display | 10.6" 1920×1080 IPS touchscreen |
-| Kernel | `kernel-bazzite` (includes Surface hardware support) |
+| Base image | `bazzite:stable` |
+
+| Feature | Status |
+|---------|--------|
+| Keyboard / Type Cover | ✅ |
+| Touchscreen | ✅ |
+| Surface Pen | ✅ |
+| WiFi (Marvell 88W8797 USB) | ✅ |
+| Bluetooth | ✅ |
+| Front + rear cameras | ✅ |
+| Audio / microphone | ✅ |
+| Brightness | ✅ |
+| Suspend (lid-loop fix) | ✅ |
+| Performance Modes | ❌ |
+
+[**⬇ Download SlozOS 1.0 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp2)
 
 ---
 
-## SlozOS Wallpaper Preview
+### 🟩 SlozOS SP1 — Surface Pro 1
 
 <div align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Surface_Pro.jpg/1280px-Surface_Pro.jpg" alt="Microsoft Surface Pro 1" width="560"/>
 
-<img src="assets/wallpapers/slozos-default.png" alt="SlozOS Wallpaper" width="700"/>
-
+*Microsoft Surface Pro 1 (2013) — the original, still gaming*
 </div>
+
+| Spec | Details |
+|------|---------|
+| CPU | Intel Core i5-3317U (Ivy Bridge) |
+| GPU | Intel HD Graphics 4000 |
+| RAM | 4 GB LPDDR3 |
+| Storage | 64 / 128 GB SSD |
+| Display | 10.6" 1920×1080 IPS touchscreen |
+| Base image | `bazzite:stable` |
+
+| Feature | Status |
+|---------|--------|
+| Keyboard / Type Cover | ✅ |
+| Touchscreen | ✅ |
+| Surface Pen | ✅ |
+| WiFi (Marvell USB) | ✅ |
+| Bluetooth | ✅ |
+| Both cameras | ✅ |
+| Audio / microphone | ✅ |
+| Suspend (lid-loop fix) | ✅ |
+| Sensors & Battery | ✅ |
+| Performance Modes | ❌ |
+
+[**⬇ Download SlozOS 1.0 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp1)
+
+---
+
+### 🟧 SlozOS SB1 — Surface Book 1
+
+<div align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Surface_Book_keyboard_and_screen.jpg/1280px-Surface_Book_keyboard_and_screen.jpg" alt="Microsoft Surface Book 1" width="560"/>
+
+*Microsoft Surface Book 1 (2015) — NVIDIA gaming power in a clipboard laptop*
+</div>
+
+| Spec | Details |
+|------|---------|
+| CPU | Intel Core i5-6300U / i7-6600U (Skylake) |
+| iGPU | Intel HD Graphics 520 |
+| dGPU | NVIDIA GeForce GTX 940M (keyboard base) |
+| RAM | 8 / 16 GB LPDDR3 |
+| Storage | 128 – 512 GB SSD |
+| Display | 13.5" 3000×2000 PixelSense touchscreen |
+| Base image | `bazzite-nvidia:stable` |
+
+| Feature | Status |
+|---------|--------|
+| Keyboard & Touchpad | ✅ |
+| Tablet Mode / Touchscreen | ✅ |
+| Surface Pen | ✅ |
+| WiFi (Marvell 88W8897 PCIe) | ✅ |
+| Bluetooth | ✅ |
+| Dedicated GPU (GTX 940M via PRIME) | ✅ |
+| Clipboard Detachment | ✅ |
+| Audio, Sensors, Battery | ✅ |
+| Suspend / Hibernate | ✅ |
+| Cameras | ❓ |
+| Performance Modes | ❌ |
+
+[**⬇ Download SlozOS 1.0 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sb1)
 
 ---
 
 ## How to Install
 
-### Step 1 — Download the ISO
+### Step 1 — Download your edition
 
-The installer ISO (~5.5GB) is published on the [**Releases page**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0). Because GitHub caps each release file at 2 GiB, the ISO is split into 1900 MB parts.
+Each edition is split into 1900 MB parts (GitHub's 2 GiB per-file limit). Download all parts for your device into one folder, then reassemble:
 
-1. Go to the [**SlozOS 1.0 release**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0)
-2. Download **every** part: `SlozOS-1.0-amd64.7z.001`, `.002`, `.003`, … into the **same folder**
-3. Reassemble them into the ISO with [7-Zip](https://www.7-zip.org/) (point it at the `.001` file — it automatically pulls in the rest):
-   - **Windows:** right-click `SlozOS-1.0-amd64.7z.001` → 7-Zip → Extract Here
-   - **Linux:** `7z x SlozOS-1.0-amd64.7z.001`
-   - **macOS:** `brew install p7zip` then `7z x SlozOS-1.0-amd64.7z.001`
-4. You'll get `SlozOS-1.0-amd64.iso`
+| Edition | Release |
+|---------|---------|
+| Surface Pro 2 | [v1.0-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp2) → `SlozOS-1.0-SP2-amd64.7z.001/002/003` |
+| Surface Pro 1 | [v1.0-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp1) → `SlozOS-1.0-SP1-amd64.7z.001/002/003` |
+| Surface Book 1 | [v1.0-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sb1) → `SlozOS-1.0-SB1-amd64.7z.001/002/003` |
+
+Reassemble with [7-Zip](https://www.7-zip.org/):
+- **Windows:** right-click the `.001` file → 7-Zip → Extract Here
+- **Linux/macOS:** `7z x SlozOS-1.0-SP2-amd64.7z.001` (swap SP2 for your edition)
 
 ---
 
@@ -94,74 +175,54 @@ The installer ISO (~5.5GB) is published on the [**Releases page**](https://githu
 
 Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/Linux):
 
-1. Download and open Balena Etcher
-2. Click **Flash from file** → select `SlozOS-1.0-amd64.iso`
+1. Open Balena Etcher
+2. Click **Flash from file** → select your `.iso`
 3. Click **Select target** → choose your USB drive (8 GB+)
-4. Click **Flash!** and wait for it to finish
+4. Click **Flash!** and wait
 
 > ⚠️ This will erase everything on the USB drive.
 
 ---
 
-### Step 3 — Boot the Surface Pro 2 from USB
+### Step 3 — Boot from USB
 
-1. Plug the USB into your Surface Pro 2
+1. Plug the USB into your Surface
 2. Hold **Volume Down** and press the **Power** button
-3. The Surface UEFI / boot menu will appear
-4. Select your USB drive to boot from it
-5. SlozOS installer will launch automatically
+3. Select your USB drive in the boot menu
+4. The SlozOS installer launches automatically
 
 ---
 
 ### Step 4 — Install
 
-1. Follow the on-screen installer (language, disk, username)
-2. When asked which disk, select your Surface's internal SSD
+1. Follow the on-screen Anaconda installer (language, disk, username)
+2. Under **Installation Destination**, select your Surface's internal SSD
 3. Let it install (~10 minutes)
 4. Remove the USB when prompted and reboot
 5. Welcome to SlozOS 🎉
 
 ---
 
-## What's Included
-
-The Surface Pro 2 (2013) predates the Linux-hostile IPTS/IPU hardware in newer
-Surfaces, so **all of its hardware uses standard in-kernel drivers** — including
-the cameras, which actually work (they're plain USB webcams, not the cursed
-IPU sensors found in the Pro 4+).
-
-| Feature | Status | How |
-|---------|--------|-----|
-| Microphone + speakers | ✅ | Intel HD Audio (`snd_hda_intel`) |
-| Front + rear cameras | ✅ | USB webcams (`uvcvideo`) |
-| Touchscreen | ✅ | Atmel digitizer (`hid-multitouch`) |
-| Surface Pen / stylus | ✅ | Wacom HID (`wacom`) |
-| Type Cover keyboard | ✅ | USB HID |
-| Wi-Fi | ✅ | Marvell 88W8797 (`mwifiex_usb`) + no-autosuspend fix |
-| Bluetooth | ✅ | `btusb` |
-| Brightness | ✅ | Intel `i915` native backlight |
-| Suspend (no loop) | ✅ | Buggy-lid workaround baked in |
-| Steam (Flatpak) | ✅ | From Bazzite |
-| KDE Plasma desktop | ✅ | From Bazzite |
-| SlozOS branding & theme | ✅ | Custom |
-
----
-
 ## Building Locally
 
-The ISO is built automatically via GitHub Actions. If you want to build it yourself (Linux x86_64 with podman):
+ISOs are built automatically via GitHub Actions on every push to `main`. To build yourself (Linux x86_64 with podman):
 
 ```bash
-# Build the OS image
-sudo podman build -t localhost/slozos:latest -f build/Containerfile .
+# SP2 (Intel only)
+sudo podman build -t localhost/slozos-sp2:latest -f build/Containerfile.sp2 .
 
-# Generate the ISO
-mkdir -p output
+# SP1 (Intel only)
+sudo podman build -t localhost/slozos-sp1:latest -f build/Containerfile.sp1 .
+
+# SB1 (Intel + NVIDIA)
+sudo podman build -t localhost/slozos-sb1:latest -f build/Containerfile.sb1 .
+
+# Generate ISO (swap image tag as needed)
 sudo podman run --rm --privileged \
   -v /var/lib/containers/storage:/var/lib/containers/storage \
   -v "$(pwd)/output:/output" \
   quay.io/centos-bootc/bootc-image-builder:latest \
-  --type iso --local localhost/slozos:latest
+  --type iso --rootfs btrfs --local localhost/slozos-sp2:latest
 ```
 
 ---
@@ -169,7 +230,7 @@ sudo podman run --rm --privileged \
 ## Credits
 
 - [**Bazzite**](https://bazzite.gg) by Universal Blue — the best gaming Linux distro
-- [**linux-surface**](https://github.com/linux-surface/linux-surface) — Surface kernel patches
+- [**linux-surface**](https://github.com/linux-surface/linux-surface) — Surface kernel patches & feature matrix
 - [**bootc-image-builder**](https://github.com/osbuild/bootc-image-builder) — ISO generation
 
 ---

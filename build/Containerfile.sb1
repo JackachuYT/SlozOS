@@ -1,0 +1,38 @@
+FROM ghcr.io/ublue-os/bazzite-nvidia:stable
+
+# ── Microsoft Surface Book 1 (2015, Skylake) ─────────────────────────────────
+# CPU   : Intel Core i5-6300U / i7-6600U (Skylake)
+# iGPU  : Intel HD Graphics 520 — i915 (in-kernel)
+# dGPU  : NVIDIA GeForce GTX 940M — nvidia driver (in bazzite-nvidia)
+#          In the keyboard base; available when clipboard is attached.
+#          PRIME render offload lets games pick GPU on demand.
+# WiFi  : Marvell AVASTAR 88W8897 (PCIe) — mwifiex_pcie (in-kernel)
+# BT    : Same Marvell combo chip — btusb (in-kernel)
+# Touch : surface_aggregator patches (in kernel-bazzite)
+# Detach: surface_book_power handles clipboard detach (in kernel-bazzite)
+# ✗ Performance Modes not supported
+# ? Cameras: status unclear (linux-surface footnote 10)
+
+# ── ISO build prep ────────────────────────────────────────────────────────────
+RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' \
+        /etc/yum.repos.d/terra*.repo 2>/dev/null || true
+
+# ── Surface Book 1 hardware quirk fixes ──────────────────────────────────────
+COPY config/surface-book/mwifiex.conf        /usr/lib/modprobe.d/mwifiex.conf
+COPY config/surface-book/wifi-powersave.conf /usr/lib/NetworkManager/conf.d/wifi-powersave.conf
+COPY config/surface-book/01-sb1-kargs.toml   /usr/lib/bootc/kargs.d/01-sb1-kargs.toml
+
+# ── SlozOS branding ───────────────────────────────────────────────────────────
+COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
+COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
+COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
+COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
+
+RUN echo "slozos-sb1" > /etc/hostname && \
+    sed -i \
+        -e 's/^NAME=.*/NAME="SlozOS SB1"/' \
+        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 1.0 SB1 (Bazzite)"/' \
+        /usr/lib/os-release 2>/dev/null || true
+
+LABEL org.opencontainers.image.title="SlozOS SB1"
+LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface Book 1"

@@ -1,0 +1,2 @@
+match-architectures = ["x86_64"]
+kargs = ["button.lid_init_state=open", "mem_sleep_default=deep"]

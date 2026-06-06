@@ -1,0 +1,37 @@
+FROM ghcr.io/ublue-os/bazzite:stable
+
+# ── Microsoft Surface Pro 1 (2013, Ivy Bridge) ───────────────────────────────
+# CPU   : Intel Core i5-3317U (Ivy Bridge)
+# GPU   : Intel HD Graphics 4000 — i915 (in-kernel)
+# WiFi  : Marvell AVASTAR USB (88W8764/88W8797) — mwifiex_usb (in-kernel)
+# BT    : Same Marvell combo chip — btusb (in-kernel)
+# Touch : hid-multitouch + wacom (in-kernel)
+# Audio : Intel HDA — snd_hda_intel (in-kernel)
+# Cameras: ✅ Both cameras work via uvcvideo (in-kernel)
+# ✗ Performance Modes not supported
+
+# ── ISO build prep ────────────────────────────────────────────────────────────
+RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' \
+        /etc/yum.repos.d/terra*.repo 2>/dev/null || true
+
+# ── Surface Pro 1 hardware quirk fixes ───────────────────────────────────────
+COPY config/surface-pro1/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
+COPY config/surface-pro1/mwifiex.conf                    /usr/lib/modprobe.d/mwifiex.conf
+COPY config/surface-pro1/wifi-powersave.conf             /usr/lib/NetworkManager/conf.d/wifi-powersave.conf
+COPY config/surface-pro1/10-surface-lid.conf             /usr/lib/systemd/logind.conf.d/10-surface-lid.conf
+COPY config/surface-pro1/01-sp1-kargs.toml               /usr/lib/bootc/kargs.d/01-sp1-kargs.toml
+
+# ── SlozOS branding ───────────────────────────────────────────────────────────
+COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
+COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
+COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
+COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
+
+RUN echo "slozos-sp1" > /etc/hostname && \
+    sed -i \
+        -e 's/^NAME=.*/NAME="SlozOS SP1"/' \
+        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 1.0 SP1 (Bazzite)"/' \
+        /usr/lib/os-release 2>/dev/null || true
+
+LABEL org.opencontainers.image.title="SlozOS SP1"
+LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface Pro 1"

@@ -1,7 +1,7 @@
-name: Build SlozOS ISO
+name: Build SlozOS ISOs
 
 on:
-  workflow_dispatch:        # lets you click "Run workflow" manually
+  workflow_dispatch:
   push:
     branches: [main]
 
@@ -9,7 +9,93 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     permissions:
-      contents: write        # needed to create/update GitHub Releases
+      contents: write
+    strategy:
+      fail-fast: false          # keep building the others if one fails
+      matrix:
+        include:
+          - device: sp2
+            containerfile: build/Containerfile.sp2
+            image_tag: slozos-sp2
+            iso_name: SlozOS-1.0-SP2-amd64
+            artifact: SlozOS-SP2-ISO
+            release_tag: v1.0-sp2
+            release_title: "SlozOS 1.0 SP2"
+            release_notes: |
+              SlozOS 1.0 for the **Microsoft Surface Pro 2** (2013, Haswell).
+
+              **Hardware support:**
+              - ✅ Keyboard / Type Cover
+              - ✅ Touchscreen & Pen
+              - ✅ WiFi (Marvell 88W8797 USB)
+              - ✅ Bluetooth
+              - ✅ Cameras (front + rear, uvcvideo)
+              - ✅ Audio
+              - ✅ Suspend / Hibernate
+              - ✅ Sensors & Battery
+              - ❌ Performance Modes (not supported)
+
+              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
+              ```
+              7z x SlozOS-1.0-SP2-amd64.7z.001
+              ```
+              Flash `SlozOS-1.0-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+
+          - device: sp1
+            containerfile: build/Containerfile.sp1
+            image_tag: slozos-sp1
+            iso_name: SlozOS-1.0-SP1-amd64
+            artifact: SlozOS-SP1-ISO
+            release_tag: v1.0-sp1
+            release_title: "SlozOS 1.0 SP1"
+            release_notes: |
+              SlozOS 1.0 for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+
+              **Hardware support:**
+              - ✅ Keyboard / Type Cover
+              - ✅ Touchscreen & Pen
+              - ✅ WiFi (Marvell USB)
+              - ✅ Bluetooth
+              - ✅ Both Cameras
+              - ✅ Audio
+              - ✅ Suspend / Hibernate
+              - ✅ Sensors & Battery
+              - ❌ Performance Modes (not supported)
+
+              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
+              ```
+              7z x SlozOS-1.0-SP1-amd64.7z.001
+              ```
+              Flash `SlozOS-1.0-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+
+          - device: sb1
+            containerfile: build/Containerfile.sb1
+            image_tag: slozos-sb1
+            iso_name: SlozOS-1.0-SB1-amd64
+            artifact: SlozOS-SB1-ISO
+            release_tag: v1.0-sb1
+            release_title: "SlozOS 1.0 SB1"
+            release_notes: |
+              SlozOS 1.0 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+
+              **Hardware support:**
+              - ✅ Keyboard & Touchpad
+              - ✅ Touchscreen & Pen
+              - ✅ WiFi (Marvell 88W8897 PCIe)
+              - ✅ Bluetooth
+              - ✅ Dedicated GPU (GTX 940M via PRIME)
+              - ✅ Clipboard Detachment
+              - ✅ Audio, Sensors, Battery
+              - ✅ Suspend / Hibernate
+              - ❌ Performance Modes (not supported)
+              - ❓ Cameras (status unclear)
+
+              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
+              ```
+              7z x SlozOS-1.0-SB1-amd64.7z.001
+              ```
+              Flash `SlozOS-1.0-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,9 +107,11 @@ jobs:
           sudo docker image prune --all --force || true
           df -h /
 
-      - name: Build SlozOS image (Bazzite + Surface kernel)
+      - name: Build SlozOS ${{ matrix.device }} image
         run: |
-          sudo podman build -t localhost/slozos:latest -f build/Containerfile .
+          sudo podman build \
+            -t localhost/${{ matrix.image_tag }}:latest \
+            -f ${{ matrix.containerfile }} .
 
       - name: Generate bootable ISO
         run: |
@@ -36,42 +124,35 @@ jobs:
             --type iso \
             --rootfs btrfs \
             --local \
-            localhost/slozos:latest
+            localhost/${{ matrix.image_tag }}:latest
 
       - name: Rename ISO
         run: |
-          # bootc-image-builder runs as root, so the ISO is root-owned.
           ISO=$(sudo find output -name '*.iso' | head -1)
-          sudo mv "$ISO" output/SlozOS-1.0-amd64.iso
-          sudo chown "$USER:$USER" output/SlozOS-1.0-amd64.iso
+          sudo mv "$ISO" output/${{ matrix.iso_name }}.iso
+          sudo chown "$USER:$USER" output/${{ matrix.iso_name }}.iso
           ls -lh output/
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SlozOS-ISO
-          path: output/SlozOS-1.0-amd64.iso
+          name: ${{ matrix.artifact }}
+          path: output/${{ matrix.iso_name }}.iso
           retention-days: 7
 
       - name: Split ISO into <2GB volumes
         run: |
-          # GitHub Releases cap each file at 2 GiB; the ISO is ~5.5GB.
-          # A bootc ISO is already-compressed squashfs, so compression won't
-          # shrink it (-mx=0 = store only, fastest). We just SPLIT it into
-          # 1900 MB volumes: SlozOS-1.0-amd64.7z.001 / .002 / .003 ...
-          sudo apt-get update
+          sudo apt-get update -q
           sudo apt-get install -y p7zip-full
-          7z a -mx=0 -v1900m output/SlozOS-1.0-amd64.7z output/SlozOS-1.0-amd64.iso
-          ls -lh output/*.7z.*
+          cd output && 7z a -mx=0 -v1900m ${{ matrix.iso_name }}.7z ${{ matrix.iso_name }}.iso
+          ls -lh ${{ matrix.iso_name }}.7z.*
 
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Refresh the v1.0 release each successful build so the parts always
-          # match the latest ISO. --cleanup-tag removes the old tag too.
-          gh release delete v1.0 --yes --cleanup-tag || true
-          gh release create v1.0 \
-            --title "SlozOS 1.0" \
-            --notes $'SlozOS 1.0 — Bazzite gaming OS tuned for the Microsoft Surface Pro 2.\n\nThe installer ISO (~5.5GB) is split into 1900 MB parts to fit GitHub'\''s 2GiB-per-file release limit.\n\n**To download & reassemble:**\n1. Download every `SlozOS-1.0-amd64.7z.0*` part into one folder.\n2. Extract with 7-Zip (point it at the `.001` file — it pulls in the rest):\n   - Windows/Linux: `7z x SlozOS-1.0-amd64.7z.001`\n   - macOS: `brew install p7zip` then `7z x SlozOS-1.0-amd64.7z.001`\n3. You now have `SlozOS-1.0-amd64.iso` — flash it with Balena Etcher.' \
-            output/SlozOS-1.0-amd64.7z.*
+          gh release delete ${{ matrix.release_tag }} --yes --cleanup-tag || true
+          gh release create ${{ matrix.release_tag }} \
+            --title "${{ matrix.release_title }}" \
+            --notes "${{ matrix.release_notes }}" \
+            output/${{ matrix.iso_name }}.7z.*
