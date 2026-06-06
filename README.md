@@ -89,7 +89,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 > ⚠️ **Alpha release.** The Surface Pro 1 works great but this edition is low-maintenance — it'll keep getting Bazzite updates automatically, but don't expect frequent SlozOS-specific fixes. Still totally usable!
 
 <div align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg/800px-Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg" alt="Microsoft Surface Pro 1" width="560"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg" alt="Microsoft Surface Pro 1" width="560"/>
 
 *Microsoft Surface Pro 1 (2013) — the original, still gaming*
 </div>
@@ -123,7 +123,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 ### 🟧 SlozOS SB1 — Surface Book 1
 
 <div align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Surface_Book_%281%29.jpg/800px-Surface_Book_%281%29.jpg" alt="Microsoft Surface Book 1" width="560"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Surface_Book_%281%29.jpg" alt="Microsoft Surface Book 1" width="560"/>
 
 *Microsoft Surface Book 1 (2015) — NVIDIA gaming power in a clipboard laptop*
 </div>
