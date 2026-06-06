@@ -18,12 +18,13 @@ jobs:
       matrix:
         include:
           - device: sp2
+            display_name: Surface Pro 2
             containerfile: build/Containerfile.sp2
             image_tag: slozos-sp2
             iso_name: SlozOS-1.0-SP2-amd64
             artifact: SlozOS-SP2-ISO
             release_tag: v1.0-sp2
-            release_title: "SlozOS 1.0 SP2"
+            release_title: "SlozOS 1.0 — Surface Pro 2"
             release_notes: |
               SlozOS 1.0 for the **Microsoft Surface Pro 2** (2013, Haswell).
 
@@ -45,12 +46,13 @@ jobs:
               Flash `SlozOS-1.0-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sp1
+            display_name: Surface Pro 1
             containerfile: build/Containerfile.sp1
             image_tag: slozos-sp1
             iso_name: SlozOS-0.1-Alpha-SP1-amd64
             artifact: SlozOS-SP1-ISO
             release_tag: v0.1-alpha-sp1
-            release_title: "SlozOS 0.1 Alpha SP1"
+            release_title: "SlozOS 0.1 Alpha — Surface Pro 1"
             release_notes: |
               SlozOS 0.1 Alpha for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
 
@@ -74,12 +76,13 @@ jobs:
               Flash `SlozOS-0.1-Alpha-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sb1
+            display_name: Surface Book 1
             containerfile: build/Containerfile.sb1
             image_tag: slozos-sb1
             iso_name: SlozOS-1.0-SB1-amd64
             artifact: SlozOS-SB1-ISO
             release_tag: v1.0-sb1
-            release_title: "SlozOS 1.0 SB1"
+            release_title: "SlozOS 1.0 — Surface Book 1"
             release_notes: |
               SlozOS 1.0 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
 
@@ -112,7 +115,7 @@ jobs:
           sudo docker image prune --all --force || true
           df -h /
 
-      - name: Build SlozOS ${{ matrix.device }} image
+      - name: Build SlozOS ${{ matrix.display_name }} image
         run: |
           sudo podman build \
             -t localhost/${{ matrix.image_tag }}:latest \
