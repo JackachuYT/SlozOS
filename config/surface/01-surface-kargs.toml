@@ -1,4 +1,6 @@
 # Surface Pro 2 kernel arguments, applied by bootc at install/update time.
-# button.lid_init_state=open fixes the SP1/SP2 buggy-lid infinite-suspend loop.
+#   button.lid_init_state=open  → fixes the SP1/SP2 buggy-lid infinite-suspend loop
+#   mem_sleep_default=deep      → SP2 resumes more reliably from deep (S3) sleep
+#                                 than from the s2idle default
 match-architectures = ["x86_64"]
-kargs = ["button.lid_init_state=open"]
+kargs = ["button.lid_init_state=open", "mem_sleep_default=deep"]

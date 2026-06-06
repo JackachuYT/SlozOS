@@ -24,9 +24,12 @@ FROM ghcr.io/ublue-os/bazzite:stable
 # The only real-world quirks need config, not drivers:
 
 # ── Surface Pro 2 hardware quirk fixes ────────────────────────────────────────
-# WiFi: stop USB autosuspend from killing the Marvell adapter (the must-have fix)
+# WiFi: stop USB autosuspend from killing the Marvell adapter (USB variant)
 COPY config/surface/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
+# WiFi: deactivate auto deep-sleep (firmware-hang fix, valid for USB + PCIe)
 COPY config/surface/mwifiex.conf                    /usr/lib/modprobe.d/mwifiex.conf
+# WiFi: disable power save globally (bus-agnostic, the reliable fix)
+COPY config/surface/wifi-powersave.conf             /usr/lib/NetworkManager/conf.d/wifi-powersave.conf
 # Suspend: ignore the buggy SP1/SP2 lid sensor (prevents infinite suspend loop)
 COPY config/surface/10-surface-lid.conf             /usr/lib/systemd/logind.conf.d/10-surface-lid.conf
 # Kernel arg companion for the lid fix, applied by bootc at install time
