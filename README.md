@@ -4,7 +4,7 @@
 
 # SlozOS
 
-**A custom gaming OS for Microsoft Surface devices — built on Bazzite**
+**A custom gaming OS for Microsoft Surface Pro 1, 2 and Surface Book 1 — built on Bazzite**
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
 ![Based on Bazzite](https://img.shields.io/badge/base-Bazzite-blueviolet?logo=fedora)
@@ -86,7 +86,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 ### 🟩 SlozOS SP1 — Surface Pro 1
 
 <div align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Surface_Pro.jpg/1280px-Surface_Pro.jpg" alt="Microsoft Surface Pro 1" width="560"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg/800px-Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg" alt="Microsoft Surface Pro 1" width="560"/>
 
 *Microsoft Surface Pro 1 (2013) — the original, still gaming*
 </div>
@@ -120,7 +120,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 ### 🟧 SlozOS SB1 — Surface Book 1
 
 <div align="center">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Surface_Book_keyboard_and_screen.jpg/1280px-Surface_Book_keyboard_and_screen.jpg" alt="Microsoft Surface Book 1" width="560"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Surface_Book_%281%29.jpg/800px-Surface_Book_%281%29.jpg" alt="Microsoft Surface Book 1" width="560"/>
 
 *Microsoft Surface Book 1 (2015) — NVIDIA gaming power in a clipboard laptop*
 </div>
