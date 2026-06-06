@@ -12,6 +12,25 @@ FROM ghcr.io/ublue-os/bazzite:stable
 #      pinctrl_*, intel_lpss, …) at first boot. This is the supported path.
 # If a Surface-specific fix is ever needed that isn't in kernel-bazzite, revisit
 # once pkg.surfacelinux.com/fedora/f44/ exists.
+#
+# The Surface Pro 2 (2013, Haswell) predates IPTS/IPU, so ALL its hardware uses
+# in-kernel drivers already present in kernel-bazzite:
+#   • Cameras  → uvcvideo (they're plain USB webcams, 045e:0794 / 045e:0795)
+#   • Touch    → hid-multitouch (Atmel digitizer 03eb:8209)
+#   • Pen      → wacom (HID)
+#   • WiFi/BT  → mwifiex_usb + btusb (Marvell 88W8797, 1286:2044)
+#   • Audio    → snd_hda_intel (Intel Lynx Point-LP)
+#   • Backlight→ i915 native
+# The only real-world quirks need config, not drivers:
+
+# ── Surface Pro 2 hardware quirk fixes ────────────────────────────────────────
+# WiFi: stop USB autosuspend from killing the Marvell adapter (the must-have fix)
+COPY config/surface/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
+COPY config/surface/mwifiex.conf                    /usr/lib/modprobe.d/mwifiex.conf
+# Suspend: ignore the buggy SP1/SP2 lid sensor (prevents infinite suspend loop)
+COPY config/surface/10-surface-lid.conf             /usr/lib/systemd/logind.conf.d/10-surface-lid.conf
+# Kernel arg companion for the lid fix, applied by bootc at install time
+COPY config/surface/01-surface-kargs.toml           /usr/lib/bootc/kargs.d/01-surface-kargs.toml
 
 # ── SlozOS branding ───────────────────────────────────────────────────────────
 COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/

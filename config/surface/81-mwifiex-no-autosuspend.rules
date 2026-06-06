@@ -1,0 +1,4 @@
+# Surface Pro 2 — Marvell 88W8797 WiFi/BT combo (USB 1286:2044)
+# The single most important SP2 fix: USB autosuspend kills this WiFi adapter
+# until reboot. Pin its power control to "on" so it never autosuspends.
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1286", ATTR{idProduct}=="2044", TEST=="power/control", ATTR{power/control}="on"

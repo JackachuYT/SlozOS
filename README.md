@@ -120,18 +120,25 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 ## What's Included
 
-| Feature | Status |
-|---------|--------|
-| Bazzite kernel w/ Surface support | ✅ |
-| Surface module auto-load at boot | ✅ |
-| Touchscreen support | ✅ |
-| Surface Pen / stylus | ✅ |
-| Type Cover keyboard | ✅ |
-| Wi-Fi & Bluetooth | ✅ |
-| Steam (Flatpak) | ✅ |
-| KDE Plasma desktop | ✅ |
-| SlozOS branding & theme | ✅ |
-| SDDM login theme | ✅ |
+The Surface Pro 2 (2013) predates the Linux-hostile IPTS/IPU hardware in newer
+Surfaces, so **all of its hardware uses standard in-kernel drivers** — including
+the cameras, which actually work (they're plain USB webcams, not the cursed
+IPU sensors found in the Pro 4+).
+
+| Feature | Status | How |
+|---------|--------|-----|
+| Microphone + speakers | ✅ | Intel HD Audio (`snd_hda_intel`) |
+| Front + rear cameras | ✅ | USB webcams (`uvcvideo`) |
+| Touchscreen | ✅ | Atmel digitizer (`hid-multitouch`) |
+| Surface Pen / stylus | ✅ | Wacom HID (`wacom`) |
+| Type Cover keyboard | ✅ | USB HID |
+| Wi-Fi | ✅ | Marvell 88W8797 (`mwifiex_usb`) + no-autosuspend fix |
+| Bluetooth | ✅ | `btusb` |
+| Brightness | ✅ | Intel `i915` native backlight |
+| Suspend (no loop) | ✅ | Buggy-lid workaround baked in |
+| Steam (Flatpak) | ✅ | From Bazzite |
+| KDE Plasma desktop | ✅ | From Bazzite |
+| SlozOS branding & theme | ✅ | Custom |
 
 ---
 
