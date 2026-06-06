@@ -32,6 +32,7 @@ jobs:
             -v "$(pwd)/output:/output" \
             quay.io/centos-bootc/bootc-image-builder:latest \
             --type iso \
+            --rootfs btrfs \
             --local \
             localhost/slozos:latest
 
