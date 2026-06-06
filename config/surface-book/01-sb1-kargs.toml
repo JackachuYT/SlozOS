@@ -1,0 +1,4 @@
+match-architectures = ["x86_64"]
+# mem_sleep_default=deep  — enable S3 suspend (instead of s2idle)
+# nouveau.modeset=0       — disable nouveau so the NVIDIA driver owns the GTX 940M
+kargs = ["mem_sleep_default=deep", "nouveau.modeset=0"]

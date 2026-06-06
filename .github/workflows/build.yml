@@ -47,12 +47,14 @@ jobs:
           - device: sp1
             containerfile: build/Containerfile.sp1
             image_tag: slozos-sp1
-            iso_name: SlozOS-1.0-SP1-amd64
+            iso_name: SlozOS-0.1-Alpha-SP1-amd64
             artifact: SlozOS-SP1-ISO
-            release_tag: v1.0-sp1
-            release_title: "SlozOS 1.0 SP1"
+            release_tag: v0.1-alpha-sp1
+            release_title: "SlozOS 0.1 Alpha SP1"
             release_notes: |
-              SlozOS 1.0 for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+              SlozOS 0.1 Alpha for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+
+              > ⚠️ **Alpha / Low-maintenance release.** The Surface Pro 1 is fully functional but this edition receives minimal updates. Use at your own risk.
 
               **Hardware support:**
               - ✅ Keyboard / Type Cover
@@ -67,9 +69,9 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.0-SP1-amd64.7z.001
+              7z x SlozOS-0.1-Alpha-SP1-amd64.7z.001
               ```
-              Flash `SlozOS-1.0-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-0.1-Alpha-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sb1
             containerfile: build/Containerfile.sb1

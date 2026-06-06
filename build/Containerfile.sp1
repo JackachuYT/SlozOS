@@ -30,7 +30,7 @@ COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
 RUN echo "slozos-sp1" > /etc/hostname && \
     sed -i \
         -e 's/^NAME=.*/NAME="SlozOS SP1"/' \
-        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 1.0 SP1 (Bazzite)"/' \
+        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 0.1 Alpha SP1 (Bazzite)"/' \
         /usr/lib/os-release 2>/dev/null || true
 
 LABEL org.opencontainers.image.title="SlozOS SP1"
