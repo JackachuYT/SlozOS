@@ -1,24 +1,17 @@
 FROM ghcr.io/ublue-os/bazzite:stable
 
-# ── Surface Linux repo ────────────────────────────────────────────────────────
-RUN curl -Lo /etc/yum.repos.d/linux-surface.repo \
-        https://pkg.surfacelinux.com/fedora/linux-surface.repo && \
-    rpm --import https://raw.githubusercontent.com/linux-surface/linux-surface/master/pkg/keys/surface.asc
-
-# ── Replace kernel with Surface-patched version ───────────────────────────────
-RUN rpm-ostree override replace \
-        --experimental \
-        --from repo=linux-surface \
-        kernel kernel-core kernel-modules kernel-modules-core kernel-modules-extra && \
-    ostree container commit
-
-# ── Surface hardware support packages ────────────────────────────────────────
-RUN rpm-ostree install \
-        iptsd \
-        libwacom-surface \
-        surface-control && \
-    rpm-ostree cleanup -m && \
-    ostree container commit
+# ── Microsoft Surface support ─────────────────────────────────────────────────
+# NOTE: We intentionally do NOT swap in the linux-surface kernel.
+#   1. linux-surface has no Fedora 44 repo yet (Bazzite stable is now F44),
+#      so its repo 404s.
+#   2. Its packages are named kernel-surface*, not kernel/kernel-core, so a
+#      drop-in override replace was never going to work.
+#   3. Bazzite's stock kernel (kernel-bazzite) already carries Surface hardware
+#      patches, and `bazzite-hardware-setup` auto-detects Surface devices and
+#      loads the correct modules (surface_aggregator, surface_hid, surface_kbd,
+#      pinctrl_*, intel_lpss, …) at first boot. This is the supported path.
+# If a Surface-specific fix is ever needed that isn't in kernel-bazzite, revisit
+# once pkg.surfacelinux.com/fedora/f44/ exists.
 
 # ── SlozOS branding ───────────────────────────────────────────────────────────
 COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/

@@ -16,7 +16,7 @@
 
 ## What is SlozOS?
 
-SlozOS is a bootable gaming Linux distribution tailor-made for the **Microsoft Surface Pro 2**. It combines the rock-solid gaming foundation of **Bazzite** (by Universal Blue) with the **linux-surface kernel** for full Surface hardware support — touchscreen, stylus, camera, type cover — all out of the box.
+SlozOS is a bootable gaming Linux distribution tailor-made for the **Microsoft Surface Pro 2**. It's built on the rock-solid gaming foundation of **Bazzite** (by Universal Blue), whose kernel already ships with Microsoft Surface hardware support baked in — touchscreen, stylus, type cover and the Surface aggregator modules auto-load at boot.
 
 ---
 
@@ -60,7 +60,7 @@ Bazzite brings:
 | RAM | 4 GB / 8 GB LPDDR3 |
 | Storage | 64 / 128 / 256 / 512 GB SSD |
 | Display | 10.6" 1920×1080 IPS touchscreen |
-| Kernel | `linux-surface` (patched for Surface hardware) |
+| Kernel | `kernel-bazzite` (includes Surface hardware support) |
 
 ---
 
@@ -122,7 +122,8 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 | Feature | Status |
 |---------|--------|
-| linux-surface kernel | ✅ |
+| Bazzite kernel w/ Surface support | ✅ |
+| Surface module auto-load at boot | ✅ |
 | Touchscreen support | ✅ |
 | Surface Pen / stylus | ✅ |
 | Type Cover keyboard | ✅ |
