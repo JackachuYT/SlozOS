@@ -24,9 +24,13 @@ SlozOS is a bootable gaming Linux distribution tailor-made for the **Microsoft S
 
 <div align="center">
 
-<img src="https://github.com/ublue-os/bazzite/raw/main/repo_content/desktop.png" alt="Bazzite Desktop" width="700"/>
+<img src="https://raw.githubusercontent.com/ublue-os/bazzite/main/repo_content/desktop1.png" alt="Bazzite Desktop" width="700"/>
 
 *Bazzite — the best gaming desktop Linux, now on your Surface*
+
+<img src="https://raw.githubusercontent.com/ublue-os/bazzite/main/repo_content/gamemode.png" alt="Bazzite Game Mode" width="700"/>
+
+*Bazzite Game Mode — Steam Big Picture on your Surface*
 
 </div>
 
@@ -43,7 +47,7 @@ Bazzite brings:
 
 <div align="center">
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Microsoft_Surface_Pro_2_with_Type_Cover.jpg/1280px-Microsoft_Surface_Pro_2_with_Type_Cover.jpg" alt="Microsoft Surface Pro 2" width="600"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Surface_Pro_2.jpg" alt="Microsoft Surface Pro 2" width="600"/>
 
 *Microsoft Surface Pro 2 — given new life as a gaming tablet*
 
