@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write        # needed to create/update GitHub Releases
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,3 +52,26 @@ jobs:
           name: SlozOS-ISO
           path: output/SlozOS-1.0-amd64.iso
           retention-days: 7
+
+      - name: Split ISO into <2GB volumes
+        run: |
+          # GitHub Releases cap each file at 2 GiB; the ISO is ~5.5GB.
+          # A bootc ISO is already-compressed squashfs, so compression won't
+          # shrink it (-mx=0 = store only, fastest). We just SPLIT it into
+          # 1900 MB volumes: SlozOS-1.0-amd64.7z.001 / .002 / .003 ...
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
+          7z a -mx=0 -v1900m output/SlozOS-1.0-amd64.7z output/SlozOS-1.0-amd64.iso
+          ls -lh output/*.7z.*
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Refresh the v1.0 release each successful build so the parts always
+          # match the latest ISO. --cleanup-tag removes the old tag too.
+          gh release delete v1.0 --yes --cleanup-tag || true
+          gh release create v1.0 \
+            --title "SlozOS 1.0" \
+            --notes $'SlozOS 1.0 — Bazzite gaming OS tuned for the Microsoft Surface Pro 2.\n\nThe installer ISO (~5.5GB) is split into 1900 MB parts to fit GitHub'\''s 2GiB-per-file release limit.\n\n**To download & reassemble:**\n1. Download every `SlozOS-1.0-amd64.7z.0*` part into one folder.\n2. Extract with 7-Zip (point it at the `.001` file — it pulls in the rest):\n   - Windows/Linux: `7z x SlozOS-1.0-amd64.7z.001`\n   - macOS: `brew install p7zip` then `7z x SlozOS-1.0-amd64.7z.001`\n3. You now have `SlozOS-1.0-amd64.iso` — flash it with Balena Etcher.' \
+            output/SlozOS-1.0-amd64.7z.*

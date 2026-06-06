@@ -78,10 +78,15 @@ Bazzite brings:
 
 ### Step 1 — Download the ISO
 
-1. Go to the [**Actions tab**](https://github.com/JackachuYT/SlozOS/actions)
-2. Click the latest successful **Build SlozOS ISO** run
-3. Scroll to the bottom and download **SlozOS-ISO**
-4. Unzip it — you'll get `SlozOS-1.0-amd64.iso`
+The installer ISO (~5.5GB) is published on the [**Releases page**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0). Because GitHub caps each release file at 2 GiB, the ISO is split into 1900 MB parts.
+
+1. Go to the [**SlozOS 1.0 release**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0)
+2. Download **every** part: `SlozOS-1.0-amd64.7z.001`, `.002`, `.003`, … into the **same folder**
+3. Reassemble them into the ISO with [7-Zip](https://www.7-zip.org/) (point it at the `.001` file — it automatically pulls in the rest):
+   - **Windows:** right-click `SlozOS-1.0-amd64.7z.001` → 7-Zip → Extract Here
+   - **Linux:** `7z x SlozOS-1.0-amd64.7z.001`
+   - **macOS:** `brew install p7zip` then `7z x SlozOS-1.0-amd64.7z.001`
+4. You'll get `SlozOS-1.0-amd64.iso`
 
 ---
 
