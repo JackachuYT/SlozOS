@@ -22,11 +22,45 @@ COPY config/surface-book/mwifiex.conf        /usr/lib/modprobe.d/mwifiex.conf
 COPY config/surface-book/wifi-powersave.conf /usr/lib/NetworkManager/conf.d/wifi-powersave.conf
 COPY config/surface-book/01-sb1-kargs.toml   /usr/lib/bootc/kargs.d/01-sb1-kargs.toml
 
+# ── UI packages ───────────────────────────────────────────────────────────────
+RUN rpm-ostree install --idempotent --assumeyes \
+        papirus-icon-theme \
+        kvantum \
+        jetbrains-mono-fonts-all
+
 # ── SlozOS branding ───────────────────────────────────────────────────────────
 COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
 COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
 COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
 COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
+
+# ── macOS Tahoe Liquid Glass UI — KDE defaults (via /etc/skel) ────────────────
+RUN mkdir -p \
+        /etc/skel/.config/Kvantum/SlozOS \
+        /etc/skel/.config/gtk-3.0 \
+        /etc/skel/.config/gtk-4.0 \
+        /etc/skel/.config/autostart \
+        /usr/share/slozos
+
+COPY config/kde/kdeglobals                  /etc/skel/.config/kdeglobals
+COPY config/kde/kwinrc                      /etc/skel/.config/kwinrc
+COPY config/kvantum/SlozOS/SlozOS.kvconfig  /etc/skel/.config/Kvantum/SlozOS/SlozOS.kvconfig
+COPY config/gtk/gtk3-settings.ini           /etc/skel/.config/gtk-3.0/settings.ini
+COPY config/gtk/gtk4-settings.ini           /etc/skel/.config/gtk-4.0/settings.ini
+
+RUN printf '[General]\ntheme=SlozOS\n' > /etc/skel/.config/Kvantum/kvantum.kvconfig
+
+COPY config/kde/plasma-layout.js            /usr/share/slozos/plasma-layout.js
+RUN sed -i \
+    's|file:///usr/share/slozos/wallpapers/slozos-default.png|file:///usr/share/wallpapers/SlozOS/slozos-default.png|g' \
+    /usr/share/slozos/plasma-layout.js
+
+RUN printf '#!/bin/bash\nSTAMP="$HOME/.slozos-configured"\n[ -f "$STAMP" ] && exit 0\nsleep 4\nqdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat /usr/share/slozos/plasma-layout.js)" 2>/dev/null || true\ntouch "$STAMP"\n' \
+    > /usr/share/slozos/firstlogin.sh && \
+    chmod +x /usr/share/slozos/firstlogin.sh
+
+RUN printf '[Desktop Entry]\nType=Application\nName=SlozOS First Login Setup\nExec=/usr/share/slozos/firstlogin.sh\nX-KDE-AutostartScript=true\nNoDisplay=true\n' \
+    > /etc/skel/.config/autostart/slozos-setup.desktop
 
 RUN echo "slozos-sb1" > /etc/hostname && \
     sed -i \
