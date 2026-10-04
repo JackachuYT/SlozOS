@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -225,7 +226,9 @@ def main():
             f.write(diag)
         print("── diagnostics ──\n" + diag.strip(), flush=True)
         console.send("exit")
-        states = [l.strip() for l in diag.splitlines() if l.strip() in ("active", "inactive", "failed", "activating")]
+        # Strip terminal escape codes (the shell glues OSC/CSI sequences onto output)
+        clean = re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]", "", diag)
+        states = [l.strip() for l in clean.splitlines() if l.strip() in ("active", "inactive", "failed", "activating")]
         if states[:2] != ["active", "active"]:
             print("❌ graphical.target / display manager not active", flush=True)
             qmp.screenshot(os.path.join(args.out, "99-no-display-manager.png"))
