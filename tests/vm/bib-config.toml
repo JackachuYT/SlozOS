@@ -9,5 +9,5 @@ password = "slozos"
 groups = ["wheel"]
 
 [customizations.kernel]
-# Serial console + systemd status so tests/vm/qemu-test.py can see boot progress
+# Serial console so tests/vm/qemu-test.py can see boot progress
 append = "console=tty0 console=ttyS0,115200 systemd.show_status=1"
