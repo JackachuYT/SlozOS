@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [ { "Name": "SlozOS" } ],
+        "Category": "Application Launchers",
+        "Description": "The SlozOS logo menu: About, System Settings, Spotlight, sleep, restart, shut down, lock and log out",
+        "Icon": "start-here",
+        "Id": "org.slozos.logomenu",
+        "License": "GPL-3.0",
+        "Name": "SlozOS Menu",
+        "Version": "1.0",
+        "Website": "https://github.com/JackachuYT/SlozOS"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

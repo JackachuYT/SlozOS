@@ -21,7 +21,7 @@ for (var i = 0; i < existing.length; i++) {
 }
 
 // ── Menu bar (top) ───────────────────────────────────────────────────────────
-// [SlozOS menu] [App menu (global menu)] ........ [tray] [clock]
+// [SlozOS logo menu] [App menu (global menu)] ........ [tray] [clock]
 var menuBar = new Panel;
 menuBar.location = "top";
 menuBar.height = 2 * Math.round(gridUnit * 0.75);   // ~26 px at 100% scale
@@ -29,10 +29,8 @@ menuBar.floating = false;
 menuBar.hiding = "none";
 menuBar.lengthMode = "fill";
 
-var logoMenu = menuBar.addWidget("org.kde.plasma.kickoff");
-logoMenu.currentConfigGroup = ["General"];
-logoMenu.writeConfig("icon", "/usr/share/pixmaps/slozos-logo.png");
-logoMenu.writeConfig("compactMode", true);
+// The SlozOS menu (like the Apple menu): About, Settings, Spotlight, power…
+var logoMenu = menuBar.addWidget("org.slozos.logomenu");
 logoMenu.currentConfigGroup = ["Shortcuts"];
 logoMenu.writeConfig("global", "Alt+F1");
 

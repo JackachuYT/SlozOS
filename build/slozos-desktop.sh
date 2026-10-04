@@ -96,6 +96,9 @@ end
 # ── SlozOS branding ──────────────────────────────────────────────────────────
 log "Branding"
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/pixmaps/slozos-logo.png
+# White-on-transparent version for the dark menu bar (the main logo is a dark
+# sketch on a white square, which showed up as a white box there)
+install -Dm644 "$CTX/config/plymouth/slozos/logo.png" /usr/share/pixmaps/slozos-logo-symbolic.png
 install -Dm644 "$CTX/config/kde/SlozOS.colors"    /usr/share/color-schemes/SlozOS.colors
 
 # Wallpaper as a proper Plasma wallpaper package so it shows in the picker
@@ -116,6 +119,9 @@ WALL_URL="file://$WALL/contents/images/slozos-default.png"
 # Global theme (Look-and-Feel): defaults + the menu-bar/dock layout script
 mkdir -p /usr/share/plasma/look-and-feel
 cp -r "$CTX/config/plasma/look-and-feel/org.slozos.desktop" /usr/share/plasma/look-and-feel/
+# The SlozOS logo menu widget for the top-left of the menu bar
+mkdir -p /usr/share/plasma/plasmoids
+cp -r "$CTX/config/plasma/plasmoids/org.slozos.logomenu" /usr/share/plasma/plasmoids/
 
 # Login screen: Bazzite 44 uses Plasma Login Manager (SDDM themes no longer
 # apply). It only supports a wallpaper, so set that.

@@ -25,7 +25,7 @@ SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazz
 
 SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out of the box on first login:
 
-- 🍎 **Menu bar** along the top — SlozOS menu, global app menu, system tray and clock
+- 🍎 **Menu bar** along the top — SlozOS logo menu (About, System Settings, Spotlight, Sleep / Restart / Shut Down, Lock, Log Out), global app menu, system tray and clock
 - 🚀 **Floating dock** that hugs its icons, with a Launchpad button and Trash, and tucks away when a window needs the space
 - 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
 - 🔍 **SlozOS Spotlight** on **Meta + Space**: a glass search bar for apps, files, settings and your clipboard history (Ctrl+1–4 jumps straight to each)
