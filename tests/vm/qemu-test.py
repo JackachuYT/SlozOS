@@ -141,7 +141,7 @@ class Serial:
         self.sock.sendall(line.encode() + b"\r")
 
 
-DIAG = ("systemctl is-active graphical.target display-manager.service; "
+DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "
         "echo '--- failed units:'; systemctl --failed --no-legend --plain; "
         "echo '--- os:'; grep PRETTY_NAME /etc/os-release; echo SLOZOS-DIAG-''END")
 

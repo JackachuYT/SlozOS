@@ -96,9 +96,9 @@ end
 # ── SlozOS branding ──────────────────────────────────────────────────────────
 log "Branding"
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/pixmaps/slozos-logo.png
-# White-on-transparent version for the dark menu bar (the main logo is a dark
-# sketch on a white square, which showed up as a white box there)
-install -Dm644 "$CTX/config/plymouth/slozos/logo.png" /usr/share/pixmaps/slozos-logo-symbolic.png
+# Bold white sloth face for the dark menu bar, like the Apple logo (the main
+# logo is a dark sketch on a white square, which showed up as a white box)
+install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.png" /usr/share/pixmaps/slozos-logo-symbolic.png
 install -Dm644 "$CTX/config/kde/SlozOS.colors"    /usr/share/color-schemes/SlozOS.colors
 
 # Wallpaper as a proper Plasma wallpaper package so it shows in the picker
