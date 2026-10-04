@@ -40,7 +40,7 @@ COPY config/surface/01-surface-kargs.toml           /usr/lib/bootc/kargs.d/01-su
 RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_HOSTNAME="slozos" \
     SLOZOS_NAME="SlozOS" \
-    SLOZOS_PRETTY_NAME="SlozOS 1.0 (Bazzite)" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.1 (Bazzite)" \
     bash /ctx/build/slozos-desktop.sh
 
 LABEL org.opencontainers.image.title="SlozOS"

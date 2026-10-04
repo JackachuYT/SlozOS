@@ -25,12 +25,14 @@ jobs:
             display_name: Surface Pro 2
             containerfile: build/Containerfile.sp2
             image_tag: slozos-sp2
-            iso_name: SlozOS-1.0-SP2-amd64
+            iso_name: SlozOS-1.1-SP2-amd64
             artifact: SlozOS-SP2-ISO
-            release_tag: v1.0-sp2
-            release_title: "SlozOS 1.0 — Surface Pro 2"
+            release_tag: v1.1-sp2
+            release_title: "SlozOS 1.1 — Surface Pro 2"
             release_notes: |
-              SlozOS 1.0 for the **Microsoft Surface Pro 2** (2013, Haswell).
+              SlozOS 1.1 for the **Microsoft Surface Pro 2** (2013, Haswell).
+
+              **New in 1.1:** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, Meta+Space search, SlozOS boot splash — plus a batch of fixes (glass theme now actually applies, dock/menu bar layout now applies on first login, Inter font installed).
 
               **Hardware support:**
               - ✅ Keyboard / Type Cover
@@ -45,9 +47,9 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.0-SP2-amd64.7z.001
+              7z x SlozOS-1.1-SP2-amd64.7z.001
               ```
-              Flash `SlozOS-1.0-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.1-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sp1
             display_name: Surface Pro 1
@@ -83,12 +85,14 @@ jobs:
             display_name: Surface Book 1
             containerfile: build/Containerfile.sb1
             image_tag: slozos-sb1
-            iso_name: SlozOS-1.0-SB1-amd64
+            iso_name: SlozOS-1.1-SB1-amd64
             artifact: SlozOS-SB1-ISO
-            release_tag: v1.0-sb1
-            release_title: "SlozOS 1.0 — Surface Book 1"
+            release_tag: v1.1-sb1
+            release_title: "SlozOS 1.1 — Surface Book 1"
             release_notes: |
-              SlozOS 1.0 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              SlozOS 1.1 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+
+              **New in 1.1:** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, Meta+Space search, SlozOS boot splash — plus a batch of fixes (glass theme now actually applies, dock/menu bar layout now applies on first login, Inter font installed).
 
               **Hardware support:**
               - ✅ Keyboard & Touchpad
@@ -104,9 +108,9 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.0-SB1-amd64.7z.001
+              7z x SlozOS-1.1-SB1-amd64.7z.001
               ```
-              Flash `SlozOS-1.0-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+              Flash `SlozOS-1.1-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
 
     steps:
       - name: Checkout
