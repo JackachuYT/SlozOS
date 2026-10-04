@@ -1,0 +1,13 @@
+# bootc-image-builder config for the throwaway VM-test disk image only —
+# never used for the release ISOs.
+
+# Test account (password "slozos"); its home is created from /etc/skel, so it
+# gets the SlozOS desktop defaults exactly like a real install.
+[[customizations.user]]
+name = "slozos"
+password = "slozos"
+groups = ["wheel"]
+
+[customizations.kernel]
+# Serial console + systemd status so tests/vm/qemu-test.py can see boot progress
+append = "console=tty0 console=ttyS0,115200 systemd.show_status=1"

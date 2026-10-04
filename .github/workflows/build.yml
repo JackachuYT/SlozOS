@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths-ignore:
       - '**.md'
+      # VM-test-only changes don't change the OS, so don't republish releases
+      - 'tests/**'
+      - '.github/workflows/vm-test.yml'
+      - '.github/workflows/interactive-vm.yml'
   # PRs build the images + ISOs to prove they work, but never publish a release
   pull_request:
     branches: [main]

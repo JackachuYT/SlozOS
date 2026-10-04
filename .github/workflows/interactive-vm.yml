@@ -1,0 +1,105 @@
+name: Interactive VM (try SlozOS in your browser)
+
+# Boots the latest published SlozOS ISO in a QEMU/KVM virtual machine on a
+# GitHub runner and shares its screen through noVNC + a Cloudflare quick
+# tunnel, so you can click through the installer and use the installed OS
+# from any browser. The link appears in this run's summary; the VNC password is
+# the VM_PASSWORD repository secret.
+on:
+  workflow_dispatch:
+    inputs:
+      edition:
+        description: Edition
+        type: choice
+        options: [sp2, sp1, sb1]
+        default: sp2
+      minutes:
+        description: How long to keep the VM running (max 330)
+        type: number
+        default: 120
+
+jobs:
+  vm:
+    name: Interactive VM ${{ inputs.edition }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable KVM + install QEMU, noVNC
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            qemu-system-x86 qemu-utils ovmf p7zip-full novnc websockify
+          curl -fsSL -o /usr/local/bin/cloudflared \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          sudo chmod +x /usr/local/bin/cloudflared
+
+      - name: Download the latest ${{ inputs.edition }} release ISO
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EDITION: ${{ inputs.edition }}
+        run: |
+          TAG=$(gh release list --exclude-drafts --json tagName,publishedAt \
+            --jq "[.[] | select(.tagName | endswith(\"-$EDITION\"))] | sort_by(.publishedAt) | last | .tagName")
+          echo "Using release $TAG"
+          mkdir -p iso
+          gh release download "$TAG" --pattern '*.7z.*' -D iso
+          (cd iso && 7z x -y "$(ls *.7z.001)" >/dev/null && rm -f *.7z.*)
+          ls -lh iso
+
+      - name: Start the VM
+        env:
+          VM_PASSWORD: ${{ secrets.VM_PASSWORD }}
+        run: |
+          [ -n "$VM_PASSWORD" ] || { echo "::error::Set the VM_PASSWORD repository secret first"; exit 1; }
+          qemu-img create -f qcow2 disk.qcow2 64G
+          cp /usr/share/OVMF/OVMF_VARS_4M.fd vars.fd
+          # Installer boots from the ISO; after "Reboot" it boots the installed disk.
+          qemu-system-x86_64 -machine q35 -accel kvm -cpu host -m 4096 -smp 2 \
+            -drive if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE_4M.fd \
+            -drive if=pflash,format=raw,file=vars.fd \
+            -drive file=disk.qcow2,if=virtio,format=qcow2 \
+            -drive "file=$(ls iso/*.iso),media=cdrom,readonly=on" -boot once=d \
+            -device virtio-vga -device qemu-xhci -device usb-tablet -device usb-kbd \
+            -nic user,model=virtio-net-pci \
+            -vnc 127.0.0.1:0,password=on -qmp unix:qmp.sock,server=on,wait=off \
+            -daemonize -pidfile qemu.pid
+          sleep 2
+          # VNC passwords are limited to 8 characters
+          python3 - <<'EOF'
+          import json, os, socket
+          s = socket.socket(socket.AF_UNIX); s.connect("qmp.sock"); f = s.makefile("rw")
+          f.readline()
+          for cmd in ({"execute": "qmp_capabilities"},
+                      {"execute": "set_password", "arguments": {"protocol": "vnc", "password": os.environ["VM_PASSWORD"][:8]}}):
+              f.write(json.dumps(cmd) + "\n"); f.flush(); print(f.readline().strip())
+          EOF
+
+      - name: Share the screen
+        run: |
+          nohup websockify --web /usr/share/novnc 6080 127.0.0.1:5900 > websockify.log 2>&1 &
+          nohup cloudflared tunnel --no-autoupdate --url http://127.0.0.1:6080 > tunnel.log 2>&1 &
+          for _ in $(seq 60); do
+            URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' tunnel.log | head -1) && [ -n "$URL" ] && break
+            sleep 2
+          done
+          [ -n "$URL" ] || { cat tunnel.log; exit 1; }
+          LINK="$URL/vnc.html?autoconnect=true&resize=scale"
+          echo "### 🖥️ SlozOS VM is running" >> "$GITHUB_STEP_SUMMARY"
+          echo "Open **[$LINK]($LINK)** and enter the VM password." >> "$GITHUB_STEP_SUMMARY"
+          echo "It stays up for ${{ inputs.minutes }} minutes, or until you power the VM off." >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=SlozOS VM::$LINK"
+
+      - name: Keep the VM running
+        run: |
+          END=$(( $(date +%s) + ${{ inputs.minutes }} * 60 ))
+          while [ "$(date +%s)" -lt "$END" ] && kill -0 "$(cat qemu.pid)" 2>/dev/null; do
+            sleep 30
+          done
+          echo "VM stopped (time up or powered off)."
