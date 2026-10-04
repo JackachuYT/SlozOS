@@ -6,7 +6,11 @@ on:
     branches: [main]
     paths-ignore:
       - '**.md'
-      - 'assets/**'
+  # PRs build the images + ISOs to prove they work, but never publish a release
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
@@ -149,6 +153,7 @@ jobs:
           retention-days: 7
 
       - name: Split ISO into <2GB volumes
+        if: github.event_name != 'pull_request'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y p7zip-full
@@ -156,11 +161,17 @@ jobs:
           ls -lh ${{ matrix.iso_name }}.7z.*
 
       - name: Publish GitHub Release
+        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
+          # Passed through env, not inlined: inlining put the notes inside a
+          # double-quoted shell string, so their ``` fences ran as command
+          # substitutions (the published notes contained 7-Zip's console output).
+          RELEASE_TITLE: ${{ matrix.release_title }}
+          RELEASE_NOTES: ${{ matrix.release_notes }}
         run: |
           gh release delete ${{ matrix.release_tag }} --yes --cleanup-tag || true
           gh release create ${{ matrix.release_tag }} \
-            --title "${{ matrix.release_title }}" \
-            --notes "${{ matrix.release_notes }}" \
+            --title "$RELEASE_TITLE" \
+            --notes "$RELEASE_NOTES" \
             output/${{ matrix.iso_name }}.7z.*

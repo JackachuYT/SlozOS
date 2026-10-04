@@ -21,6 +21,22 @@ SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazz
 
 ---
 
+## The SlozOS Desktop 🪟
+
+SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out of the box on first login:
+
+- 🍎 **Menu bar** along the top — SlozOS menu, global app menu, system tray and clock
+- 🚀 **Floating dock** that hugs its icons, with a Launchpad button and Trash, and tucks away when a window needs the space
+- 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
+- 🔍 **Meta + Space** opens search, like Spotlight
+- 🧞 **Genie-style minimise** and a Cmd-Tab-style app switcher
+- 🎨 macOS dark palette and system blue accent, WhiteSur icons and cursors, Inter font
+- 🦥 SlozOS boot splash, login and lock screen wallpaper
+
+You can switch any of it off from **System Settings → Colors & Themes → Global Theme** (pick *SlozOS Liquid Glass* to get it back).
+
+---
+
 ## Built on Bazzite 🎮
 
 <div align="center">
@@ -208,7 +224,7 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 ## Building Locally
 
-ISOs are built automatically via GitHub Actions on every push to `main`. To build yourself (Linux x86_64 with podman):
+ISOs are built automatically via GitHub Actions on every push to `main` (pull requests build them too, without publishing a release). All three editions share one desktop build step, [`build/slozos-desktop.sh`](build/slozos-desktop.sh). To build yourself (Linux x86_64 with podman):
 
 ```bash
 # SP2 (Intel only)
@@ -235,6 +251,7 @@ sudo podman run --rm --privileged \
 - [**Bazzite**](https://bazzite.gg) by Universal Blue — the best gaming Linux distro
 - [**linux-surface**](https://github.com/linux-surface/linux-surface) — Surface kernel patches & feature matrix
 - [**bootc-image-builder**](https://github.com/osbuild/bootc-image-builder) — ISO generation
+- [**WhiteSur KDE, icons and cursors**](https://github.com/vinceliuice/WhiteSur-kde) by Vince Liuice (GPL-3.0) — the macOS Tahoe Liquid Glass look
 
 ---
 

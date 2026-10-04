@@ -23,16 +23,6 @@ FROM ghcr.io/ublue-os/bazzite:stable
 #   • Backlight→ i915 native
 # The only real-world quirks need config, not drivers:
 
-# ── ISO build prep ────────────────────────────────────────────────────────────
-# bootc-image-builder depsolves every enabled repo in the image to assemble the
-# installer. Bazzite's third-party Terra repos point at a GPG key file that
-# isn't shipped (/etc/pki/rpm-gpg/RPM-GPG-KEY-terra44-mesa), which breaks that
-# depsolve. Disable them — the OS ships as this bootc image and Bazzite already
-# bakes in the Terra packages (mesa, etc.); these repos are only for optional
-# local layering.
-RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' \
-        /etc/yum.repos.d/terra*.repo 2>/dev/null || true
-
 # ── Surface Pro 2 hardware quirk fixes ────────────────────────────────────────
 # WiFi: stop USB autosuspend from killing the Marvell adapter (USB variant)
 COPY config/surface/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
@@ -45,68 +35,13 @@ COPY config/surface/10-surface-lid.conf             /usr/lib/systemd/logind.conf
 # Kernel arg companion for the lid fix, applied by bootc at install time
 COPY config/surface/01-surface-kargs.toml           /usr/lib/bootc/kargs.d/01-surface-kargs.toml
 
-# ── UI packages ───────────────────────────────────────────────────────────────
-# papirus-icon-theme  → Papirus-Dark icon set used by kdeglobals
-# kvantum             → Qt style engine for the Liquid Glass widget theme
-# jetbrains-mono-fonts-all → monospace font used by kdeglobals
-RUN rpm-ostree install --idempotent --assumeyes \
-        papirus-icon-theme \
-        kvantum \
-        jetbrains-mono-fonts-all
-
-# ── SlozOS branding ───────────────────────────────────────────────────────────
-COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
-COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
-COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
-COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
-
-# ── macOS Tahoe Liquid Glass UI — KDE defaults (via /etc/skel) ────────────────
-# Files in /etc/skel are copied to each new user's home on account creation.
-RUN mkdir -p \
-        /etc/skel/.config/Kvantum/SlozOS \
-        /etc/skel/.config/gtk-3.0 \
-        /etc/skel/.config/gtk-4.0 \
-        /etc/skel/.config/autostart \
-        /usr/share/slozos
-
-# KDE global config: color scheme, fonts (Inter/JetBrains Mono), Papirus-Dark icons,
-# Breeze Dark look-and-feel, fast animations
-COPY config/kde/kdeglobals                  /etc/skel/.config/kdeglobals
-# KWin: OpenGL compositor, blur strength 18, wobbly windows, translucency effects
-COPY config/kde/kwinrc                      /etc/skel/.config/kwinrc
-# Kvantum glass theme files
-COPY config/kvantum/SlozOS/SlozOS.kvconfig  /etc/skel/.config/Kvantum/SlozOS/SlozOS.kvconfig
-# GTK apps follow the same dark glass look
-COPY config/gtk/gtk3-settings.ini           /etc/skel/.config/gtk-3.0/settings.ini
-COPY config/gtk/gtk4-settings.ini           /etc/skel/.config/gtk-4.0/settings.ini
-
-# Tell Kvantum which theme to use
-RUN printf '[General]\ntheme=SlozOS\n' > /etc/skel/.config/Kvantum/kvantum.kvconfig
-
-# Store the plasma layout script system-wide so the first-login runner can find it
-COPY config/kde/plasma-layout.js            /usr/share/slozos/plasma-layout.js
-
-# Fix wallpaper path in the layout script to match where we actually copy the file
-RUN sed -i \
-    's|file:///usr/share/slozos/wallpapers/slozos-default.png|file:///usr/share/wallpapers/SlozOS/slozos-default.png|g' \
-    /usr/share/slozos/plasma-layout.js
-
-# First-login script: applies the macOS-style panel layout once via the Plasma
-# scripting D-Bus API, then stamps $HOME so it never runs again.
-RUN printf '#!/bin/bash\nSTAMP="$HOME/.slozos-configured"\n[ -f "$STAMP" ] && exit 0\nsleep 4\nqdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat /usr/share/slozos/plasma-layout.js)" 2>/dev/null || true\ntouch "$STAMP"\n' \
-    > /usr/share/slozos/firstlogin.sh && \
-    chmod +x /usr/share/slozos/firstlogin.sh
-
-# Autostart entry — KDE runs this on every login; the stamp file makes it a no-op
-# after the first time.
-RUN printf '[Desktop Entry]\nType=Application\nName=SlozOS First Login Setup\nExec=/usr/share/slozos/firstlogin.sh\nX-KDE-AutostartScript=true\nNoDisplay=true\n' \
-    > /etc/skel/.config/autostart/slozos-setup.desktop
-
-RUN echo "slozos" > /etc/hostname && \
-    sed -i \
-        -e 's/^NAME=.*/NAME="SlozOS"/' \
-        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 1.0 (Bazzite)"/' \
-        /usr/lib/os-release 2>/dev/null || true
+# ── SlozOS desktop: macOS Tahoe Liquid Glass UI, branding, boot splash ───────
+# Shared by all editions — see build/slozos-desktop.sh.
+RUN --mount=type=bind,source=.,target=/ctx \
+    SLOZOS_HOSTNAME="slozos" \
+    SLOZOS_NAME="SlozOS" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.0 (Bazzite)" \
+    bash /ctx/build/slozos-desktop.sh
 
 LABEL org.opencontainers.image.title="SlozOS"
 LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface"
