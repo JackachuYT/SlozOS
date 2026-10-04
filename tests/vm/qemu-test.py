@@ -212,7 +212,11 @@ def main():
         console.send("slozos")
         console.expect("assword:", 30, since=m)
         console.send(args.password)
-        time.sleep(5)
+        # Wait for the shell prompt — Bazzite prints a long welcome banner first,
+        # and anything typed before the prompt gets swallowed.
+        if console.expect("]$ ", 90, since=m) is None:
+            print("⚠️  no shell prompt seen on the serial console", flush=True)
+        time.sleep(2)
         m = console.mark()
         console.send(DIAG)
         diag = console.expect("SLOZOS-DIAG-END\r\n", 60, since=m) or console.text[m:]
@@ -244,6 +248,17 @@ def main():
         qmp.key("alt", "f1")
         time.sleep(8)
         qmp.screenshot(os.path.join(args.out, "06-menu.png"))
+        qmp.key("esc")
+        time.sleep(2)
+
+        # Meta+Space opens SlozOS Spotlight; empty first, then with a query
+        qmp.key("meta_l", "spc")
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "07-spotlight.png"))
+        qmp.type_text("settings")
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "08-spotlight-search.png"))
+        qmp.key("esc")
         qmp.key("esc")
         ok = True
         return 0

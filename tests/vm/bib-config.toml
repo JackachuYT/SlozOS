@@ -11,3 +11,9 @@ groups = ["wheel"]
 [customizations.kernel]
 # Serial console so tests/vm/qemu-test.py can see boot progress
 append = "console=tty0 console=ttyS0,115200 systemd.show_status=1"
+
+# The test account already exists, so skip KDE's first-run setup wizard
+# (it only runs while this file is missing) and go straight to the login screen.
+[[customizations.files]]
+path = "/etc/plasma-setup-done"
+data = ""

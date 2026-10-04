@@ -1,3 +1,16 @@
+# ── Stage 1: build SlozOS Spotlight against this exact base ─────────────────
+# Same image as the OS below, so it links against the same Qt/KDE versions.
+FROM ghcr.io/ublue-os/bazzite:stable AS spotlight
+RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' /etc/yum.repos.d/terra*.repo 2>/dev/null || true && \
+    dnf5 -y install --setopt=install_weak_deps=False \
+        gcc-c++ cmake extra-cmake-modules qt6-qtbase-devel qt6-qtdeclarative-devel \
+        kf6-kwindowsystem-devel layer-shell-qt-devel
+COPY spotlight /src/spotlight
+RUN cmake -S /src/spotlight -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
+    cmake --build /tmp/build -j"$(nproc)" && \
+    DESTDIR=/out cmake --install /tmp/build
+
+# ── Stage 2: the OS image ────────────────────────────────────────────────────
 FROM ghcr.io/ublue-os/bazzite:stable
 
 # ── Microsoft Surface support ─────────────────────────────────────────────────
@@ -42,6 +55,10 @@ RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_NAME="SlozOS" \
     SLOZOS_PRETTY_NAME="SlozOS 1.1 (Bazzite)" \
     bash /ctx/build/slozos-desktop.sh
+
+# SlozOS Spotlight (Meta+Space search bar) from stage 1; --help proves it links
+COPY --from=spotlight /out/usr/ /usr/
+RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null
 
 LABEL org.opencontainers.image.title="SlozOS"
 LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface"

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Spotlight
+GenericName=Search
+Comment=Search apps, files, settings and your clipboard
+Exec=slozos-spotlight
+Icon=search
+NoDisplay=true
+X-KDE-Shortcuts=Meta+Space

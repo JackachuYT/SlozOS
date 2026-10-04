@@ -47,8 +47,11 @@ log "Packages"
 #                    referenced by kdeglobals before but never installed.
 # jetbrains-mono   → monospace font
 # plymouth-plugin-script → engine the SlozOS boot splash is written for
+# plasma-milou, layer-shell-qt → runtime pieces SlozOS Spotlight uses
 rpm-ostree install --idempotent --assumeyes \
     kvantum \
+    plasma-milou \
+    layer-shell-qt \
     plymouth-plugin-script \
     rsms-inter-fonts \
     jetbrains-mono-fonts-all
@@ -141,6 +144,12 @@ printf '[Greeter][Wallpaper][org.kde.image][General]\nImage=%s\nPreviewImage=%s\
     "$WALL_URL" "$WALL_URL" > "$SRC/kscreenlockerrc"
 merge "$SKEL/kscreenlockerrc" "$SRC/kscreenlockerrc"
 
+# SlozOS Spotlight (binary + .desktop come from the Containerfile's build
+# stage): start it hidden at login so Meta+Space opens it instantly, and
+# register its Meta+Space shortcut with KGlobalAccel.
+install -Dm644 "$CTX/spotlight/slozos-spotlight-autostart.desktop" /etc/xdg/autostart/slozos-spotlight.desktop
+install -Dm644 "$CTX/spotlight/org.slozos.spotlight.desktop"       /usr/share/kglobalaccel/org.slozos.spotlight.desktop
+
 # First-login fallback that applies the layout if Plasma didn't (see script)
 install -Dm755 "$CTX/config/slozos/slozos-firstlogin.sh"      /usr/libexec/slozos-firstlogin
 install -Dm644 "$CTX/config/slozos/slozos-firstlogin.desktop" /etc/xdg/autostart/slozos-firstlogin.desktop
@@ -172,6 +181,7 @@ echo "$SLOZOS_HOSTNAME" > /etc/hostname
 sed -i \
     -e "s/^NAME=.*/NAME=\"$SLOZOS_NAME\"/" \
     -e "s/^PRETTY_NAME=.*/PRETTY_NAME=\"$SLOZOS_PRETTY_NAME\"/" \
+    -e "s/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME=\"$SLOZOS_HOSTNAME\"/" \
     /usr/lib/os-release
 # "About This System" (Info Center) shows SlozOS + its logo
 cat > "$SRC/kcm-about-distrorc" <<EOF

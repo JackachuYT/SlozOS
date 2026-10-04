@@ -28,7 +28,7 @@ SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out
 - 🍎 **Menu bar** along the top — SlozOS menu, global app menu, system tray and clock
 - 🚀 **Floating dock** that hugs its icons, with a Launchpad button and Trash, and tucks away when a window needs the space
 - 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
-- 🔍 **Meta + Space** opens search, like Spotlight
+- 🔍 **SlozOS Spotlight** on **Meta + Space**: a glass search bar for apps, files, settings and your clipboard history (Ctrl+1–4 jumps straight to each)
 - 🧞 **Genie-style minimise** and a Cmd-Tab-style app switcher
 - 🎨 macOS dark palette and system blue accent, WhiteSur icons and cursors, Inter font
 - 🦥 SlozOS boot splash, login and lock screen wallpaper
