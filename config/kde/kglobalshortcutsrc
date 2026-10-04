@@ -1,0 +1,3 @@
+[services][org.kde.krunner.desktop]
+# Meta+Space opens KRunner, like Spotlight on Cmd+Space
+_launch=Meta+Space	Alt+Space	Alt+F2	Search

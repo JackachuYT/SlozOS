@@ -21,6 +21,22 @@ SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazz
 
 ---
 
+## The SlozOS Desktop 🪟
+
+SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out of the box on first login:
+
+- 🍎 **Menu bar** along the top — SlozOS menu, global app menu, system tray and clock
+- 🚀 **Floating dock** that hugs its icons, with a Launchpad button and Trash, and tucks away when a window needs the space
+- 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
+- 🔍 **Meta + Space** opens search, like Spotlight
+- 🧞 **Genie-style minimise** and a Cmd-Tab-style app switcher
+- 🎨 macOS dark palette and system blue accent, WhiteSur icons and cursors, Inter font
+- 🦥 SlozOS boot splash, login and lock screen wallpaper
+
+You can switch any of it off from **System Settings → Colors & Themes → Global Theme** (pick *SlozOS Liquid Glass* to get it back).
+
+---
+
 ## Built on Bazzite 🎮
 
 <div align="center">
@@ -80,13 +96,11 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Suspend (lid-loop fix) | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.0 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp2)
+[**⬇ Download SlozOS 1.1 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp2)
 
 ---
 
-### 🟩 SlozOS SP1 — Surface Pro 1 *(0.1 Alpha — Low Maintenance)*
-
-> ⚠️ **Alpha release.** The Surface Pro 1 works great but this edition is low-maintenance — it'll keep getting Bazzite updates automatically, but don't expect frequent SlozOS-specific fixes. Still totally usable!
+### 🟩 SlozOS SP1 — Surface Pro 1
 
 <div align="center">
 <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg" alt="Microsoft Surface Pro 1" width="560"/>
@@ -116,7 +130,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Sensors & Battery | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 0.1 Alpha SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v0.1-alpha-sp1)
+[**⬇ Download SlozOS 1.1 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp1)
 
 ---
 
@@ -152,7 +166,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Cameras | ❓ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.0 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sb1)
+[**⬇ Download SlozOS 1.1 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sb1)
 
 ---
 
@@ -164,13 +178,13 @@ Each edition is split into 1900 MB parts (GitHub's 2 GiB per-file limit). Downlo
 
 | Edition | Release |
 |---------|---------|
-| Surface Pro 2 | [v1.0-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sp2) → `SlozOS-1.0-SP2-amd64.7z.001/002/003` |
-| Surface Pro 1 | [v0.1-alpha-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v0.1-alpha-sp1) → `SlozOS-0.1-Alpha-SP1-amd64.7z.001/002/003` |
-| Surface Book 1 | [v1.0-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.0-sb1) → `SlozOS-1.0-SB1-amd64.7z.001/002/003` |
+| Surface Pro 2 | [v1.1-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp2) → `SlozOS-1.1-SP2-amd64.7z.001/002/003` |
+| Surface Pro 1 | [v1.1-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp1) → `SlozOS-1.1-SP1-amd64.7z.001/002/003` |
+| Surface Book 1 | [v1.1-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sb1) → `SlozOS-1.1-SB1-amd64.7z.001/002/003` |
 
 Reassemble with [7-Zip](https://www.7-zip.org/):
 - **Windows:** right-click the `.001` file → 7-Zip → Extract Here
-- **Linux/macOS:** `7z x SlozOS-1.0-SP2-amd64.7z.001` (swap SP2 for your edition)
+- **Linux/macOS:** `7z x SlozOS-1.1-SP2-amd64.7z.001` (swap SP2 for your edition)
 
 ---
 
@@ -208,7 +222,7 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 ## Building Locally
 
-ISOs are built automatically via GitHub Actions on every push to `main`. To build yourself (Linux x86_64 with podman):
+ISOs are built automatically via GitHub Actions on every push to `main` (pull requests build them too, without publishing a release). All three editions share one desktop build step, [`build/slozos-desktop.sh`](build/slozos-desktop.sh). To build yourself (Linux x86_64 with podman):
 
 ```bash
 # SP2 (Intel only)
@@ -235,6 +249,7 @@ sudo podman run --rm --privileged \
 - [**Bazzite**](https://bazzite.gg) by Universal Blue — the best gaming Linux distro
 - [**linux-surface**](https://github.com/linux-surface/linux-surface) — Surface kernel patches & feature matrix
 - [**bootc-image-builder**](https://github.com/osbuild/bootc-image-builder) — ISO generation
+- [**WhiteSur KDE, icons and cursors**](https://github.com/vinceliuice/WhiteSur-kde) by Vince Liuice (GPL-3.0) — the macOS Tahoe Liquid Glass look
 
 ---
 

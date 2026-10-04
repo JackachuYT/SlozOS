@@ -6,10 +6,17 @@ on:
     branches: [main]
     paths-ignore:
       - '**.md'
-      - 'assets/**'
+  # PRs build the images + ISOs to prove they work, but never publish a release
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
+    # Stable check name (default included every matrix value, truncated) so
+    # branch protection can require it.
+    name: Build ${{ matrix.display_name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -21,12 +28,14 @@ jobs:
             display_name: Surface Pro 2
             containerfile: build/Containerfile.sp2
             image_tag: slozos-sp2
-            iso_name: SlozOS-1.0-SP2-amd64
+            iso_name: SlozOS-1.1-SP2-amd64
             artifact: SlozOS-SP2-ISO
-            release_tag: v1.0-sp2
-            release_title: "SlozOS 1.0 — Surface Pro 2"
+            release_tag: v1.1-sp2
+            release_title: "SlozOS 1.1 — Surface Pro 2"
             release_notes: |
-              SlozOS 1.0 for the **Microsoft Surface Pro 2** (2013, Haswell).
+              SlozOS 1.1 for the **Microsoft Surface Pro 2** (2013, Haswell).
+
+              **New in 1.1:** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, Meta+Space search, SlozOS boot splash — plus a batch of fixes (glass theme now actually applies, dock/menu bar layout now applies on first login, Inter font installed).
 
               **Hardware support:**
               - ✅ Keyboard / Type Cover
@@ -41,22 +50,22 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.0-SP2-amd64.7z.001
+              7z x SlozOS-1.1-SP2-amd64.7z.001
               ```
-              Flash `SlozOS-1.0-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.1-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sp1
             display_name: Surface Pro 1
             containerfile: build/Containerfile.sp1
             image_tag: slozos-sp1
-            iso_name: SlozOS-0.1-Alpha-SP1-amd64
+            iso_name: SlozOS-1.1-SP1-amd64
             artifact: SlozOS-SP1-ISO
-            release_tag: v0.1-alpha-sp1
-            release_title: "SlozOS 0.1 Alpha — Surface Pro 1"
+            release_tag: v1.1-sp1
+            release_title: "SlozOS 1.1 — Surface Pro 1"
             release_notes: |
-              SlozOS 0.1 Alpha for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+              SlozOS 1.1 for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
 
-              > ⚠️ **Alpha / Low-maintenance release.** The Surface Pro 1 is fully functional but this edition receives minimal updates. Use at your own risk.
+              **New in 1.1:** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, Meta+Space search, SlozOS boot splash — plus a batch of fixes (glass theme now actually applies, dock/menu bar layout now applies on first login, Inter font installed).
 
               **Hardware support:**
               - ✅ Keyboard / Type Cover
@@ -71,20 +80,22 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-0.1-Alpha-SP1-amd64.7z.001
+              7z x SlozOS-1.1-SP1-amd64.7z.001
               ```
-              Flash `SlozOS-0.1-Alpha-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.1-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sb1
             display_name: Surface Book 1
             containerfile: build/Containerfile.sb1
             image_tag: slozos-sb1
-            iso_name: SlozOS-1.0-SB1-amd64
+            iso_name: SlozOS-1.1-SB1-amd64
             artifact: SlozOS-SB1-ISO
-            release_tag: v1.0-sb1
-            release_title: "SlozOS 1.0 — Surface Book 1"
+            release_tag: v1.1-sb1
+            release_title: "SlozOS 1.1 — Surface Book 1"
             release_notes: |
-              SlozOS 1.0 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              SlozOS 1.1 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+
+              **New in 1.1:** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, Meta+Space search, SlozOS boot splash — plus a batch of fixes (glass theme now actually applies, dock/menu bar layout now applies on first login, Inter font installed).
 
               **Hardware support:**
               - ✅ Keyboard & Touchpad
@@ -100,9 +111,9 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.0-SB1-amd64.7z.001
+              7z x SlozOS-1.1-SB1-amd64.7z.001
               ```
-              Flash `SlozOS-1.0-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+              Flash `SlozOS-1.1-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
 
     steps:
       - name: Checkout
@@ -149,6 +160,7 @@ jobs:
           retention-days: 7
 
       - name: Split ISO into <2GB volumes
+        if: github.event_name != 'pull_request'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y p7zip-full
@@ -156,11 +168,17 @@ jobs:
           ls -lh ${{ matrix.iso_name }}.7z.*
 
       - name: Publish GitHub Release
+        if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
+          # Passed through env, not inlined: inlining put the notes inside a
+          # double-quoted shell string, so their ``` fences ran as command
+          # substitutions (the published notes contained 7-Zip's console output).
+          RELEASE_TITLE: ${{ matrix.release_title }}
+          RELEASE_NOTES: ${{ matrix.release_notes }}
         run: |
           gh release delete ${{ matrix.release_tag }} --yes --cleanup-tag || true
           gh release create ${{ matrix.release_tag }} \
-            --title "${{ matrix.release_title }}" \
-            --notes "${{ matrix.release_notes }}" \
+            --title "$RELEASE_TITLE" \
+            --notes "$RELEASE_NOTES" \
             output/${{ matrix.iso_name }}.7z.*

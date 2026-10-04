@@ -10,10 +10,6 @@ FROM ghcr.io/ublue-os/bazzite:stable
 # Cameras: ✅ Both cameras work via uvcvideo (in-kernel)
 # ✗ Performance Modes not supported
 
-# ── ISO build prep ────────────────────────────────────────────────────────────
-RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' \
-        /etc/yum.repos.d/terra*.repo 2>/dev/null || true
-
 # ── Surface Pro 1 hardware quirk fixes ───────────────────────────────────────
 COPY config/surface-pro1/81-mwifiex-no-autosuspend.rules /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
 COPY config/surface-pro1/mwifiex.conf                    /usr/lib/modprobe.d/mwifiex.conf
@@ -21,51 +17,13 @@ COPY config/surface-pro1/wifi-powersave.conf             /usr/lib/NetworkManager
 COPY config/surface-pro1/10-surface-lid.conf             /usr/lib/systemd/logind.conf.d/10-surface-lid.conf
 COPY config/surface-pro1/01-sp1-kargs.toml               /usr/lib/bootc/kargs.d/01-sp1-kargs.toml
 
-# ── UI packages ───────────────────────────────────────────────────────────────
-RUN rpm-ostree install --idempotent --assumeyes \
-        papirus-icon-theme \
-        kvantum \
-        jetbrains-mono-fonts-all
-
-# ── SlozOS branding ───────────────────────────────────────────────────────────
-COPY assets/wallpapers/          /usr/share/wallpapers/SlozOS/
-COPY assets/logo/slozos-logo.png /usr/share/pixmaps/slozos-logo.png
-COPY config/sddm/slozos/         /usr/share/sddm/themes/slozos/
-COPY config/kde/SlozOS.colors    /usr/share/color-schemes/SlozOS.colors
-
-# ── macOS Tahoe Liquid Glass UI — KDE defaults (via /etc/skel) ────────────────
-RUN mkdir -p \
-        /etc/skel/.config/Kvantum/SlozOS \
-        /etc/skel/.config/gtk-3.0 \
-        /etc/skel/.config/gtk-4.0 \
-        /etc/skel/.config/autostart \
-        /usr/share/slozos
-
-COPY config/kde/kdeglobals                  /etc/skel/.config/kdeglobals
-COPY config/kde/kwinrc                      /etc/skel/.config/kwinrc
-COPY config/kvantum/SlozOS/SlozOS.kvconfig  /etc/skel/.config/Kvantum/SlozOS/SlozOS.kvconfig
-COPY config/gtk/gtk3-settings.ini           /etc/skel/.config/gtk-3.0/settings.ini
-COPY config/gtk/gtk4-settings.ini           /etc/skel/.config/gtk-4.0/settings.ini
-
-RUN printf '[General]\ntheme=SlozOS\n' > /etc/skel/.config/Kvantum/kvantum.kvconfig
-
-COPY config/kde/plasma-layout.js            /usr/share/slozos/plasma-layout.js
-RUN sed -i \
-    's|file:///usr/share/slozos/wallpapers/slozos-default.png|file:///usr/share/wallpapers/SlozOS/slozos-default.png|g' \
-    /usr/share/slozos/plasma-layout.js
-
-RUN printf '#!/bin/bash\nSTAMP="$HOME/.slozos-configured"\n[ -f "$STAMP" ] && exit 0\nsleep 4\nqdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat /usr/share/slozos/plasma-layout.js)" 2>/dev/null || true\ntouch "$STAMP"\n' \
-    > /usr/share/slozos/firstlogin.sh && \
-    chmod +x /usr/share/slozos/firstlogin.sh
-
-RUN printf '[Desktop Entry]\nType=Application\nName=SlozOS First Login Setup\nExec=/usr/share/slozos/firstlogin.sh\nX-KDE-AutostartScript=true\nNoDisplay=true\n' \
-    > /etc/skel/.config/autostart/slozos-setup.desktop
-
-RUN echo "slozos-sp1" > /etc/hostname && \
-    sed -i \
-        -e 's/^NAME=.*/NAME="SlozOS SP1"/' \
-        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="SlozOS 0.1 Alpha SP1 (Bazzite)"/' \
-        /usr/lib/os-release 2>/dev/null || true
+# ── SlozOS desktop: macOS Tahoe Liquid Glass UI, branding, boot splash ───────
+# Shared by all editions — see build/slozos-desktop.sh.
+RUN --mount=type=bind,source=.,target=/ctx \
+    SLOZOS_HOSTNAME="slozos-sp1" \
+    SLOZOS_NAME="SlozOS SP1" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.1 SP1 (Bazzite)" \
+    bash /ctx/build/slozos-desktop.sh
 
 LABEL org.opencontainers.image.title="SlozOS SP1"
 LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface Pro 1"

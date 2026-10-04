@@ -1,0 +1,22 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "SlozOS"
+            }
+        ],
+        "Category": "",
+        "Description": "macOS Tahoe-style Liquid Glass desktop: menu bar on top, floating dock below",
+        "EnabledByDefault": true,
+        "Id": "org.slozos.desktop",
+        "License": "GPL-3.0",
+        "Name": "SlozOS Liquid Glass",
+        "Version": "2.0",
+        "Website": "https://github.com/JackachuYT/SlozOS"
+    },
+    "Keywords": "Desktop;Workspace;Appearance;Look and Feel;SlozOS;macOS;",
+    "X-KDE-fallbackPackage": "org.kde.breeze.desktop",
+    "X-Plasma-APIVersion": "2",
+    "X-Plasma-MainScript": "defaults"
+}
