@@ -14,6 +14,9 @@ on:
 
 jobs:
   build:
+    # Stable check name (default included every matrix value, truncated) so
+    # branch protection can require it.
+    name: Build ${{ matrix.display_name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
