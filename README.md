@@ -242,6 +242,18 @@ sudo podman run --rm --privileged \
   --type iso --rootfs btrfs --local localhost/slozos-sp2:latest
 ```
 
+### Testing in a virtual machine
+
+Every pull request also boots each edition in a QEMU/KVM virtual machine, logs in, and uploads screenshots of the boot splash, login screen and desktop (Actions → **VM test (QEMU)** → artifacts). You can run that test by hand from the Actions tab too.
+
+To try SlozOS on your own computer:
+
+```bash
+tests/vm/run-vm.sh SlozOS-1.1-SP2-amd64.iso
+```
+
+That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there.
+
 ---
 
 ## Credits
