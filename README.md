@@ -25,10 +25,10 @@ SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazz
 
 SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out of the box on first login:
 
-- 🍎 **Menu bar** along the top — SlozOS menu, global app menu, system tray and clock
+- 🍎 **Menu bar** along the top — SlozOS logo menu (About, System Settings, Spotlight, Sleep / Restart / Shut Down, Lock, Log Out), global app menu, system tray and clock
 - 🚀 **Floating dock** that hugs its icons, with a Launchpad button and Trash, and tucks away when a window needs the space
 - 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
-- 🔍 **Meta + Space** opens search, like Spotlight
+- 🔍 **SlozOS Spotlight** on **Meta + Space**: a glass search bar for apps, files, settings and your clipboard history (Ctrl+1–4 jumps straight to each)
 - 🧞 **Genie-style minimise** and a Cmd-Tab-style app switcher
 - 🎨 macOS dark palette and system blue accent, WhiteSur icons and cursors, Inter font
 - 🦥 SlozOS boot splash, login and lock screen wallpaper
@@ -222,7 +222,7 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 ## Building Locally
 
-ISOs are built automatically via GitHub Actions on every push to `main` (pull requests build them too, without publishing a release). All three editions share one desktop build step, [`build/slozos-desktop.sh`](build/slozos-desktop.sh). To build yourself (Linux x86_64 with podman):
+ISOs are built by GitHub Actions, **once per change**: a pull request builds each edition, and merging it publishes those exact ISOs without rebuilding (if `main` moved on in the meantime, it rebuilds to be safe). All three editions share one desktop build step, [`build/slozos-desktop.sh`](build/slozos-desktop.sh). To build yourself (Linux x86_64 with podman):
 
 ```bash
 # SP2 (Intel only)
@@ -244,7 +244,7 @@ sudo podman run --rm --privileged \
 
 ### Testing in a virtual machine
 
-Every pull request and every push to `main` also boots each edition in a QEMU/KVM virtual machine, logs in, and uploads screenshots of the boot splash, login screen and desktop (Actions → **VM test (QEMU)** → artifacts). You can run that test by hand from the Actions tab too.
+Every build also boots its edition in a QEMU/KVM virtual machine — same image as the ISO — logs in, and uploads screenshots of the boot splash, login screen, desktop, logo menu and Spotlight (open the **Build SlozOS** run → artifacts `vm-test-sp2` etc.).
 
 **Try it in your browser:** Actions → **Interactive VM (try SlozOS in your browser)** → *Run workflow*, pick an edition. After a few minutes the run's summary shows a link: open it, enter the VM password (the `VM_PASSWORD` repository secret), and you're looking at the SlozOS installer running in a fast virtual machine. Install it, reboot, and use the OS — it stays up for up to 5½ hours.
 

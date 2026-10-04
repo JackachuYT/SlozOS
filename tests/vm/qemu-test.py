@@ -14,6 +14,7 @@ import argparse
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -212,7 +213,11 @@ def main():
         console.send("slozos")
         console.expect("assword:", 30, since=m)
         console.send(args.password)
-        time.sleep(5)
+        # Wait for the shell prompt — Bazzite prints a long welcome banner first,
+        # and anything typed before the prompt gets swallowed.
+        if console.expect("]$ ", 90, since=m) is None:
+            print("⚠️  no shell prompt seen on the serial console", flush=True)
+        time.sleep(2)
         m = console.mark()
         console.send(DIAG)
         diag = console.expect("SLOZOS-DIAG-END\r\n", 60, since=m) or console.text[m:]
@@ -221,7 +226,9 @@ def main():
             f.write(diag)
         print("── diagnostics ──\n" + diag.strip(), flush=True)
         console.send("exit")
-        states = [l.strip() for l in diag.splitlines() if l.strip() in ("active", "inactive", "failed", "activating")]
+        # Strip terminal escape codes (the shell glues OSC/CSI sequences onto output)
+        clean = re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]", "", diag)
+        states = [l.strip() for l in clean.splitlines() if l.strip() in ("active", "inactive", "failed", "activating")]
         if states[:2] != ["active", "active"]:
             print("❌ graphical.target / display manager not active", flush=True)
             qmp.screenshot(os.path.join(args.out, "99-no-display-manager.png"))
@@ -244,6 +251,17 @@ def main():
         qmp.key("alt", "f1")
         time.sleep(8)
         qmp.screenshot(os.path.join(args.out, "06-menu.png"))
+        qmp.key("esc")
+        time.sleep(2)
+
+        # Meta+Space opens SlozOS Spotlight; empty first, then with a query
+        qmp.key("meta_l", "spc")
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "07-spotlight.png"))
+        qmp.type_text("settings")
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "08-spotlight-search.png"))
+        qmp.key("esc")
         qmp.key("esc")
         ok = True
         return 0

@@ -47,8 +47,11 @@ log "Packages"
 #                    referenced by kdeglobals before but never installed.
 # jetbrains-mono   → monospace font
 # plymouth-plugin-script → engine the SlozOS boot splash is written for
+# plasma-milou, layer-shell-qt → runtime pieces SlozOS Spotlight uses
 rpm-ostree install --idempotent --assumeyes \
     kvantum \
+    plasma-milou \
+    layer-shell-qt \
     plymouth-plugin-script \
     rsms-inter-fonts \
     jetbrains-mono-fonts-all
@@ -93,6 +96,9 @@ end
 # ── SlozOS branding ──────────────────────────────────────────────────────────
 log "Branding"
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/pixmaps/slozos-logo.png
+# White-on-transparent version for the dark menu bar (the main logo is a dark
+# sketch on a white square, which showed up as a white box there)
+install -Dm644 "$CTX/config/plymouth/slozos/logo.png" /usr/share/pixmaps/slozos-logo-symbolic.png
 install -Dm644 "$CTX/config/kde/SlozOS.colors"    /usr/share/color-schemes/SlozOS.colors
 
 # Wallpaper as a proper Plasma wallpaper package so it shows in the picker
@@ -113,6 +119,9 @@ WALL_URL="file://$WALL/contents/images/slozos-default.png"
 # Global theme (Look-and-Feel): defaults + the menu-bar/dock layout script
 mkdir -p /usr/share/plasma/look-and-feel
 cp -r "$CTX/config/plasma/look-and-feel/org.slozos.desktop" /usr/share/plasma/look-and-feel/
+# The SlozOS logo menu widget for the top-left of the menu bar
+mkdir -p /usr/share/plasma/plasmoids
+cp -r "$CTX/config/plasma/plasmoids/org.slozos.logomenu" /usr/share/plasma/plasmoids/
 
 # Login screen: Bazzite 44 uses Plasma Login Manager (SDDM themes no longer
 # apply). It only supports a wallpaper, so set that.
@@ -140,6 +149,12 @@ merge "$SKEL/gtk-4.0/settings.ini" "$CTX/config/gtk/gtk4-settings.ini"
 printf '[Greeter][Wallpaper][org.kde.image][General]\nImage=%s\nPreviewImage=%s\n' \
     "$WALL_URL" "$WALL_URL" > "$SRC/kscreenlockerrc"
 merge "$SKEL/kscreenlockerrc" "$SRC/kscreenlockerrc"
+
+# SlozOS Spotlight (binary + .desktop come from the Containerfile's build
+# stage): start it hidden at login so Meta+Space opens it instantly, and
+# register its Meta+Space shortcut with KGlobalAccel.
+install -Dm644 "$CTX/spotlight/slozos-spotlight-autostart.desktop" /etc/xdg/autostart/slozos-spotlight.desktop
+install -Dm644 "$CTX/spotlight/org.slozos.spotlight.desktop"       /usr/share/kglobalaccel/org.slozos.spotlight.desktop
 
 # First-login fallback that applies the layout if Plasma didn't (see script)
 install -Dm755 "$CTX/config/slozos/slozos-firstlogin.sh"      /usr/libexec/slozos-firstlogin
@@ -172,6 +187,7 @@ echo "$SLOZOS_HOSTNAME" > /etc/hostname
 sed -i \
     -e "s/^NAME=.*/NAME=\"$SLOZOS_NAME\"/" \
     -e "s/^PRETTY_NAME=.*/PRETTY_NAME=\"$SLOZOS_PRETTY_NAME\"/" \
+    -e "s/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME=\"$SLOZOS_HOSTNAME\"/" \
     /usr/lib/os-release
 # "About This System" (Info Center) shows SlozOS + its logo
 cat > "$SRC/kcm-about-distrorc" <<EOF

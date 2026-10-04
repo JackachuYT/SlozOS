@@ -1,30 +1,40 @@
-name: Build SlozOS ISOs
+name: Build SlozOS
 
+# One build per edition per change:
+#   • Pull request → build the image once, make the ISO *and* a VM disk from it,
+#     boot the VM, screenshot it, keep the ISO as an artifact. Never publishes.
+#   • Merge to main → no rebuild: if the merged code is exactly what the PR
+#     tested, publish the ISOs that PR run already built. Otherwise (main moved
+#     on, direct push, artifact expired) build as usual and publish.
+#   • Run workflow (manual) → full build + publish.
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths-ignore:
       - '**.md'
-      # VM-test-only changes don't change the OS, so don't republish releases
+      # Test-only changes don't change the OS, so don't republish releases
       - 'tests/**'
-      - '.github/workflows/vm-test.yml'
       - '.github/workflows/interactive-vm.yml'
       - '.gitignore'
-  # PRs build the images + ISOs to prove they work, but never publish a release
   pull_request:
     branches: [main]
     paths-ignore:
       - '**.md'
 
+# A new push to a PR cancels that PR's still-running build; main never cancels.
+concurrency:
+  group: build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
-    # Stable check name (default included every matrix value, truncated) so
-    # branch protection can require it.
+    # Stable check name — branch protection requires it.
     name: Build ${{ matrix.display_name }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      actions: read
     strategy:
       fail-fast: false          # keep building the others if one fails
       matrix:
@@ -120,11 +130,40 @@ jobs:
               ```
               Flash `SlozOS-1.1-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
 
+    env:
+      PUBLISH: ${{ github.event_name != 'pull_request' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Reuse the ISO the pull request already built
+        id: reuse
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          PR_HEAD=$(gh api "repos/$REPO/commits/$GITHUB_SHA/pulls" --jq '.[0].head.sha // empty')
+          if [ -z "$PR_HEAD" ]; then echo "Not from a pull request — building."; exit 0; fi
+          # Only reuse if the merged code is byte-for-byte what the PR tested
+          OUR_TREE=$(git rev-parse 'HEAD^{tree}')
+          PR_TREE=$(gh api "repos/$REPO/git/commits/$PR_HEAD" --jq .tree.sha)
+          if [ "$OUR_TREE" != "$PR_TREE" ]; then echo "Merged code differs from what the PR tested — building."; exit 0; fi
+          RUN=$(gh api "repos/$REPO/actions/workflows/build.yml/runs?head_sha=$PR_HEAD&event=pull_request" \
+                  --jq '[.workflow_runs[] | select(.status == "completed")][0].id // empty')
+          if [ -z "$RUN" ]; then echo "No finished PR build found — building."; exit 0; fi
+          mkdir -p output
+          if gh run download "$RUN" -n "${{ matrix.artifact }}" -D output; then
+            echo "Reusing ${{ matrix.artifact }} from PR build $RUN"
+            ls -lh output
+            echo "reused=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR build $RUN has no ${{ matrix.artifact }} (failed or expired) — building."
+            rm -rf output
+          fi
+
       - name: Free up disk space
+        if: steps.reuse.outputs.reused != 'true'
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android \
                       /opt/hostedtoolcache/CodeQL /usr/local/share/boost
@@ -132,12 +171,14 @@ jobs:
           df -h /
 
       - name: Build SlozOS ${{ matrix.display_name }} image
+        if: steps.reuse.outputs.reused != 'true'
         run: |
           sudo podman build \
             -t localhost/${{ matrix.image_tag }}:latest \
             -f ${{ matrix.containerfile }} .
 
       - name: Generate bootable ISO
+        if: steps.reuse.outputs.reused != 'true'
         run: |
           mkdir -p output
           sudo podman run --rm --privileged \
@@ -147,25 +188,23 @@ jobs:
             quay.io/centos-bootc/bootc-image-builder:latest \
             --type iso \
             --rootfs btrfs \
-            --local \
             localhost/${{ matrix.image_tag }}:latest
-
-      - name: Rename ISO
-        run: |
           ISO=$(sudo find output -name '*.iso' | head -1)
           sudo mv "$ISO" output/${{ matrix.iso_name }}.iso
-          sudo chown "$USER:$USER" output/${{ matrix.iso_name }}.iso
+          sudo chown -R "$USER:$USER" output
           ls -lh output/
 
       - name: Upload ISO artifact
+        if: steps.reuse.outputs.reused != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: output/${{ matrix.iso_name }}.iso
           retention-days: 7
+          compression-level: 0
 
       - name: Split ISO into <2GB volumes
-        if: github.event_name != 'pull_request'
+        if: env.PUBLISH == 'true'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y p7zip-full
@@ -173,7 +212,7 @@ jobs:
           ls -lh ${{ matrix.iso_name }}.7z.*
 
       - name: Publish GitHub Release
-        if: github.event_name != 'pull_request'
+        if: env.PUBLISH == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           # Passed through env, not inlined: inlining put the notes inside a
@@ -187,3 +226,48 @@ jobs:
             --title "$RELEASE_TITLE" \
             --notes "$RELEASE_NOTES" \
             output/${{ matrix.iso_name }}.7z.*
+
+      # ── VM test: boot the same image in QEMU/KVM, log in, screenshot ────────
+      # Skipped when the ISO was reused — the PR run already tested it.
+      - name: Make room for the VM disk
+        if: steps.reuse.outputs.reused != 'true'
+        run: rm -rf output && df -h /
+
+      - name: Enable KVM + install QEMU
+        if: steps.reuse.outputs.reused != 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends qemu-system-x86 qemu-utils ovmf
+
+      - name: Make VM disk image
+        if: steps.reuse.outputs.reused != 'true'
+        run: |
+          mkdir -p vmdisk
+          sudo podman run --rm --privileged \
+            --security-opt label=type:unconfined_t \
+            -v /var/lib/containers/storage:/var/lib/containers/storage \
+            -v "$(pwd)/tests/vm/bib-config.toml:/config.toml:ro" \
+            -v "$(pwd)/vmdisk:/output" \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type qcow2 --rootfs btrfs --config /config.toml \
+            localhost/${{ matrix.image_tag }}:latest
+          sudo chown -R "$USER:$USER" vmdisk
+
+      - name: Boot in QEMU, log in, take screenshots
+        if: steps.reuse.outputs.reused != 'true'
+        # Reported as a warning rather than blocking: the screenshots are the
+        # real output, and a flaky VM shouldn't hold up a working ISO.
+        continue-on-error: true
+        run: python3 tests/vm/qemu-test.py --disk vmdisk/qcow2/disk.qcow2 --out vm-results
+
+      - name: Upload VM screenshots + serial log
+        if: always() && steps.reuse.outputs.reused != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: vm-test-${{ matrix.device }}
+          path: vm-results/
+          retention-days: 14

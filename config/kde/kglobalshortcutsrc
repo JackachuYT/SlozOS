@@ -1,3 +1,7 @@
+[services][org.slozos.spotlight.desktop]
+# Meta+Space opens SlozOS Spotlight, like Cmd+Space on a Mac
+_launch=Meta+Space
+
 [services][org.kde.krunner.desktop]
-# Meta+Space opens KRunner, like Spotlight on Cmd+Space
-_launch=Meta+Space	Alt+Space	Alt+F2	Search
+# KRunner stays available on its classic keys
+_launch=Alt+Space	Alt+F2	Search
