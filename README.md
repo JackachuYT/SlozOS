@@ -100,9 +100,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 
 ---
 
-### 🟩 SlozOS SP1 — Surface Pro 1 *(0.1 Alpha — Low Maintenance)*
-
-> ⚠️ **Alpha release.** The Surface Pro 1 works great but this edition is low-maintenance — it'll keep getting Bazzite updates automatically, but don't expect frequent SlozOS-specific fixes. Still totally usable!
+### 🟩 SlozOS SP1 — Surface Pro 1
 
 <div align="center">
 <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Virginia_Ballot_on_Microsoft_Surface_Pro_Tablet.jpg" alt="Microsoft Surface Pro 1" width="560"/>
@@ -132,7 +130,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Sensors & Battery | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 0.1 Alpha SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v0.1-alpha-sp1)
+[**⬇ Download SlozOS 1.1 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp1)
 
 ---
 
@@ -181,7 +179,7 @@ Each edition is split into 1900 MB parts (GitHub's 2 GiB per-file limit). Downlo
 | Edition | Release |
 |---------|---------|
 | Surface Pro 2 | [v1.1-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp2) → `SlozOS-1.1-SP2-amd64.7z.001/002/003` |
-| Surface Pro 1 | [v0.1-alpha-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v0.1-alpha-sp1) → `SlozOS-0.1-Alpha-SP1-amd64.7z.001/002/003` |
+| Surface Pro 1 | [v1.1-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sp1) → `SlozOS-1.1-SP1-amd64.7z.001/002/003` |
 | Surface Book 1 | [v1.1-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1-sb1) → `SlozOS-1.1-SB1-amd64.7z.001/002/003` |
 
 Reassemble with [7-Zip](https://www.7-zip.org/):
