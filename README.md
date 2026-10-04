@@ -244,7 +244,7 @@ sudo podman run --rm --privileged \
 
 ### Testing in a virtual machine
 
-Every pull request also boots each edition in a QEMU/KVM virtual machine, logs in, and uploads screenshots of the boot splash, login screen and desktop (Actions → **VM test (QEMU)** → artifacts). You can run that test by hand from the Actions tab too.
+Every pull request and every push to `main` also boots each edition in a QEMU/KVM virtual machine, logs in, and uploads screenshots of the boot splash, login screen and desktop (Actions → **VM test (QEMU)** → artifacts). You can run that test by hand from the Actions tab too.
 
 To try SlozOS on your own computer:
 

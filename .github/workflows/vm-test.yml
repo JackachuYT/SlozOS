@@ -2,7 +2,13 @@ name: VM test (QEMU)
 
 # Boots each edition in a QEMU/KVM virtual machine, logs in, and saves
 # screenshots of the boot splash, login screen and desktop as an artifact.
+# Runs automatically on every pull request and every push to main (alongside
+# the release build), and on demand from the Actions tab.
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
     inputs:
       edition:
