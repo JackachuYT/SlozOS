@@ -3,7 +3,8 @@
 # SlozOS desktop layer — shared by every edition's Containerfile:
 #
 #   RUN --mount=type=bind,source=.,target=/ctx \
-#       SLOZOS_HOSTNAME=… SLOZOS_NAME=… SLOZOS_PRETTY_NAME=… SLOZOS_VERSION=… SLOZOS_EDITION=… \
+#       SLOZOS_HOSTNAME=… SLOZOS_NAME=… SLOZOS_PRETTY_NAME=… SLOZOS_VERSION=… \
+#       SLOZOS_EDITION=… SLOZOS_IMAGE=ghcr.io/jackachuyt/slozos-<edition> \
 #       bash /ctx/build/slozos-desktop.sh
 #
 # Keeping this in one place means a UI fix lands in SP1, SP2 and SB1 at once
@@ -12,7 +13,7 @@
 set -euo pipefail
 
 CTX=${CTX:-/ctx}
-: "${SLOZOS_HOSTNAME:?}" "${SLOZOS_NAME:?}" "${SLOZOS_PRETTY_NAME:?}" "${SLOZOS_VERSION:?}" "${SLOZOS_EDITION:?}"
+: "${SLOZOS_HOSTNAME:?}" "${SLOZOS_NAME:?}" "${SLOZOS_PRETTY_NAME:?}" "${SLOZOS_VERSION:?}" "${SLOZOS_EDITION:?}" "${SLOZOS_IMAGE:?}"
 
 merge() { python3 "$CTX/build/ini-merge.py" "$@"; }
 log()   { echo "::group::$*"; }
@@ -96,9 +97,9 @@ end
 # ── SlozOS branding ──────────────────────────────────────────────────────────
 log "Branding"
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/pixmaps/slozos-logo.png
-# Bold white sloth face for the dark menu bar, like the Apple logo (the main
-# logo is a dark sketch on a white square, which showed up as a white box)
-install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.png" /usr/share/pixmaps/slozos-logo-symbolic.png
+# Solid white sloth-face glyph for the dark menu bar, like the Apple logo —
+# vector, so it stays crisp at 16–24 px (the old PNG went blurry and broken)
+install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.svg" /usr/share/pixmaps/slozos-logo-symbolic.svg
 # Full logo, white on transparent, for dark backgrounds (About page)
 install -Dm644 "$CTX/config/plymouth/slozos/logo.png" /usr/share/pixmaps/slozos-logo-white.png
 install -Dm644 "$CTX/config/kde/SlozOS.colors"    /usr/share/color-schemes/SlozOS.colors
@@ -163,6 +164,12 @@ install -Dm755 "$CTX/config/slozos/slozos-firstlogin.sh"      /usr/libexec/slozo
 install -Dm644 "$CTX/config/slozos/slozos-firstlogin.desktop" /etc/xdg/autostart/slozos-firstlogin.desktop
 end
 
+# ── Identity + update channel ────────────────────────────────────────────────
+# Before the initramfs rebuild below, which copies os-release into it.
+log "Identity + updates"
+source "$CTX/build/slozos-identity.sh"
+end
+
 # ── Boot splash (Plymouth) ───────────────────────────────────────────────────
 log "Plymouth"
 mkdir -p /usr/share/plymouth/themes/slozos
@@ -183,24 +190,3 @@ else
     echo "WARNING: dracut failed — keeping the stock initramfs/boot splash" >&2
 fi
 end
-
-# ── Identity ─────────────────────────────────────────────────────────────────
-echo "$SLOZOS_HOSTNAME" > /etc/hostname
-sed -i \
-    -e "s/^NAME=.*/NAME=\"$SLOZOS_NAME\"/" \
-    -e "s/^PRETTY_NAME=.*/PRETTY_NAME=\"$SLOZOS_PRETTY_NAME\"/" \
-    -e "s/^DEFAULT_HOSTNAME=.*/DEFAULT_HOSTNAME=\"$SLOZOS_HOSTNAME\"/" \
-    /usr/lib/os-release
-# "About this System" (Info Center): "SlozOS 1.1.3", "Surface Pro 2 Edition ·
-# Bazzite 44". Version comes from here — os-release VERSION_ID must stay the
-# Fedora release number (rpm-ostree and bootc-image-builder depend on it).
-FEDORA_VERSION=$(. /usr/lib/os-release && echo "$VERSION_ID")
-cat > "$SRC/kcm-about-distrorc" <<EOF
-[General]
-LogoPath=/usr/share/pixmaps/slozos-logo-white.png
-Name=SlozOS
-Version=$SLOZOS_VERSION
-Variant=$SLOZOS_EDITION Edition · Bazzite $FEDORA_VERSION
-Website=https://github.com/JackachuYT/SlozOS
-EOF
-merge /etc/xdg/kcm-about-distrorc "$SRC/kcm-about-distrorc"

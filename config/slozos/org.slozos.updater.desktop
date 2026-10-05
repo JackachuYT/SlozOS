@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS Updater
+GenericName=System Update
+Comment=Update SlozOS, your apps and more
+Exec=konsole --hold -e slozos-update
+Icon=system-software-update
+Categories=System;
+Keywords=update;upgrade;

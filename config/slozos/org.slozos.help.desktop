@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS Help
+GenericName=Documentation
+Comment=Guides, release notes and support for SlozOS
+Exec=xdg-open https://github.com/JackachuYT/SlozOS#readme
+Icon=help-browser
+Categories=Documentation;System;

@@ -1,0 +1,13 @@
+[Unit]
+Description=Point SlozOS at its own update images
+ConditionPathExists=!/var/lib/slozos/update-origin-set
+After=local-fs.target
+Before=uupd.service uupd.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/slozos-update-origin
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

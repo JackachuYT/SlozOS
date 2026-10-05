@@ -1,0 +1,25 @@
+#!/usr/bin/bash
+# Point this install at SlozOS's own update images.
+#
+# The ISO installs SlozOS from an image embedded on the USB stick, so a fresh
+# install doesn't know where future updates live. On first boot, record
+# ghcr.io/jackachuyt/slozos-<edition>:stable as the update source (without
+# downloading anything). Installs that already track a SlozOS image — e.g.
+# someone who picked another channel with `slozos-update channel` — are left
+# alone.
+set -euo pipefail
+
+WANT=$(cat /usr/share/slozos/image-ref)            # ghcr.io/jackachuyt/slozos-sp2:stable
+REPO=${WANT%%:*}
+CURRENT=$(bootc status --format=json | jq -r '.spec.image.image // empty')
+
+case "$CURRENT" in
+    "$REPO":*|"$REPO")
+        echo "Already updating from $CURRENT" ;;
+    *)
+        echo "Switching update source: ${CURRENT:-none} → $WANT"
+        bootc switch --mutate-in-place --transport registry "$WANT" ;;
+esac
+
+mkdir -p /var/lib/slozos
+touch /var/lib/slozos/update-origin-set
