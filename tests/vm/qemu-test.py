@@ -141,6 +141,15 @@ class Serial:
         self.sock.sendall(line.encode() + b"\r")
 
 
+# Performance snapshot, taken on the serial console once the desktop has settled
+METRICS = ("echo '=== boot'; systemd-analyze 2>/dev/null | head -2; "
+           "echo '=== slowest units'; systemd-analyze blame --no-pager 2>/dev/null | head -15; "
+           "echo '=== memory (MiB)'; free -m; "
+           "echo '=== top processes (RSS MiB)'; ps -eo rss=,comm= --sort=-rss | head -25 | awk '{printf \"%6.0f  %s\\n\", $1/1024, $2}'; "
+           "echo '=== running services'; systemctl list-units --type=service --state=running --no-legend --plain | wc -l; "
+           "echo '=== disk'; df -h / /var 2>/dev/null | tail -2; "
+           "echo SLOZOS-METRICS-''END")
+
 DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "
         "echo '--- failed units:'; systemctl --failed --no-legend --plain; "
         "echo '--- os:'; grep PRETTY_NAME /etc/os-release; "
@@ -232,7 +241,7 @@ def main():
         with open(os.path.join(args.out, "update-source.txt"), "w") as f:
             f.write(m_src.group(1) if m_src else "unknown")
         print("── diagnostics ──\n" + diag.strip(), flush=True)
-        console.send("exit")
+        # stay logged in on the serial console for the performance snapshot later
         # Strip terminal escape codes (the shell glues OSC/CSI sequences onto output)
         clean = re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]", "", diag)
         states = [l.strip() for l in clean.splitlines() if l.strip() in ("active", "inactive", "failed", "activating")]
@@ -253,6 +262,14 @@ def main():
         qmp.screenshot(os.path.join(args.out, "04-desktop.png"))
         time.sleep(90)  # first-login setup + autostarts settle
         qmp.screenshot(os.path.join(args.out, "05-desktop-settled.png"))
+
+        m = console.mark()
+        console.send(METRICS)
+        metrics = console.expect("SLOZOS-METRICS-END\r\n", 90, since=m) or console.text[m:]
+        metrics = re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]", "", metrics.split(METRICS, 1)[-1])
+        with open(os.path.join(args.out, "metrics.txt"), "w") as f:
+            f.write(metrics)
+        print("── performance ──\n" + metrics.strip(), flush=True)
 
         # Alt+F1 opens the SlozOS logo menu in the menu bar
         qmp.key("alt", "f1")
