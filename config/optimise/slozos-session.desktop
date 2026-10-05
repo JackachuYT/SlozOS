@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS session setup
+Exec=/usr/libexec/slozos-session
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

@@ -11,8 +11,8 @@ on:
       edition:
         description: Edition
         type: choice
-        options: [sp2, sp1, sb1]
-        default: sp2
+        options: [standard, nvidia]
+        default: standard
       minutes:
         description: How long to keep the VM running (max 330)
         type: number

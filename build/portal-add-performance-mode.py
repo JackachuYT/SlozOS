@@ -10,7 +10,7 @@ action = {
     "id": "slozos-performance-mode",
     "title": "SlozOS Performance Mode",
     "description": "More FPS in games and Minecraft by turning off CPU security mitigations "
-                   "(Spectre/Meltdown). Faster on these older Surfaces, but less protected "
+                   "(Spectre/Meltdown). Biggest gains on older Intel CPUs, but less protected "
                    "against malicious code. Takes effect after a reboot.",
     "default": False,
     "status_script": "slozos-performance-mode status",

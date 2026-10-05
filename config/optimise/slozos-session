@@ -1,0 +1,42 @@
+#!/usr/bin/bash
+# SlozOS per-login setup, driven by the profile slozos-hardware picked at boot
+# (/run/slozos/profile: light on PCs with under ~7 GB of RAM, full otherwise).
+#
+#   • KDE Connect + XWayland video bridge: start at login on "full" PCs,
+#     on demand (when opened) on "light" ones
+#   • Steam at login: the user's choice in SlozOS Welcome wins; without one,
+#     "full" PCs start it, "light" PCs don't
+#   • Prism Launcher's Java heap: sized to this PC's RAM, once
+set -u
+PROFILE=$(cat /run/slozos/profile 2>/dev/null || echo full)
+PREF="${XDG_CONFIG_HOME:-$HOME/.config}/slozos"
+mkdir -p "$PREF"
+
+run_exec_of() {  # start the Exec= line of a (hidden) autostart entry
+    [[ -f $1 ]] || return 1
+    local cmd; cmd=$(grep -m1 '^Exec=' "$1" | cut -d= -f2- | sed 's/ %[a-zA-Z]//g')
+    [[ -n $cmd ]] || return 1
+    setsid bash -c "$cmd" >/dev/null 2>&1 &
+}
+
+if [[ $PROFILE == full ]]; then
+    for f in /etc/xdg/autostart/*kdeconnect*daemon*.desktop /etc/xdg/autostart/*xwaylandvideobridge*.desktop; do
+        run_exec_of "$f"
+    done
+fi
+
+choice=$(cat "$PREF/steam-at-login" 2>/dev/null)
+if [[ $choice == on || ( -z $choice && $PROFILE == full ) ]]; then
+    run_exec_of "${XDG_CONFIG_HOME:-$HOME/.config}/autostart/steam.desktop" \
+        || { command -v steam >/dev/null && setsid steam -silent >/dev/null 2>&1 & }
+fi
+
+CFG="$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/prismlauncher.cfg"
+if [[ -f $CFG && ! -f $PREF/prism-heap-set ]] && grep -q '^MaxMemAlloc=2048$' "$CFG"; then
+    MEM_GB=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) / 1024 / 1024 ))
+    if   (( MEM_GB >= 15 )); then HEAP=4096
+    elif (( MEM_GB >= 7  )); then HEAP=3072
+    else                          HEAP=2048; fi
+    sed -i "s/^MaxMemAlloc=2048$/MaxMemAlloc=$HEAP/" "$CFG"
+    touch "$PREF/prism-heap-set"
+fi

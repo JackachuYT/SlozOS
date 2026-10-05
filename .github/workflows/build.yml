@@ -40,139 +40,61 @@ jobs:
       fail-fast: false          # keep building the others if one fails
       matrix:
         include:
-          - device: sp2
-            display_name: Surface Pro 2
-            containerfile: build/Containerfile.sp2
-            image_tag: slozos-sp2
+          - device: standard
+            display_name: SlozOS
             bazzite: bazzite
-            iso_name: SlozOS-1.3-SP2-amd64
-            artifact: SlozOS-SP2-ISO
-            release_tag: v1.3-sp2
-            release_title: "SlozOS 1.3 — Surface Pro 2"
+            edition: Standard
+            image_tag: slozos
+            iso_name: SlozOS-1.4-amd64
+            artifact: SlozOS-ISO
+            release_tag: v1.4-standard
+            release_title: "SlozOS 1.4"
+            # old per-Surface update channels that keep receiving this edition
+            legacy_images: "slozos-sp1 slozos-sp2"
             release_notes: |
-              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
+              SlozOS 1.4 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
 
-              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
+              **New in 1.4 — SlozOS for every PC.** No longer just for Surface: SlozOS now installs on almost any 64-bit PC, laptop or handheld. It checks your hardware at boot — PCs with less RAM get the light profile automatically, Surface Pro/Book fixes switch on only on Surfaces, and the glass effects match your graphics chip.
 
-              **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
+              **Surface owners:** Surface Pro 1 and Pro 2 use this edition (the Surface Book 1 uses SlozOS NVIDIA). Existing Surface installs move over automatically with their next update.
 
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
+              **Also included:** Control Center, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
-              **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
-
-              **New in 1.2:** SlozOS now updates from its own images — 1.2 → 1.3 → 2.0, never to plain Bazzite. New SlozOS Updater, SlozOS Portal and SlozOS Help replace Bazzite's; a crisp new sloth icon in the menu bar; the boot menu and terminal say SlozOS.
-
-              **Coming from 1.1.x or 1.2?** Run this once in a terminal, then reboot, to switch to SlozOS updates: `sudo bootc switch ghcr.io/jackachuyt/slozos-sp2:stable`
-
-              **Also included:** SlozOS Spotlight (Meta+Space), the Apps grid, the SlozOS logo menu, and the macOS Tahoe Liquid Glass desktop.
-
-              **Hardware support:**
-              - ✅ Keyboard / Type Cover
-              - ✅ Touchscreen & Pen
-              - ✅ WiFi (Marvell 88W8797 USB)
-              - ✅ Bluetooth
-              - ✅ Cameras (front + rear, uvcvideo)
-              - ✅ Audio
-              - ✅ Suspend / Hibernate
-              - ✅ Sensors & Battery
-              - ❌ Performance Modes (not supported)
-
-              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
+              The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.3-SP2-amd64.7z.001
+              7z x SlozOS-1.4-amd64.7z.001
               ```
-              Flash `SlozOS-1.3-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.4-amd64.iso` with Balena Etcher and boot from the USB stick.
 
-          - device: sp1
-            display_name: Surface Pro 1
-            containerfile: build/Containerfile.sp1
-            image_tag: slozos-sp1
-            bazzite: bazzite
-            iso_name: SlozOS-1.3-SP1-amd64
-            artifact: SlozOS-SP1-ISO
-            release_tag: v1.3-sp1
-            release_title: "SlozOS 1.3 — Surface Pro 1"
-            release_notes: |
-              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
-
-              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
-
-              **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
-
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
-
-              **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
-
-              **New in 1.2:** SlozOS now updates from its own images — 1.2 → 1.3 → 2.0, never to plain Bazzite. New SlozOS Updater, SlozOS Portal and SlozOS Help replace Bazzite's; a crisp new sloth icon in the menu bar; the boot menu and terminal say SlozOS.
-
-              **Coming from 1.1.x or 1.2?** Run this once in a terminal, then reboot, to switch to SlozOS updates: `sudo bootc switch ghcr.io/jackachuyt/slozos-sp1:stable`
-
-              **Also included:** SlozOS Spotlight (Meta+Space), the Apps grid, the SlozOS logo menu, and the macOS Tahoe Liquid Glass desktop.
-
-              **Hardware support:**
-              - ✅ Keyboard / Type Cover
-              - ✅ Touchscreen & Pen
-              - ✅ WiFi (Marvell USB)
-              - ✅ Bluetooth
-              - ✅ Both Cameras
-              - ✅ Audio
-              - ✅ Suspend / Hibernate
-              - ✅ Sensors & Battery
-              - ❌ Performance Modes (not supported)
-
-              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
-              ```
-              7z x SlozOS-1.3-SP1-amd64.7z.001
-              ```
-              Flash `SlozOS-1.3-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
-
-          - device: sb1
-            display_name: Surface Book 1
-            containerfile: build/Containerfile.sb1
-            image_tag: slozos-sb1
+          - device: nvidia
+            display_name: SlozOS NVIDIA
             bazzite: bazzite-nvidia
-            iso_name: SlozOS-1.3-SB1-amd64
-            artifact: SlozOS-SB1-ISO
-            release_tag: v1.3-sb1
-            release_title: "SlozOS 1.3 — Surface Book 1"
+            edition: NVIDIA
+            image_tag: slozos-nvidia
+            iso_name: SlozOS-1.4-NVIDIA-amd64
+            artifact: SlozOS-NVIDIA-ISO
+            release_tag: v1.4-nvidia
+            release_title: "SlozOS 1.4 — NVIDIA"
+            # old per-Surface update channels that keep receiving this edition
+            legacy_images: "slozos-sb1"
             release_notes: |
-              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              SlozOS 1.4 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
 
-              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
+              **New in 1.4 — SlozOS for every PC.** No longer just for Surface: SlozOS now installs on almost any 64-bit PC, laptop or handheld. It checks your hardware at boot — PCs with less RAM get the light profile automatically, Surface Pro/Book fixes switch on only on Surfaces, and the glass effects match your graphics chip.
 
-              **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
+              **Surface owners:** the Surface Book 1 uses this edition (Surface Pro 1/2 use the standard one). Existing Surface installs move over automatically with their next update.
 
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
+              **Also included:** Control Center, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
-              **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
-
-              **New in 1.2:** SlozOS now updates from its own images — 1.2 → 1.3 → 2.0, never to plain Bazzite. New SlozOS Updater, SlozOS Portal and SlozOS Help replace Bazzite's; a crisp new sloth icon in the menu bar; the boot menu and terminal say SlozOS.
-
-              **Coming from 1.1.x or 1.2?** Run this once in a terminal, then reboot, to switch to SlozOS updates: `sudo bootc switch ghcr.io/jackachuyt/slozos-sb1:stable`
-
-              **Also included:** SlozOS Spotlight (Meta+Space), the Apps grid, the SlozOS logo menu, and the macOS Tahoe Liquid Glass desktop.
-
-              **Hardware support:**
-              - ✅ Keyboard & Touchpad
-              - ✅ Touchscreen & Pen
-              - ✅ WiFi (Marvell 88W8897 PCIe)
-              - ✅ Bluetooth
-              - ✅ Dedicated GPU (GTX 940M via PRIME)
-              - ✅ Clipboard Detachment
-              - ✅ Audio, Sensors, Battery
-              - ✅ Suspend / Hibernate
-              - ❌ Performance Modes (not supported)
-              - ❓ Cameras (status unclear)
-
-              The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
+              The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.3-SB1-amd64.7z.001
+              7z x SlozOS-1.4-NVIDIA-amd64.7z.001
               ```
-              Flash `SlozOS-1.3-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+              Flash `SlozOS-1.4-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.3"
+      SLOZOS_VERSION: "1.4"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise
@@ -247,8 +169,11 @@ jobs:
         run: |
           sudo podman build \
             --build-arg BASE="$BASE" \
+            --build-arg EDITION="${{ matrix.edition }}" \
+            --build-arg IMAGE="$IMAGE" \
+            --build-arg VERSION="$SLOZOS_VERSION" \
             -t localhost/${{ matrix.image_tag }}:latest \
-            -f ${{ matrix.containerfile }} .
+            -f build/Containerfile .
 
       - name: Push update image (tagged with this commit)
         if: steps.reuse.outputs.reused != 'true'
@@ -304,6 +229,11 @@ jobs:
           for tag in stable "$SLOZOS_VERSION"; do
             sudo skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://$IMAGE:$tag"
           done
+          # Old per-Surface channels get this edition too, so Surface installs
+          # update to it and then move to $IMAGE (see slozos-update-origin)
+          for legacy in ${{ matrix.legacy_images }}; do
+            sudo skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://ghcr.io/jackachuyt/$legacy:stable"
+          done
 
       - name: Publish GitHub Release
         if: env.PUBLISH == 'true'
@@ -319,7 +249,7 @@ jobs:
           gh release create ${{ matrix.release_tag }} \
             --title "$RELEASE_TITLE" \
             --notes "$RELEASE_NOTES" \
-            --latest=${{ matrix.device == 'sp2' }} \
+            --latest=${{ matrix.device == 'standard' }} \
             output/${{ matrix.iso_name }}.7z.*
 
       - name: Remove older releases of this edition
@@ -330,7 +260,7 @@ jobs:
           # Installs update through SlozOS's update images, so only the newest
           # ISO per edition is kept. Runs only after the new release uploaded.
           gh release list --limit 200 --json tagName --jq '.[].tagName' \
-            | grep -E -- '-${{ matrix.device }}$' \
+            | grep -E -- '-(${{ matrix.device }}|sp1|sp2|sb1)$' \
             | grep -vx -- '${{ matrix.release_tag }}' \
             | while read -r tag; do
                 echo "Deleting old release $tag"

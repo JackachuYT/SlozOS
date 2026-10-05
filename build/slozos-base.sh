@@ -6,7 +6,7 @@
 #   RUN --mount=type=bind,source=.,target=/ctx bash /ctx/build/slozos-base.sh
 #
 # Kept in its own image layer, below SlozOS's settings and apps, so a normal
-# SlozOS update doesn't make every Surface re-download it. Nothing here may
+# SlozOS update doesn't make every PC re-download it. Nothing here may
 # depend on the SlozOS version (that's why the initramfs is built before
 # os-release is rebranded).
 # ──────────────────────────────────────────────────────────────────────────────

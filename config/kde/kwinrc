@@ -21,7 +21,7 @@ diminactiveEnabled=false
 translucencyEnabled=false
 
 [Effect-blur]
-BlurStrength=10
+# BlurStrength is set per GPU at boot (slozos-hardware → /etc/xdg/kwinrc)
 NoiseStrength=3
 
 [Effect-overview]
