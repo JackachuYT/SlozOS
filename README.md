@@ -96,7 +96,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Suspend (lid-loop fix) | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.1.3 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sp2)
+[**⬇ Download SlozOS 1.2 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sp2)
 
 ---
 
@@ -130,7 +130,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Sensors & Battery | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.1.3 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sp1)
+[**⬇ Download SlozOS 1.2 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sp1)
 
 ---
 
@@ -166,7 +166,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Cameras | ❓ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.1.3 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sb1)
+[**⬇ Download SlozOS 1.2 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sb1)
 
 ---
 
@@ -178,13 +178,13 @@ Each edition is split into 1900 MB parts (GitHub's 2 GiB per-file limit). Downlo
 
 | Edition | Release |
 |---------|---------|
-| Surface Pro 2 | [v1.1.3-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sp2) → `SlozOS-1.1.3-SP2-amd64.7z.001/002/003` |
-| Surface Pro 1 | [v1.1.3-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sp1) → `SlozOS-1.1.3-SP1-amd64.7z.001/002/003` |
-| Surface Book 1 | [v1.1.3-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.1.3-sb1) → `SlozOS-1.1.3-SB1-amd64.7z.001/002/003` |
+| Surface Pro 2 | [v1.2-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sp2) → `SlozOS-1.2-SP2-amd64.7z.001/002/003` |
+| Surface Pro 1 | [v1.2-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sp1) → `SlozOS-1.2-SP1-amd64.7z.001/002/003` |
+| Surface Book 1 | [v1.2-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2-sb1) → `SlozOS-1.2-SB1-amd64.7z.001/002/003` |
 
 Reassemble with [7-Zip](https://www.7-zip.org/):
 - **Windows:** right-click the `.001` file → 7-Zip → Extract Here
-- **Linux/macOS:** `7z x SlozOS-1.1.3-SP2-amd64.7z.001` (swap SP2 for your edition)
+- **Linux/macOS:** `7z x SlozOS-1.2-SP2-amd64.7z.001` (swap SP2 for your edition)
 
 ---
 
@@ -220,6 +220,24 @@ Use **[Balena Etcher](https://etcher.balena.io/)** (free, works on Mac/Windows/L
 
 ---
 
+## Updating
+
+SlozOS updates itself in the background from its own images (`ghcr.io/jackachuyt/slozos-sp2`, `-sp1`, `-sb1`) — so 1.2 goes to 1.3 and on to 2.0, never to plain Bazzite. To update right now, open **SlozOS Updater** from the app menu, or run:
+
+```bash
+slozos-update
+```
+
+`slozos-update status` shows your version and where updates come from; `slozos-update rollback` boots the previous version if an update misbehaves.
+
+**On 1.1.x?** Those versions didn't know where SlozOS updates live. Run this once (swap `sp2` for `sp1` or `sb1`), then reboot:
+
+```bash
+sudo bootc switch ghcr.io/jackachuyt/slozos-sp2:stable
+```
+
+---
+
 ## Building Locally
 
 ISOs are built by GitHub Actions, **once per change**: a pull request builds each edition, and merging it publishes those exact ISOs without rebuilding (if `main` moved on in the meantime, it rebuilds to be safe). All three editions share one desktop build step, [`build/slozos-desktop.sh`](build/slozos-desktop.sh). To build yourself (Linux x86_64 with podman):
@@ -251,7 +269,7 @@ Every build also boots its edition in a QEMU/KVM virtual machine — same image 
 To try SlozOS on your own computer instead:
 
 ```bash
-tests/vm/run-vm.sh SlozOS-1.1.3-SP2-amd64.iso
+tests/vm/run-vm.sh SlozOS-1.2-SP2-amd64.iso
 ```
 
 That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there.

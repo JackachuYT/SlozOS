@@ -10,7 +10,7 @@ import org.kde.coreaddons as KCoreAddons
 PlasmoidItem {
     id: root
 
-    readonly property string logo: "/usr/share/pixmaps/slozos-logo-symbolic.png"
+    readonly property string logo: "/usr/share/pixmaps/slozos-logo-symbolic.svg"
     readonly property string qdbus: "$(command -v qdbus-qt6 || command -v qdbus6 || echo qdbus)"
 
     preferredRepresentation: compactRepresentation
@@ -52,7 +52,7 @@ PlasmoidItem {
 
         Kirigami.Icon {
             anchors.centerIn: parent
-            width: Math.min(parent.width, parent.height) * 0.75
+            width: Math.round(Math.min(parent.width, parent.height) * 0.86)
             height: width
             source: root.logo
         }

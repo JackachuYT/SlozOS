@@ -1,0 +1,78 @@
+#!/usr/bin/bash
+# slozos-update — keep SlozOS on SlozOS.
+#
+# SlozOS is built on Bazzite, but updates come from SlozOS's own images
+# (ghcr.io/jackachuyt/slozos-<edition>), never from Bazzite's. This replaces
+# Bazzite's rollback/rebase helper (`brh`), whose rebase targets are hard-wired
+# to ghcr.io/ublue-os and would turn a SlozOS install into plain Bazzite.
+#
+#   slozos-update                 update everything (system, Flatpaks, …)
+#   slozos-update status          show what you're running and where updates come from
+#   slozos-update channel [TAG]   switch update channel: stable (default) or a version, e.g. 1.2
+#   slozos-update list            list available channels/versions
+#   slozos-update rollback        boot back into the previous version
+#
+# Bazzite-style calls keep working: `brh rebase stable`, `brh rollback`, …
+
+set -euo pipefail
+
+IMAGE=$(cut -d: -f1 < /usr/share/slozos/image-ref)      # ghcr.io/jackachuyt/slozos-sp2
+VERSION=$(. /usr/lib/os-release && echo "${SLOZOS_VERSION:-unknown}")
+EDITION=$(. /usr/lib/os-release && echo "${SLOZOS_EDITION:-}")
+
+booted_ref() {
+    bootc status --format=json 2>/dev/null | jq -r '.spec.image.image // empty'
+}
+
+as_root() {
+    if [[ $EUID -eq 0 ]]; then "$@"; else pkexec "$@"; fi
+}
+
+cmd_status() {
+    echo "SlozOS $VERSION — $EDITION"
+    echo "Updates from: $(booted_ref || echo unknown)"
+    echo
+    rpm-ostree status --booted 2>/dev/null || true
+}
+
+cmd_update() {
+    if [[ -x /usr/libexec/uupd-update ]]; then
+        /usr/libexec/uupd-update | jq -r -R 'fromjson? | [(.title, .msg, .description) | select(.)] | join(" ")'
+    else
+        as_root bootc upgrade
+    fi
+}
+
+cmd_list() {
+    skopeo list-tags "docker://$IMAGE" | jq -r '.Tags[]' | grep -Ev '^sha-' | sort -V
+}
+
+cmd_channel() {
+    local tag=${1:-stable} yes=${2:-}
+    # Only ever switch between SlozOS images
+    case "$tag" in
+        */*|*:*) echo "Refusing to switch to '$tag': SlozOS only updates from $IMAGE." >&2; exit 1 ;;
+    esac
+    echo "Switch SlozOS updates to: $IMAGE:$tag"
+    if [[ "$yes" != "-y" ]]; then
+        read -rp "Proceed? [y/N] " reply
+        [[ $reply =~ ^[Yy]$ ]] || { echo "Cancelled."; exit 0; }
+    fi
+    as_root bootc switch "$IMAGE:$tag"
+    echo "Done — reboot to start the new version."
+}
+
+cmd_rollback() {
+    as_root rpm-ostree rollback
+    echo "Done — reboot to go back to the previous version."
+}
+
+case "${1:-update}" in
+    update|upgrade)          cmd_update ;;
+    status)                  cmd_status ;;
+    list|list-tags|tags)     cmd_list ;;
+    channel|rebase|switch)   shift; cmd_channel "${1:-stable}" "${2:-}" ;;
+    rollback)                cmd_rollback ;;
+    -h|--help|help)          sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//' ;;
+    *)                       echo "Unknown command '$1' (try: slozos-update help)" >&2; exit 1 ;;
+esac

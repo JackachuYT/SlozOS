@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SlozOS menu-bar glyph: a solid sloth face, like the Apple logo. One path,
+     even-odd fill: face (filled) → eye patches (holes) → pupils (filled again),
+     nose and smile (holes). White; transparent where the background shows. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <path fill="#ffffff" fill-rule="evenodd" d="
+    M3,34 A29,26 0 1,0 61,34 A29,26 0 1,0 3,34 Z
+    M12.4,35.2 A10,6.8 -32 1,0 29.6,24.8 A10,6.8 -32 1,0 12.4,35.2 Z
+    M34.4,24.8 A10,6.8 32 1,0 51.6,35.2 A10,6.8 32 1,0 34.4,24.8 Z
+    M18.6,30 A3.4,3.4 0 1,0 25.4,30 A3.4,3.4 0 1,0 18.6,30 Z
+    M38.6,30 A3.4,3.4 0 1,0 45.4,30 A3.4,3.4 0 1,0 38.6,30 Z
+    M28.4,41 A3.6,2.7 0 1,0 35.6,41 A3.6,2.7 0 1,0 28.4,41 Z
+    M24.5,45.5 Q32,53.5 39.5,45.5 Q32,50 24.5,45.5 Z"/>
+</svg>
