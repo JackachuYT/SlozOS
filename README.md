@@ -48,6 +48,27 @@ Bazzite is built for gaming PCs with 16 GB+ of RAM. SlozOS re-tunes it for 2013�
 - **Easier on the graphics chip:** glass blur strength matched to each Surface's iGPU
 - **Small updates:** SlozOS's own changes download in megabytes — the heavy base only changes when Bazzite does
 
+### Minecraft at 60 FPS (vanilla, no Sodium) 🟩
+
+SlozOS sets up **Prism Launcher** (installed on first boot) for the best vanilla performance these Surfaces can give: threaded OpenGL (`mesa_glthread`), GameMode, a Java heap that fits next to the desktop with low-pause garbage collection, a 720p game window, and on the Surface Book the GTX 940M instead of the Intel chip.
+
+In Minecraft, these **Video Settings** get a Surface Pro 2 (HD 4400) closest to a steady 60 FPS:
+
+| Setting | Value |
+|---|---|
+| Graphics | **Fast** |
+| Render Distance | **6–8** chunks |
+| Simulation Distance | **5** |
+| Smooth Lighting | **Off** |
+| Max Framerate | **60** · VSync **Off** |
+| Clouds · Entity Shadows | **Off** |
+| Particles | **Minimal** |
+| Biome Blend | **Off** |
+| Mipmap Levels | **0** |
+| Window | **1280×720** (or Fullscreen Resolution 1280×720) |
+
+For a few more FPS, turn on **SlozOS Performance Mode** in SlozOS Portal → *Manage SlozOS* (or `slozos-performance-mode on`, then reboot). It switches off CPU security mitigations, which cost these older Intel CPUs noticeably — faster, but less protected against malicious code, so it's off by default.
+
 ---
 
 ## Built on Bazzite 🎮

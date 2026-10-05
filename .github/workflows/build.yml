@@ -52,7 +52,7 @@ jobs:
             release_notes: |
               🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
 
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, and much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB.
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -91,7 +91,7 @@ jobs:
             release_notes: |
               🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
 
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, and much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB.
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -130,7 +130,7 @@ jobs:
             release_notes: |
               🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
 
-              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, and much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB.
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 

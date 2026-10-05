@@ -58,4 +58,45 @@ case "$DEVICE" in
 esac
 printf '[Effect-blur]\nBlurStrength=%s\n' "$BLUR" > "$SRC/kwin-blur"
 merge /etc/skel/.config/kwinrc "$SRC/kwin-blur"
+
+# ── Gaming: Minecraft (vanilla, no Sodium) and friends ───────────────────────
+# Threaded OpenGL for the Minecraft launchers only (not the whole desktop)
+install -Dm644 "$CTX/config/gaming/flatpak-override-minecraft" /usr/share/slozos/flatpak-overrides/minecraft
+install -Dm644 "$CTX/config/gaming/slozos-gaming.tmpfiles"     /usr/lib/tmpfiles.d/slozos-gaming.conf
+install -Dm644 "$CTX/config/gaming/10-slozos-minecraft.conf"   /usr/share/drirc.d/10-slozos-minecraft.conf
+
+# Prism Launcher — the best way to run vanilla Minecraft on Linux — joins
+# Bazzite's first-boot Flatpak list
+LIST=/usr/share/ublue-os/bazzite/flatpak/install
+if [[ -f $LIST ]] && ! grep -qx org.prismlauncher.PrismLauncher "$LIST"; then
+    echo org.prismlauncher.PrismLauncher >> "$LIST"
+fi
+
+# Prism defaults for new accounts: GameMode on, a heap that fits next to the
+# desktop, low-pause G1 GC, and the GTX 940M on the Surface Book
+case "$DEVICE" in
+    sb1) HEAP=3072; DGPU=true ;;
+    *)   HEAP=2048; DGPU=false ;;
+esac
+PRISM=/etc/skel/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher
+mkdir -p "$PRISM"
+cat > "$SRC/prismlauncher.cfg" <<EOF
+[General]
+MinMemAlloc=512
+MaxMemAlloc=$HEAP
+JvmArgs=-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=16M -XX:+DisableExplicitGC -XX:+PerfDisableSharedMem -XX:+UseStringDeduplication
+EnableFeralGamemode=true
+UseDiscreteGpu=$DGPU
+# 720p window: 2.25x fewer pixels than 1080p — the iGPU's biggest cost
+MinecraftWinWidth=1280
+MinecraftWinHeight=720
+LaunchMaximized=false
+EOF
+merge "$PRISM/prismlauncher.cfg" "$SRC/prismlauncher.cfg"
+
+# Opt-in Performance Mode (CPU mitigations off) — in the Portal and as a command
+install -Dm755 "$CTX/config/slozos/slozos-performance-mode" /usr/bin/slozos-performance-mode
+if [[ -f /usr/share/yafti/yafti.yml ]]; then
+    python3 "$CTX/build/portal-add-performance-mode.py"
+fi
 :
