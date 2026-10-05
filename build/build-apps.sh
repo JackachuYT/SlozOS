@@ -5,6 +5,7 @@
 # the Containerfile copies /out/usr into the OS image.
 #
 #   • SlozOS Spotlight (spotlight/)
+#   • SlozOS Welcome (welcome/) — first-run setup app
 #   • SlozOS Updater — Bazzite's graphical updater (rfrench3/bazzite-updater,
 #     GPL-2.0-or-later), pinned and rebuilt with SlozOS naming. Its window
 #     title is compiled in, so configuration alone can't rename it.
@@ -29,6 +30,11 @@ dnf5 -y install --setopt=install_weak_deps=False --setopt=disable_excludes='*' \
 cmake -S "$CTX/spotlight" -B /tmp/spotlight -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build /tmp/spotlight -j"$(nproc)"
 DESTDIR=/out cmake --install /tmp/spotlight
+
+# ── SlozOS Welcome ───────────────────────────────────────────────────────────
+cmake -S "$CTX/welcome" -B /tmp/welcome -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build /tmp/welcome -j"$(nproc)"
+DESTDIR=/out cmake --install /tmp/welcome
 
 # ── SlozOS Updater ───────────────────────────────────────────────────────────
 mkdir -p /tmp/updater

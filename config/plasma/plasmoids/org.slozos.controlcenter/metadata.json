@@ -1,0 +1,15 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [ { "Name": "SlozOS" } ],
+        "Category": "System Information",
+        "Description": "macOS-style Control Center: Wi-Fi, Bluetooth, Focus, power mode, brightness and sound in one place",
+        "Icon": "configure",
+        "Id": "org.slozos.controlcenter",
+        "License": "GPL-3.0",
+        "Name": "Control Center",
+        "Version": "1.0",
+        "Website": "https://github.com/JackachuYT/SlozOS"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

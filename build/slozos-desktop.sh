@@ -55,6 +55,9 @@ cp -r "$CTX/config/plasma/look-and-feel/org.slozos.desktop" /usr/share/plasma/lo
 # The SlozOS logo menu widget for the top-left of the menu bar
 mkdir -p /usr/share/plasma/plasmoids
 cp -r "$CTX/config/plasma/plasmoids/org.slozos.logomenu" /usr/share/plasma/plasmoids/
+# Control Center (menu bar, next to the clock) + its backend
+cp -r "$CTX/config/plasma/plasmoids/org.slozos.controlcenter" /usr/share/plasma/plasmoids/
+install -Dm755 "$CTX/config/controlcenter/slozos-cc" /usr/bin/slozos-cc
 
 # Login screen: Bazzite 44 uses Plasma Login Manager (SDDM themes no longer
 # apply). It only supports a wallpaper, so set that.
@@ -88,6 +91,14 @@ merge "$SKEL/kscreenlockerrc" "$SRC/kscreenlockerrc"
 # register its Meta+Space shortcut with KGlobalAccel.
 install -Dm644 "$CTX/spotlight/slozos-spotlight-autostart.desktop" /etc/xdg/autostart/slozos-spotlight.desktop
 install -Dm644 "$CTX/spotlight/org.slozos.spotlight.desktop"       /usr/share/kglobalaccel/org.slozos.spotlight.desktop
+
+# SlozOS Welcome runs on first login (binary from the apps stage) and takes
+# over from Bazzite's Portal, which stays in the app menu as "SlozOS Portal"
+install -Dm644 "$CTX/welcome/slozos-welcome-firstrun.desktop" /etc/xdg/autostart/slozos-welcome-firstrun.desktop
+P=/etc/skel/.config/autostart/bazzite-portal.desktop
+if [[ -f $P ]]; then
+    if grep -q '^Hidden=' "$P"; then sed -i 's/^Hidden=.*/Hidden=true/' "$P"; else sed -i '/^\[Desktop Entry\]/a Hidden=true' "$P"; fi
+fi
 
 # First-login fallback that applies the layout if Plasma didn't (see script)
 install -Dm755 "$CTX/config/slozos/slozos-firstlogin.sh"      /usr/libexec/slozos-firstlogin

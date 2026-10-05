@@ -34,9 +34,10 @@ COPY config/surface-book/mwifiex.conf        /usr/lib/modprobe.d/mwifiex.conf
 COPY config/surface-book/wifi-powersave.conf /usr/lib/NetworkManager/conf.d/wifi-powersave.conf
 COPY config/surface-book/01-sb1-kargs.toml   /usr/lib/bootc/kargs.d/01-sb1-kargs.toml
 
-# SlozOS Spotlight + SlozOS Updater from stage 1; --help proves they link
+# SlozOS Spotlight, Welcome + Updater from stage 1; --help proves they link
 COPY --from=apps /out/usr/ /usr/
 RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null && \
+    QT_QPA_PLATFORM=offscreen slozos-welcome --help >/dev/null && \
     QT_QPA_PLATFORM=offscreen bazzite-updater --help >/dev/null
 
 # ── SlozOS settings: Liquid Glass desktop, branding, updates, tuning ────────

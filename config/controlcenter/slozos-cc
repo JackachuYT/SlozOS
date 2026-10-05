@@ -1,0 +1,68 @@
+#!/usr/bin/bash
+# slozos-cc — backend for the SlozOS Control Center widget.
+#
+#   slozos-cc state                      → one line of JSON with everything
+#   slozos-cc wifi on|off
+#   slozos-cc bluetooth on|off
+#   slozos-cc airplane on|off
+#   slozos-cc brightness <0-100>
+#   slozos-cc volume <0-100> | mute
+#   slozos-cc profile power-saver|balanced|performance
+#
+# Uses the same services Plasma does (NetworkManager, BlueZ, PowerDevil,
+# PipeWire, power-profiles) through their command-line/D-Bus front ends.
+set -uo pipefail
+
+json_bool() { [[ "$1" == true ]] && echo true || echo false; }
+
+wifi_on()   { [[ "$(nmcli -t -f WIFI radio 2>/dev/null)" == enabled ]] && echo true || echo false; }
+wifi_ssid() { nmcli -t -f ACTIVE,SSID dev wifi list --rescan no 2>/dev/null | sed -n 's/^yes://p' | head -1; }
+bt_on()     { bluetoothctl show 2>/dev/null | grep -q "Powered: yes" && echo true || echo false; }
+airplane()  { # every radio soft-blocked
+    local out; out=$(rfkill -rn -o SOFT 2>/dev/null) || { echo false; return; }
+    [[ -n "$out" ]] && ! grep -qv '^blocked$' <<<"$out" && echo true || echo false
+}
+
+sb_display() { # first (internal) PowerDevil display object
+    gdbus call --session --dest org.kde.ScreenBrightness --object-path /org/kde/ScreenBrightness \
+        --method org.freedesktop.DBus.Properties.Get org.kde.ScreenBrightness DisplaysDBusNames 2>/dev/null \
+        | grep -o "'[^']*'" | head -1 | tr -d "'"
+}
+sb_get() { # sb_get DISPLAY PROPERTY → int
+    gdbus call --session --dest org.kde.ScreenBrightness --object-path "/org/kde/ScreenBrightness/$1" \
+        --method org.freedesktop.DBus.Properties.Get org.kde.ScreenBrightness.Display "$2" 2>/dev/null \
+        | grep -o '[0-9]\+' | tail -1
+}
+brightness() {
+    local d cur max; d=$(sb_display); [[ -n "$d" ]] || { echo -1; return; }
+    cur=$(sb_get "$d" Brightness); max=$(sb_get "$d" MaxBrightness)
+    [[ -n "$cur" && -n "$max" && "$max" -gt 0 ]] && echo $(( cur * 100 / max )) || echo -1
+}
+
+volume()    { wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{printf "%d", $2*100 + 0.5}'; }
+muted()     { wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | grep -q MUTED && echo true || echo false; }
+
+profile() {
+    gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles \
+        --method org.freedesktop.DBus.Properties.Get net.hadess.PowerProfiles ActiveProfile 2>/dev/null \
+        | grep -o "'[^']*'" | tr -d "'"
+}
+
+case "${1:-state}" in
+    state)
+        printf '{"wifi":%s,"ssid":"%s","bluetooth":%s,"airplane":%s,"brightness":%s,"volume":%s,"muted":%s,"profile":"%s"}\n' \
+            "$(wifi_on)" "$(wifi_ssid | sed 's/["\\]/\\&/g')" "$(bt_on)" "$(airplane)" \
+            "$(brightness)" "$(v=$(volume); echo "${v:--1}")" "$(muted)" "$(profile)" ;;
+    wifi)       nmcli radio wifi "$2" ;;
+    bluetooth)  [[ "$2" == on ]] && rfkill unblock bluetooth 2>/dev/null; bluetoothctl power "$2" >/dev/null ;;
+    airplane)   if [[ "$2" == on ]]; then rfkill block all; else rfkill unblock all; fi ;;
+    brightness) d=$(sb_display); max=$(sb_get "$d" MaxBrightness)
+                [[ -n "$d" && -n "$max" ]] && gdbus call --session --dest org.kde.ScreenBrightness \
+                    --object-path "/org/kde/ScreenBrightness/$d" \
+                    --method org.kde.ScreenBrightness.Display.SetBrightness "$(( $2 * max / 100 ))" 0 >/dev/null ;;
+    volume)     if [[ "$2" == mute ]]; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+                else wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume @DEFAULT_AUDIO_SINK@ "$2%"; fi ;;
+    profile)    gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles \
+                    --method org.freedesktop.DBus.Properties.Set net.hadess.PowerProfiles ActiveProfile "<'$2'>" >/dev/null ;;
+    *)          echo "usage: slozos-cc state|wifi|bluetooth|airplane|brightness|volume|profile …" >&2; exit 2 ;;
+esac
