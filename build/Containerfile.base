@@ -1,0 +1,12 @@
+# SlozOS base image: Bazzite + packages, WhiteSur themes and the boot splash.
+#
+# Published as ghcr.io/jackachuyt/slozos-base-<edition>:<key> and only rebuilt
+# when Bazzite or the base inputs change (see the workflow). Every SlozOS
+# release builds FROM it, so its layers keep the same digests and installed
+# Surfaces don't re-download them on a normal SlozOS update.
+ARG BAZZITE=ghcr.io/ublue-os/bazzite:stable
+FROM ${BAZZITE}
+RUN --mount=type=bind,source=.,target=/ctx bash /ctx/build/slozos-base.sh && \
+    mkdir -p /usr/share/slozos && touch /usr/share/slozos/.base-layer
+LABEL org.opencontainers.image.source="https://github.com/JackachuYT/SlozOS"
+LABEL org.opencontainers.image.description="SlozOS base layer (not bootable on its own)"
