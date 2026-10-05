@@ -50,7 +50,7 @@ jobs:
             release_notes: |
               SlozOS 1.1.3 for the **Microsoft Surface Pro 2** (2013, Haswell).
 
-              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
+              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apps button on the dock that opens Spotlight's app grid (like Tahoe, replacing Launchpad), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
 
               **Also included (since 1.1):** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, SlozOS boot splash.
 
@@ -82,7 +82,7 @@ jobs:
             release_notes: |
               SlozOS 1.1.3 for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
 
-              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
+              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apps button on the dock that opens Spotlight's app grid (like Tahoe, replacing Launchpad), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
 
               **Also included (since 1.1):** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, SlozOS boot splash.
 
@@ -114,7 +114,7 @@ jobs:
             release_notes: |
               SlozOS 1.1.3 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
 
-              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
+              **New in 1.1.3:** SlozOS Spotlight on Meta+Space (glass search for apps, files, settings and clipboard), an Apps button on the dock that opens Spotlight's app grid (like Tahoe, replacing Launchpad), an Apple-style SlozOS logo menu (About, System Settings, Spotlight, Sleep, Restart, Shut Down, Lock, Log Out), a bold sloth-face menu-bar logo, and Alt+F1 opens the logo menu.
 
               **Also included (since 1.1):** macOS Tahoe Liquid Glass desktop — top menu bar, floating dock, traffic-light window buttons, glass blur, SlozOS boot splash.
 

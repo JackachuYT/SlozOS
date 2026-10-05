@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Apps
+GenericName=App Launcher
+Comment=Browse and search all your apps
+Exec=slozos-spotlight --apps
+Icon=view-app-grid
+StartupNotify=false
+NoDisplay=true

@@ -261,6 +261,11 @@ def main():
         qmp.type_text("settings")
         time.sleep(4)
         qmp.screenshot(os.path.join(args.out, "08-spotlight-search.png"))
+        qmp.key("esc")             # clear the text
+        time.sleep(1)
+        qmp.key("ctrl", "1")       # Apps grid (same as the dock's Apps button)
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "09-apps.png"))
         qmp.key("esc")
         qmp.key("esc")
         ok = True

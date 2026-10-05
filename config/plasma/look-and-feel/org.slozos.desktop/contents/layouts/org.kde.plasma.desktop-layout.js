@@ -50,7 +50,7 @@ clock.writeConfig("autoFontAndSize", false);
 clock.writeConfig("fontWeight", 500);
 
 // ── Dock (bottom, floating, hugs its icons) ──────────────────────────────────
-// [Launchpad] [pinned apps + running apps] | [Trash]
+// [Apps] [pinned apps + running apps] | [Trash]   (Apps opens Spotlight's app grid, like Tahoe)
 var dock = new Panel;
 dock.location = "bottom";
 dock.height = 2 * Math.round(gridUnit * 1.6);       // ~58 px at 100% scale
@@ -60,13 +60,10 @@ dock.alignment = "center";
 // Small Surface screens: tuck the dock away when a window would overlap it
 dock.hiding = "dodgewindows";
 
-var launchpad = dock.addWidget("org.kde.plasma.kickerdash");
-launchpad.currentConfigGroup = ["General"];
-launchpad.writeConfig("icon", "view-app-grid");
-
 var tasks = dock.addWidget("org.kde.plasma.icontasks");
 tasks.currentConfigGroup = ["General"];
 tasks.writeConfig("launchers", [
+    "applications:org.slozos.apps.desktop",
     "preferred://filemanager",
     "preferred://browser",
     "applications:steam.desktop",

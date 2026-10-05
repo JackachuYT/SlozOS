@@ -7,5 +7,5 @@ _launch=Meta+Space
 _launch=Alt+Space	Alt+F2	Search
 
 [plasmashell]
-# Meta alone opens Launchpad; Alt+F1 is left for the SlozOS logo menu
+# Alt+F1 belongs to the SlozOS logo menu, not Plasma's app-launcher widget
 activate application launcher=Meta,Meta\tAlt+F1,Activate Application Launcher
