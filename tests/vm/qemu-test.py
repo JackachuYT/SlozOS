@@ -143,7 +143,10 @@ class Serial:
 
 DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "
         "echo '--- failed units:'; systemctl --failed --no-legend --plain; "
-        "echo '--- os:'; grep PRETTY_NAME /etc/os-release; echo SLOZOS-DIAG-''END")
+        "echo '--- os:'; grep PRETTY_NAME /etc/os-release; "
+        "echo '--- update source:'; rpm-ostree status --booted --json | jq -r '.deployments[0][\"container-image-reference\"]'; "
+        "journalctl -b -u slozos-update-origin --no-pager -o cat | tail -12; "
+        "echo SLOZOS-DIAG-''END")
 
 
 def main():
@@ -224,6 +227,10 @@ def main():
         diag = diag.split(DIAG, 1)[-1]   # drop the echoed command
         with open(os.path.join(args.out, "diagnostics.txt"), "w") as f:
             f.write(diag)
+        # The workflow fails the build unless this says ghcr.io/jackachuyt/slozos-…
+        m_src = re.search(r"--- update source:\s*\n\s*(\S+)", re.sub(r"\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-9;?]*[A-Za-z]", "", diag))
+        with open(os.path.join(args.out, "update-source.txt"), "w") as f:
+            f.write(m_src.group(1) if m_src else "unknown")
         print("── diagnostics ──\n" + diag.strip(), flush=True)
         console.send("exit")
         # Strip terminal escape codes (the shell glues OSC/CSI sequences onto output)
