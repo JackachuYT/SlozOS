@@ -61,8 +61,8 @@ RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null && \
 RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_HOSTNAME="slozos" \
     SLOZOS_NAME="SlozOS" \
-    SLOZOS_PRETTY_NAME="SlozOS 1.2.2 (Bazzite)" \
-    SLOZOS_VERSION="1.2.2" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.2.3 (Bazzite)" \
+    SLOZOS_VERSION="1.2.3" \
     SLOZOS_EDITION="Surface Pro 2" \
     SLOZOS_IMAGE="ghcr.io/jackachuyt/slozos-sp2" \
     bash /ctx/build/slozos-desktop.sh
@@ -71,4 +71,4 @@ RUN --mount=type=bind,source=.,target=/ctx \
 LABEL org.opencontainers.image.title="SlozOS"
 LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface"
 LABEL org.opencontainers.image.source="https://github.com/JackachuYT/SlozOS"
-LABEL org.opencontainers.image.version="1.2.2"
+LABEL org.opencontainers.image.version="1.2.3"

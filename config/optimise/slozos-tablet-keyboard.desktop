@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS tablet keyboard
+Comment=Enable the on-screen keyboard only in tablet mode
+Exec=/usr/libexec/slozos-tablet-keyboard
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2
