@@ -72,7 +72,7 @@ echo "SlozOS release $FEDORA_VERSION" > /etc/system-release
 echo "$SLOZOS_HOSTNAME" > /etc/hostname
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/icons/hicolor/512x512/apps/slozos-logo.png
 
-# "About this System": "SlozOS 1.2", "Surface Pro 2 Edition · Bazzite 44"
+# "About this System": "SlozOS 1.4", "Standard Edition · Bazzite 44"
 cat > "$SRC/kcm-about-distrorc" <<EOF
 [General]
 LogoPath=/usr/share/pixmaps/slozos-logo-white.png
@@ -111,7 +111,7 @@ welcome = {
     "hidden": True,
     "actions": [
         {"id": "slozos-help", "title": "Read the SlozOS guide", "default": False,
-         "description": "How to install, update and get the most out of SlozOS on your Surface.",
+         "description": "How to install, update and get the most out of SlozOS.",
          "script": f"xdg-open {gh}#readme"},
         {"id": "bazaar", "title": "Browse your Bazaar", "default": False,
          "description": "Your app store — Discord, Heroic Games Launcher, emulators and more.",
@@ -120,7 +120,7 @@ welcome = {
          "description": "Get the latest SlozOS version, plus app and driver updates.",
          "script": "slozos-update; status=$?; echo; echo \"Press Enter to close...\"; read -r _; exit $status"},
         {"id": "slozos-issues", "title": "Report a problem", "default": False,
-         "description": "Something not working on your Surface? Let us know on GitHub.",
+         "description": "Something not working on your PC? Let us know on GitHub.",
          "script": f"xdg-open {gh}/issues"},
     ],
 }
@@ -151,6 +151,10 @@ fi
 for f in /usr/share/applications/*.desktop /etc/skel/.config/autostart/*.desktop /etc/xdg/autostart/*.desktop; do
     [[ -f $f ]] || continue
     sed -i -E 's/^(Name(\[[^]]*\])?=)Bazzite /\1SlozOS /' "$f"
+done
+# …and the Portal's description ("Helps you setup Bazzite")
+for f in $(grep -l '^Name=SlozOS Portal' /usr/share/applications/*.desktop 2>/dev/null); do
+    sed -i -E '/^Comment(\[[^]]*\])?=/ s/Bazzite/SlozOS/g' "$f"
 done
 install -Dm644 "$CTX/config/slozos/org.slozos.help.desktop"    /usr/share/applications/org.slozos.help.desktop
 

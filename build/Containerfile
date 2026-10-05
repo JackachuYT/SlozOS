@@ -1,0 +1,53 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# SlozOS — one Containerfile for every edition.
+#
+#   Standard (Intel/AMD graphics):
+#     podman build -f build/Containerfile -t slozos .
+#   NVIDIA:
+#     podman build -f build/Containerfile -t slozos-nvidia \
+#       --build-arg BAZZITE=ghcr.io/ublue-os/bazzite-nvidia:stable \
+#       --build-arg EDITION=NVIDIA --build-arg IMAGE=ghcr.io/jackachuyt/slozos-nvidia .
+#
+# CI also passes BASE = the published SlozOS base image (Bazzite + packages,
+# themes and boot splash — see build/Containerfile.base) so updates stay small;
+# without it the base layer is built inline from plain Bazzite.
+# ──────────────────────────────────────────────────────────────────────────────
+ARG BAZZITE=ghcr.io/ublue-os/bazzite:stable
+ARG BASE=${BAZZITE}
+
+# ── Stage 1: SlozOS's own apps (Spotlight, Welcome, Updater) ─────────────────
+# Same image as the OS below, so they link against the same Qt/KDE versions.
+FROM ${BASE} AS apps
+RUN --mount=type=bind,source=.,target=/ctx bash /ctx/build/build-apps.sh
+
+# ── Stage 2: the OS image ────────────────────────────────────────────────────
+FROM ${BASE}
+ARG EDITION=Standard
+ARG IMAGE=ghcr.io/jackachuyt/slozos
+ARG VERSION=dev
+
+# Base layer: packages, WhiteSur themes, boot splash (already present when
+# BASE is the published SlozOS base image)
+RUN --mount=type=bind,source=.,target=/ctx \
+    [ -f /usr/share/slozos/.base-layer ] || bash /ctx/build/slozos-base.sh
+
+# SlozOS Spotlight, Welcome + Updater from stage 1; --help proves they link
+COPY --from=apps /out/usr/ /usr/
+RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null && \
+    QT_QPA_PLATFORM=offscreen slozos-welcome --help >/dev/null && \
+    QT_QPA_PLATFORM=offscreen bazzite-updater --help >/dev/null
+
+# Settings: Liquid Glass desktop, branding, updates, hardware detection, tuning
+RUN --mount=type=bind,source=.,target=/ctx \
+    SLOZOS_HOSTNAME="slozos" \
+    SLOZOS_NAME="SlozOS" \
+    SLOZOS_PRETTY_NAME="SlozOS ${VERSION}" \
+    SLOZOS_VERSION="${VERSION}" \
+    SLOZOS_EDITION="${EDITION}" \
+    SLOZOS_IMAGE="${IMAGE}" \
+    bash /ctx/build/slozos-desktop.sh
+
+LABEL org.opencontainers.image.title="SlozOS"
+LABEL org.opencontainers.image.description="SlozOS — a macOS Tahoe-style gaming OS for any PC, built on Bazzite"
+LABEL org.opencontainers.image.source="https://github.com/JackachuYT/SlozOS"
+LABEL org.opencontainers.image.version="${VERSION}"

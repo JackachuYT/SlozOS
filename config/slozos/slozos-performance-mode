@@ -2,7 +2,7 @@
 # SlozOS Performance Mode — opt-in, for squeezing out more FPS.
 #
 # Turns off the kernel's CPU vulnerability mitigations (Spectre, Meltdown,
-# MDS, …). On Ivy Bridge/Haswell/Skylake Surfaces these cost a noticeable
+# MDS, …). On older Intel CPUs (Ivy Bridge → Skylake) these cost a noticeable
 # chunk of CPU time in games and Java (Minecraft). The trade-off is real:
 # malicious code you run (e.g. a hostile web page) has an easier time reading
 # memory it shouldn't. Fine for a gaming tablet you control; off by default.

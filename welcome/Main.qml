@@ -21,7 +21,7 @@ Window {
     readonly property color dim: Qt.rgba(1, 1, 1, 0.6)
     readonly property string font: "Inter"
     readonly property string version: Sys.os["SLOZOS_VERSION"] || ""
-    readonly property string edition: Sys.os["SLOZOS_EDITION"] || "Surface"
+    readonly property string edition: Sys.os["SLOZOS_EDITION"] || "Standard"
 
     function finish() { Sys.markDone(); Qt.quit() }
 
@@ -50,7 +50,7 @@ Window {
                     Layout.alignment: Qt.AlignHCenter
                 }
                 Body {
-                    text: "Let's get your Surface set up — it only takes a minute."
+                    text: "Let's get your PC set up — it only takes a minute."
                     color: root.dim
                     Layout.alignment: Qt.AlignHCenter
                 }
@@ -106,7 +106,7 @@ Window {
                 }
                 SwitchRow {
                     title: "Hide the dock when a window needs the space"
-                    subtitle: "Recommended on small Surface screens"
+                    subtitle: "Recommended on small screens and tablets"
                     checked: true
                     onToggled: on => Sys.runAsync("dock",
                         "$(command -v qdbus-qt6 || command -v qdbus6 || echo qdbus) org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript " +
@@ -131,7 +131,7 @@ Window {
                     spacing: 6
                     model: ListModel {
                         ListElement { appId: "steam";                            name: "Steam";            desc: "Your games library";                          icon: "steam" }
-                        ListElement { appId: "org.prismlauncher.PrismLauncher";  name: "Prism Launcher";   desc: "Minecraft, tuned for your Surface";           icon: "org.prismlauncher.PrismLauncher" }
+                        ListElement { appId: "org.prismlauncher.PrismLauncher";  name: "Prism Launcher";   desc: "Minecraft, tuned for SlozOS";           icon: "org.prismlauncher.PrismLauncher" }
                         ListElement { appId: "com.discordapp.Discord";           name: "Discord";          desc: "Chat with friends";                           icon: "com.discordapp.Discord" }
                         ListElement { appId: "com.heroicgameslauncher.hgl";      name: "Heroic";           desc: "Epic Games, GOG and Amazon games";            icon: "com.heroicgameslauncher.hgl" }
                         ListElement { appId: "org.libretro.RetroArch";           name: "RetroArch";        desc: "Retro consoles — perfect for this hardware";  icon: "org.libretro.RetroArch" }
@@ -204,25 +204,25 @@ Window {
                 spacing: 16
                 Heading { text: "Performance" }
                 Body {
-                    text: "SlozOS is already tuned for your " + root.edition + ". Two more choices:"
+                    text: "SlozOS has already tuned itself for this PC. Two more choices:"
                     color: root.dim
                 }
                 SwitchRow {
                     title: "SlozOS Performance Mode"
                     subtitle: "More FPS in games and Minecraft by turning off CPU security mitigations (Spectre/Meltdown). " +
-                              "Faster on older Surfaces, but less protected against malicious code. Takes effect after a restart."
+                              "Biggest gains on older Intel CPUs, but less protected against malicious code. Takes effect after a restart."
                     checked: Sys.succeeds("slozos-performance-mode status")
                     onToggled: on => Sys.runAsync("perf", "slozos-performance-mode " + (on ? "on" : "off"))
                 }
                 SwitchRow {
                     title: "Open Steam when I log in"
-                    subtitle: "Handy if you game a lot — but Steam uses a few hundred MB of memory in the background."
-                    checked: Sys.succeeds("f=$HOME/.config/autostart/steam.desktop; [ -f \"$f\" ] && ! grep -q '^Hidden=true' \"$f\"")
-                    onToggled: on => Sys.runAsync("steam", on
-                        ? "f=$HOME/.config/autostart/steam.desktop; mkdir -p \"${f%/*}\"; " +
-                          "[ -f \"$f\" ] || printf '[Desktop Entry]\\nType=Application\\nName=Steam\\nExec=steam -silent %%U\\nIcon=steam\\n' > \"$f\"; " +
-                          "sed -i '/^Hidden=/d' \"$f\""
-                        : "f=$HOME/.config/autostart/steam.desktop; [ -f \"$f\" ] && { sed -i '/^Hidden=/d' \"$f\"; echo Hidden=true >> \"$f\"; }")
+                    subtitle: "Handy if you game a lot — but Steam uses a few hundred MB of memory in the background. " +
+                              "SlozOS picks a default for this PC; your choice here overrides it."
+                    // the user's saved choice, else the default for this PC's profile (see slozos-session)
+                    checked: Sys.succeeds("p=$HOME/.config/slozos/steam-at-login; " +
+                                          "[ \"$(cat $p 2>/dev/null)\" = on ] || { [ ! -s $p ] && [ \"$(cat /run/slozos/profile 2>/dev/null)\" != light ]; }")
+                    onToggled: on => Sys.runAsync("steam", "mkdir -p $HOME/.config/slozos && echo " + (on ? "on" : "off") +
+                                                          " > $HOME/.config/slozos/steam-at-login")
                 }
                 Item { Layout.fillHeight: true }
             }

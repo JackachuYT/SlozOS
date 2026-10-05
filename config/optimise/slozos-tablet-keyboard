@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-# On-screen keyboard only while the Surface is a tablet.
+# On-screen keyboard only while a 2-in-1 / tablet is in tablet mode.
 #
 # Plasma's on-screen keyboard (plasma-keyboard) costs ~260 MB of RAM for as
 # long as it's enabled, but you only need it with the Type Cover / keyboard

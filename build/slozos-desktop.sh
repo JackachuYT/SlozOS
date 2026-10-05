@@ -111,7 +111,7 @@ log "Identity + updates"
 source "$CTX/build/slozos-identity.sh"
 end
 
-# ── Performance tuning for old Surface hardware ──────────────────────────────
+# ── Performance tuning (hardware-aware) ─────────────────────────────────────
 log "Optimise"
 source "$CTX/build/slozos-optimise.sh"
 end

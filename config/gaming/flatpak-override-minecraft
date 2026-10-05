@@ -3,5 +3,5 @@
 # Vanilla Minecraft is CPU/driver-bound on Intel HD 4000/4400/520, so this is
 # one of the biggest free FPS wins there.
 mesa_glthread=true
-# NVIDIA equivalent (Surface Book 1's GTX 940M)
+# NVIDIA equivalent (NVIDIA edition)
 __GL_THREADED_OPTIMIZATIONS=1

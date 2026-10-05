@@ -4,8 +4,11 @@
 # The ISO installs SlozOS from an image embedded on the USB stick, so a fresh
 # install's update source is that (unreachable) local image. On first boot,
 # record ghcr.io/jackachuyt/slozos-<edition>:stable instead — without
-# downloading anything. Installs that already track a SlozOS image (e.g. via
-# `slozos-update channel 1.3`) are left alone.
+# downloading anything. Installs that already track this edition's image
+# (e.g. via `slozos-update channel 1.3`) are left alone.
+#
+# SlozOS 1.4 merged the per-Surface editions into Standard and NVIDIA, so
+# installs still on an old Surface channel (slozos-sp1/-sp2/-sb1) move over.
 #
 # Two ways to do it, because 1.2's first try (bootc alone) failed on real
 # installs:
@@ -25,20 +28,23 @@ current_ref() {
 }
 
 done_ok() {
-    mkdir -p /var/lib/slozos && touch /var/lib/slozos/update-origin-set
+    mkdir -p /var/lib/slozos && touch /var/lib/slozos/update-origin-v2
     echo "Update source: $(current_ref)"
     exit 0
 }
 
 CURRENT=$(current_ref)
 echo "Current update source: ${CURRENT:-unknown}"
-case "$CURRENT" in
-    *"$REPO":*|*"$REPO") echo "Already on SlozOS updates."; done_ok ;;
-esac
+LEGACY='ghcr.io/jackachuyt/slozos-(sp1|sp2|sb1)(:|$)'
+if [[ "$CURRENT" =~ $LEGACY ]]; then
+    echo "Moving from the old Surface update channel to $WANT"
+elif [[ "$CURRENT" == *"$REPO":* || "$CURRENT" == *"$REPO" ]]; then
+    echo "Already on SlozOS updates."; done_ok
+fi
 
 echo "Switching update source to $WANT"
 if bootc switch --mutate-in-place --transport registry "$WANT"; then
-    [[ "$(current_ref)" == *"$REPO"* ]] && done_ok
+    [[ "$(current_ref)" == *"$REPO":* ]] && done_ok
     echo "bootc reported success but the source didn't change; trying the fallback" >&2
 else
     echo "bootc switch --mutate-in-place failed; trying the fallback" >&2
@@ -59,6 +65,6 @@ unshare -m sh -c '
     grep -q "^container-image-reference=" "$2" || printf "container-image-reference=%s\n" "$1" >> "$2"
 ' sh "$WANT_REF" "$ORIGIN" || { echo "Couldn't update $ORIGIN" >&2; exit 1; }
 
-[[ "$(current_ref)" == *"$REPO"* ]] && done_ok
+[[ "$(current_ref)" == *"$REPO":* ]] && done_ok
 echo "Update source still not SlozOS after fallback" >&2
 exit 1

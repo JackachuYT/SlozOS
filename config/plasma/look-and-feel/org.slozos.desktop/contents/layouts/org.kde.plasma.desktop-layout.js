@@ -58,7 +58,7 @@ dock.height = 2 * Math.round(gridUnit * 1.6);       // ~58 px at 100% scale
 dock.floating = true;
 dock.lengthMode = "fit";
 dock.alignment = "center";
-// Small Surface screens: tuck the dock away when a window would overlap it
+// Small screens: tuck the dock away when a window would overlap it
 dock.hiding = "dodgewindows";
 
 var tasks = dock.addWidget("org.kde.plasma.icontasks");

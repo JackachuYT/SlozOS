@@ -1,0 +1,81 @@
+#!/usr/bin/bash
+# SlozOS hardware setup — runs early on every boot.
+#
+# SlozOS 1.4 runs on any PC, so device-specific fixes are applied here, only
+# on the hardware that needs them, instead of being baked into every install.
+# It also picks the performance profile (see slozos-session):
+#
+#   light — under ~7 GB of RAM: Steam, KDE Connect and the XWayland video
+#           bridge start on demand; lighter glass blur
+#   full  — everything at login, full effects
+#
+# Writes only to /run (fresh each boot) and /etc/xdg/kwinrc (blur default).
+set -uo pipefail
+
+dmi() { cat "/sys/class/dmi/id/$1" 2>/dev/null; }
+VENDOR=$(dmi sys_vendor)
+PRODUCT=$(dmi product_name)
+echo "Hardware: ${VENDOR:-?} ${PRODUCT:-?}"
+
+MARVELL=false
+has_marvell_wifi() {  # USB 1286:* or PCIe 11ab:* network devices
+    $MARVELL && return 0
+    grep -qsx '1286' /sys/bus/usb/devices/*/idVendor && return 0
+    for d in /sys/bus/pci/devices/*; do
+        [[ $(cat "$d/vendor" 2>/dev/null) == 0x11ab && $(cat "$d/class" 2>/dev/null) == 0x0280* ]] && return 0
+    done
+    return 1
+}
+
+deep_sleep() {  # prefer S3 when the firmware offers it
+    grep -qw deep /sys/power/mem_sleep 2>/dev/null && echo deep > /sys/power/mem_sleep && echo "Sleep: deep"
+}
+
+# ── Microsoft Surface ────────────────────────────────────────────────────────
+if [[ $VENDOR == Microsoft* ]]; then
+    case "$PRODUCT" in
+        "Surface with Windows 8 Pro"|"Surface Pro"|"Surface Pro 2")
+            # SP1/SP2 firmware reports a bogus "lid closed" after resume, which
+            # loops suspend forever. Ignore the lid switch on these models.
+            mkdir -p /run/systemd/logind.conf.d
+            printf '[Login]\nHandleLidSwitch=ignore\nHandleLidSwitchExternalPower=ignore\nHandleLidSwitchDocked=ignore\n' \
+                > /run/systemd/logind.conf.d/10-slozos-surface-lid.conf
+            echo "Surface Pro 1/2: lid-switch fix on"
+            MARVELL=true; deep_sleep ;;
+        "Surface Book")
+            MARVELL=true; deep_sleep ;;
+    esac
+fi
+
+# Marvell Wi-Fi drops off when it power-saves; keep it awake (any PC)
+if has_marvell_wifi; then
+    mkdir -p /run/NetworkManager/conf.d
+    printf '[connection]\nwifi.powersave = 2\n' > /run/NetworkManager/conf.d/10-slozos-marvell-powersave.conf
+    echo "Marvell Wi-Fi: power saving off"
+fi
+
+# ── Performance profile ──────────────────────────────────────────────────────
+MEM_KB=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
+if (( MEM_KB < 7 * 1024 * 1024 )); then PROFILE=light; else PROFILE=full; fi
+
+# Glass blur by graphics chip: lighter on old Intel iGPUs (Sandy/Ivy Bridge →
+# Skylake), full strength on anything newer or discrete
+BLUR=10
+for d in /sys/class/drm/card*/device; do
+    [[ $(cat "$d/vendor" 2>/dev/null) == 0x8086 ]] || continue
+    case "$(cat "$d/device" 2>/dev/null)" in
+        0x01*)                         BLUR=6 ;;   # Sandy/Ivy Bridge (HD 2000–4000)
+        0x04*|0x0a*|0x0d*|0x16*|0x19*) BLUR=8 ;;   # Haswell, Broadwell, Skylake
+    esac
+done
+for d in /sys/class/drm/card*/device; do        # a discrete GPU wins
+    case "$(cat "$d/vendor" 2>/dev/null)" in 0x10de|0x1002) BLUR=10 ;; esac
+done
+[[ $PROFILE == light && $BLUR -gt 8 ]] && BLUR=8
+
+mkdir -p /run/slozos
+echo "$PROFILE" > /run/slozos/profile
+# system-wide default; a user's own blur setting still wins
+kwriteconfig6 --file /etc/xdg/kwinrc --group Effect-blur --key BlurStrength "$BLUR" 2>/dev/null \
+    || printf '[Effect-blur]\nBlurStrength=%s\n' "$BLUR" >> /etc/xdg/kwinrc
+echo "Profile: $PROFILE ($(( MEM_KB / 1024 )) MB RAM), blur $BLUR"

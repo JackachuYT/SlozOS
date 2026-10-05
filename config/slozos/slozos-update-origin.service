@@ -1,6 +1,6 @@
 [Unit]
 Description=Point SlozOS at its own update images
-ConditionPathExists=!/var/lib/slozos/update-origin-set
+ConditionPathExists=!/var/lib/slozos/update-origin-v2
 After=local-fs.target
 Before=uupd.service uupd.timer
 
