@@ -215,11 +215,11 @@ jobs:
           command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -y skopeo; }
           echo "$GH_TOKEN" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
           BAZZITE=ghcr.io/ublue-os/${{ matrix.bazzite }}:stable
-          DIGEST=$(skopeo inspect --format '{{.Digest}}' "docker://$BAZZITE")
+          DIGEST=$(sudo skopeo inspect --format '{{.Digest}}' "docker://$BAZZITE")
           INPUTS=$(cat build/Containerfile.base build/slozos-base.sh build/ini-merge.py config/plymouth/slozos/* | sha256sum | cut -c1-12)
           BASE=ghcr.io/jackachuyt/slozos-base-${{ matrix.device }}:${DIGEST#sha256:}
           BASE=${BASE:0:$(( ${#BASE} - 64 + 12 ))}-$INPUTS
-          if skopeo inspect "docker://$BASE" >/dev/null 2>&1; then
+          if sudo skopeo inspect "docker://$BASE" >/dev/null 2>&1; then
             echo "Reusing base image $BASE"
           else
             echo "Building base image $BASE (Bazzite $DIGEST)"
@@ -287,10 +287,10 @@ jobs:
           SRC_SHA: ${{ steps.reuse.outputs.pr_head || env.HEAD_SHA }}
         run: |
           command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -y skopeo; }
-          echo "$GH_TOKEN" | skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "$GH_TOKEN" | sudo skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
           # Same registry, same blobs: these are just new tags on the tested image
           for tag in stable "$SLOZOS_VERSION"; do
-            skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://$IMAGE:$tag"
+            sudo skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://$IMAGE:$tag"
           done
 
       - name: Publish GitHub Release
