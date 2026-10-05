@@ -36,6 +36,8 @@ RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_HOSTNAME="slozos-sp1" \
     SLOZOS_NAME="SlozOS SP1" \
     SLOZOS_PRETTY_NAME="SlozOS 1.1.3 SP1 (Bazzite)" \
+    SLOZOS_VERSION="1.1.3" \
+    SLOZOS_EDITION="Surface Pro 1" \
     bash /ctx/build/slozos-desktop.sh
 
 # SlozOS Spotlight (Meta+Space search bar) from stage 1; --help proves it links
