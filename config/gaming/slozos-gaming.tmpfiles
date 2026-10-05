@@ -1,0 +1,5 @@
+# Seed Flatpak overrides for the Minecraft launchers (copied only if missing,
+# so changes made in Flatseal are kept).
+d /var/lib/flatpak/overrides 0755 root root -
+C /var/lib/flatpak/overrides/org.prismlauncher.PrismLauncher - - - - /usr/share/slozos/flatpak-overrides/minecraft
+C /var/lib/flatpak/overrides/com.mojang.Minecraft            - - - - /usr/share/slozos/flatpak-overrides/minecraft

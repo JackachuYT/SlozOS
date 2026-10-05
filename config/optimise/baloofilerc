@@ -1,0 +1,5 @@
+# File search: index file names only, not their contents. Content indexing
+# keeps the CPU and SSD busy for a long time after login on old Surfaces;
+# Spotlight's Files search only needs names.
+[General]
+only basic indexing=true

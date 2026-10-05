@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+# SlozOS Performance Mode — opt-in, for squeezing out more FPS.
+#
+# Turns off the kernel's CPU vulnerability mitigations (Spectre, Meltdown,
+# MDS, …). On Ivy Bridge/Haswell/Skylake Surfaces these cost a noticeable
+# chunk of CPU time in games and Java (Minecraft). The trade-off is real:
+# malicious code you run (e.g. a hostile web page) has an easier time reading
+# memory it shouldn't. Fine for a gaming tablet you control; off by default.
+#
+#   slozos-performance-mode on | off | status
+set -euo pipefail
+as_root() { if [[ $EUID -eq 0 ]]; then "$@"; else pkexec "$@"; fi; }
+case "${1:-status}" in
+    on)     as_root rpm-ostree kargs --append-if-missing=mitigations=off
+            echo "Performance Mode will be ON after you reboot." ;;
+    off)    as_root rpm-ostree kargs --delete-if-present=mitigations=off
+            echo "Performance Mode will be OFF after you reboot." ;;
+    status) if grep -qw "mitigations=off" /proc/cmdline; then echo "Performance Mode: on"; exit 0
+            else echo "Performance Mode: off"; exit 1; fi ;;
+    *)      echo "usage: slozos-performance-mode on|off|status" >&2; exit 2 ;;
+esac

@@ -44,12 +44,15 @@ jobs:
             display_name: Surface Pro 2
             containerfile: build/Containerfile.sp2
             image_tag: slozos-sp2
-            iso_name: SlozOS-1.2.1-SP2-amd64
+            bazzite: bazzite
+            iso_name: SlozOS-1.2.2-SP2-amd64
             artifact: SlozOS-SP2-ISO
-            release_tag: v1.2.1-sp2
-            release_title: "SlozOS 1.2.1 — Surface Pro 2 · Full Release"
+            release_tag: v1.2.2-sp2
+            release_title: "SlozOS 1.2.2 — Surface Pro 2"
             release_notes: |
-              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
+              🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
+
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -72,20 +75,23 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.1-SP2-amd64.7z.001
+              7z x SlozOS-1.2.2-SP2-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.1-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.2.2-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sp1
             display_name: Surface Pro 1
             containerfile: build/Containerfile.sp1
             image_tag: slozos-sp1
-            iso_name: SlozOS-1.2.1-SP1-amd64
+            bazzite: bazzite
+            iso_name: SlozOS-1.2.2-SP1-amd64
             artifact: SlozOS-SP1-ISO
-            release_tag: v1.2.1-sp1
-            release_title: "SlozOS 1.2.1 — Surface Pro 1 · Full Release"
+            release_tag: v1.2.2-sp1
+            release_title: "SlozOS 1.2.2 — Surface Pro 1"
             release_notes: |
-              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+              🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -108,20 +114,23 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.1-SP1-amd64.7z.001
+              7z x SlozOS-1.2.2-SP1-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.1-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.2.2-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sb1
             display_name: Surface Book 1
             containerfile: build/Containerfile.sb1
             image_tag: slozos-sb1
-            iso_name: SlozOS-1.2.1-SB1-amd64
+            bazzite: bazzite-nvidia
+            iso_name: SlozOS-1.2.2-SB1-amd64
             artifact: SlozOS-SB1-ISO
-            release_tag: v1.2.1-sb1
-            release_title: "SlozOS 1.2.1 — Surface Book 1 · Full Release"
+            release_tag: v1.2.2-sb1
+            release_title: "SlozOS 1.2.2 — Surface Book 1"
             release_notes: |
-              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              🎉 **SlozOS 1.2.2 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+
+              **New in 1.2.2 — major optimisation:** 4 GB Surfaces get far more usable memory (compressed swap the size of RAM, Steam Deck-style memory tuning, Steam no longer running in the background from login on the Surface Pro 1/2), less background work (file search indexes names only; unused modem, key-remapper and hybrid-GPU services off; boot no longer waits for Wi-Fi), lighter glass blur on the Surface Pro 1/2 graphics chips, much smaller updates — SlozOS's own changes now download in megabytes instead of ~460 MB — and **Minecraft-ready**: Prism Launcher preinstalled with threaded OpenGL, GameMode, tuned Java and a 720p window (GTX 940M on the Surface Book), plus an opt-in SlozOS Performance Mode.
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -145,13 +154,13 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.1-SB1-amd64.7z.001
+              7z x SlozOS-1.2.2-SB1-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.1-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+              Flash `SlozOS-1.2.2-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.2.1"
+      SLOZOS_VERSION: "1.2.2"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise
@@ -195,10 +204,37 @@ jobs:
           sudo docker image prune --all --force || true
           df -h /
 
+      # The base layer (packages, themes, boot splash) is its own image, keyed on
+      # the exact Bazzite digest + the base inputs. Unchanged → reuse it, so the
+      # OS image keeps the same base layers and updates stay small.
+      - name: Prepare SlozOS base image
+        if: steps.reuse.outputs.reused != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -y skopeo; }
+          echo "$GH_TOKEN" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          BAZZITE=ghcr.io/ublue-os/${{ matrix.bazzite }}:stable
+          DIGEST=$(sudo skopeo inspect --format '{{.Digest}}' "docker://$BAZZITE")
+          INPUTS=$(cat build/Containerfile.base build/slozos-base.sh build/ini-merge.py config/plymouth/slozos/* | sha256sum | cut -c1-12)
+          BASE=ghcr.io/jackachuyt/slozos-base-${{ matrix.device }}:${DIGEST#sha256:}
+          BASE=${BASE:0:$(( ${#BASE} - 64 + 12 ))}-$INPUTS
+          if sudo skopeo inspect "docker://$BASE" >/dev/null 2>&1; then
+            echo "Reusing base image $BASE"
+          else
+            echo "Building base image $BASE (Bazzite $DIGEST)"
+            sudo podman build -f build/Containerfile.base \
+              --build-arg BAZZITE="ghcr.io/ublue-os/${{ matrix.bazzite }}@$DIGEST" \
+              -t "$BASE" .
+            sudo podman push "$BASE"
+          fi
+          echo "BASE=$BASE" >> "$GITHUB_ENV"
+
       - name: Build SlozOS ${{ matrix.display_name }} image
         if: steps.reuse.outputs.reused != 'true'
         run: |
           sudo podman build \
+            --build-arg BASE="$BASE" \
             -t localhost/${{ matrix.image_tag }}:latest \
             -f ${{ matrix.containerfile }} .
 
@@ -251,10 +287,10 @@ jobs:
           SRC_SHA: ${{ steps.reuse.outputs.pr_head || env.HEAD_SHA }}
         run: |
           command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -y skopeo; }
-          echo "$GH_TOKEN" | skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
+          echo "$GH_TOKEN" | sudo skopeo login ghcr.io -u "${{ github.actor }}" --password-stdin
           # Same registry, same blobs: these are just new tags on the tested image
           for tag in stable "$SLOZOS_VERSION"; do
-            skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://$IMAGE:$tag"
+            sudo skopeo copy --all "docker://$IMAGE:sha-$SRC_SHA" "docker://$IMAGE:$tag"
           done
 
       - name: Publish GitHub Release
