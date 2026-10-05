@@ -49,6 +49,25 @@ case "$DEVICE" in
         ;;
 esac
 
+# On-screen keyboard (~260 MB while enabled) only in tablet mode: off by
+# default, switched on/off by slozos-tablet-keyboard as the cover comes and goes
+printf '[Wayland]\nVirtualKeyboardEnabled=false\n' > "$SRC/kwin-vk"
+merge /etc/skel/.config/kwinrc "$SRC/kwin-vk"
+install -Dm755 "$CTX/config/optimise/slozos-tablet-keyboard"         /usr/libexec/slozos-tablet-keyboard
+install -Dm644 "$CTX/config/optimise/slozos-tablet-keyboard.desktop" /etc/xdg/autostart/slozos-tablet-keyboard.desktop
+
+# 4 GB models: start these on demand instead of at every login
+#   • KDE Connect daemon (phone linking, ~80 MB) — opening KDE Connect starts it
+#   • XWayland video bridge (~140 MB) — only needed to screen-share from X11
+#     apps such as Discord; launch "XWayland Video Bridge" when you need it
+case "$DEVICE" in
+    sp1|sp2)
+        for f in /etc/xdg/autostart/*kdeconnect*daemon*.desktop /etc/xdg/autostart/*xwaylandvideobridge*.desktop; do
+            set_desktop_key "$f" Hidden true
+        done
+        ;;
+esac
+
 # Frosted-glass blur is the most expensive effect on these iGPUs; each step of
 # strength adds blur passes. Lighter on the weaker chips, still clearly glass.
 case "$DEVICE" in
