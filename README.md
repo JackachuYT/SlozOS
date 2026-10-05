@@ -7,7 +7,6 @@
 **A macOS Tahoe-style gaming OS for any PC — built on Bazzite**
 
 🎉 **SlozOS 1.4 — now for every PC.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
-Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
 ![Based on Bazzite](https://img.shields.io/badge/base-Bazzite-blueviolet?logo=fedora)
@@ -195,5 +194,5 @@ That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to
 <div align="center">
 
 Made with ❤️ by [JackachuYT](https://github.com/JackachuYT)
-
+(Thanks for the help Claude!) 
 </div>
