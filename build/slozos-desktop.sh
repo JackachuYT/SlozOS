@@ -26,9 +26,10 @@ trap 'rm -rf "$SRC"' EXIT
 # ── SlozOS branding ──────────────────────────────────────────────────────────
 log "Branding"
 install -Dm644 "$CTX/assets/logo/slozos-logo.png" /usr/share/pixmaps/slozos-logo.png
-# Solid white sloth-face glyph for the dark menu bar, like the Apple logo —
-# vector, so it stays crisp at 16–24 px (the old PNG went blurry and broken)
-install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.svg" /usr/share/pixmaps/slozos-logo-symbolic.svg
+# Menu-bar logo: the SloZ sloth, white on transparent (made from
+# assets/logo/slozos-logo-sloz-source.png with strokes thickened slightly so
+# they hold up at 20–24 px)
+install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.png" /usr/share/pixmaps/slozos-logo-symbolic.png
 # Full logo, white on transparent, for dark backgrounds (About page)
 install -Dm644 "$CTX/config/plymouth/slozos/logo.png" /usr/share/pixmaps/slozos-logo-white.png
 install -Dm644 "$CTX/config/kde/SlozOS.colors"    /usr/share/color-schemes/SlozOS.colors
