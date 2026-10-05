@@ -15,7 +15,10 @@ CTX=${CTX:-/ctx}
 UPDATER_SHA=9e7654f91f747561d14d24dc243973edb408606c   # 2026-10-04
 
 sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' /etc/yum.repos.d/terra*.repo 2>/dev/null || true
-dnf5 -y install --setopt=install_weak_deps=False \
+# disable_excludes: Bazzite blocks Fedora's mesa-* packages (it ships its own
+# Mesa), which also blocks mesa-libGLU-devel that SDL3-devel needs. This stage
+# is thrown away after the build, so the OS image itself is unaffected.
+dnf5 -y install --setopt=install_weak_deps=False --setopt=disable_excludes='*' \
     gcc-c++ cmake extra-cmake-modules git \
     qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtsvg-devel \
     kf6-kwindowsystem-devel kf6-kservice-devel kf6-kio-devel layer-shell-qt-devel \
