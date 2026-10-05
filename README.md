@@ -13,6 +13,8 @@ Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so 
 ![Based on Bazzite](https://img.shields.io/badge/base-Bazzite-blueviolet?logo=fedora)
 ![Devices](https://img.shields.io/badge/devices-SP1%20%7C%20SP2%20%7C%20SB1-blue?logo=microsoft)
 
+### [⬇ Download SlozOS → jackachuyt.github.io/SlozOS](https://jackachuyt.github.io/SlozOS/)
+
 </div>
 
 ---
