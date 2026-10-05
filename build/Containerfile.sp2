@@ -1,14 +1,7 @@
-# ── Stage 1: build SlozOS Spotlight against this exact base ─────────────────
-# Same image as the OS below, so it links against the same Qt/KDE versions.
-FROM ghcr.io/ublue-os/bazzite:stable AS spotlight
-RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' /etc/yum.repos.d/terra*.repo 2>/dev/null || true && \
-    dnf5 -y install --setopt=install_weak_deps=False \
-        gcc-c++ cmake extra-cmake-modules qt6-qtbase-devel qt6-qtdeclarative-devel \
-        kf6-kwindowsystem-devel kf6-kservice-devel kf6-kio-devel layer-shell-qt-devel
-COPY spotlight /src/spotlight
-RUN cmake -S /src/spotlight -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
-    cmake --build /tmp/build -j"$(nproc)" && \
-    DESTDIR=/out cmake --install /tmp/build
+# ── Stage 1: build SlozOS's own apps (Spotlight, Updater) ────────────────────
+# Same image as the OS below, so they link against the same Qt/KDE versions.
+FROM ghcr.io/ublue-os/bazzite:stable AS apps
+RUN --mount=type=bind,source=.,target=/ctx bash /ctx/build/build-apps.sh
 
 # ── Stage 2: the OS image ────────────────────────────────────────────────────
 FROM ghcr.io/ublue-os/bazzite:stable
@@ -53,17 +46,18 @@ COPY config/surface/01-surface-kargs.toml           /usr/lib/bootc/kargs.d/01-su
 RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_HOSTNAME="slozos" \
     SLOZOS_NAME="SlozOS" \
-    SLOZOS_PRETTY_NAME="SlozOS 1.2 (Bazzite)" \
-    SLOZOS_VERSION="1.2" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.2.1 (Bazzite)" \
+    SLOZOS_VERSION="1.2.1" \
     SLOZOS_EDITION="Surface Pro 2" \
     SLOZOS_IMAGE="ghcr.io/jackachuyt/slozos-sp2" \
     bash /ctx/build/slozos-desktop.sh
 
-# SlozOS Spotlight (Meta+Space search bar) from stage 1; --help proves it links
-COPY --from=spotlight /out/usr/ /usr/
-RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null
+# SlozOS Spotlight + SlozOS Updater from stage 1; --help proves they link
+COPY --from=apps /out/usr/ /usr/
+RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null && \
+    QT_QPA_PLATFORM=offscreen bazzite-updater --help >/dev/null
 
 LABEL org.opencontainers.image.title="SlozOS"
 LABEL org.opencontainers.image.description="SlozOS — Bazzite gaming OS for Microsoft Surface"
 LABEL org.opencontainers.image.source="https://github.com/JackachuYT/SlozOS"
-LABEL org.opencontainers.image.version="1.2"
+LABEL org.opencontainers.image.version="1.2.1"

@@ -153,7 +153,12 @@ for f in /usr/share/applications/*.desktop /etc/skel/.config/autostart/*.desktop
     sed -i -E 's/^(Name(\[[^]]*\])?=)Bazzite /\1SlozOS /' "$f"
 done
 install -Dm644 "$CTX/config/slozos/org.slozos.help.desktop"    /usr/share/applications/org.slozos.help.desktop
-install -Dm644 "$CTX/config/slozos/org.slozos.updater.desktop" /usr/share/applications/org.slozos.updater.desktop
+
+# SlozOS Updater (built in the apps stage from Bazzite's updater): SlozOS
+# release notes, rollback via slozos-update, Bazzite-only rebase page off
+install -Dm644 "$CTX/config/slozos/updater/config.ini" /etc/bazzite-updater/config.ini
+sed "s/@SLOZOS_VERSION@/$SLOZOS_VERSION/" "$CTX/config/slozos/updater/KAboutData_OS.json" \
+    > /etc/bazzite-updater/KAboutData_OS.json
 
 # Hide Bazzite's own docs/forum shortcuts (SlozOS Help replaces them) and its
 # news popups (they announce Bazzite releases, not SlozOS ones)

@@ -8,6 +8,9 @@ Before=uupd.service uupd.timer
 Type=oneshot
 ExecStart=/usr/libexec/slozos-update-origin
 RemainAfterExit=yes
+# Also print to the console, so boot logs show what happened
+StandardOutput=journal+console
+StandardError=journal+console
 
 [Install]
 WantedBy=multi-user.target

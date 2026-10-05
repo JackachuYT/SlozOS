@@ -1,0 +1,17 @@
+{
+    "displayName": "SlozOS",
+    "shortDescription": "A gaming OS for Microsoft Surface, built on Bazzite",
+    "homepage": "https://github.com/JackachuYT/SlozOS",
+    "bugAddress": "https://github.com/JackachuYT/SlozOS/issues",
+    "version": "@SLOZOS_VERSION@",
+    "otherText": "SlozOS gives the Surface Pro 1, Surface Pro 2 and Surface Book 1 a macOS Tahoe-style Liquid Glass desktop and Bazzite's gaming stack.",
+    "authors": [
+        { "name": "JackachuYT", "task": "Creator", "emailAddress": "", "webAddress": "https://github.com/JackachuYT" },
+        { "name": "The Bazzite team", "task": "Base system", "emailAddress": "", "webAddress": "https://github.com/ublue-os/bazzite/graphs/contributors" }
+    ],
+    "credits": [],
+    "translators": [],
+    "licenses": [],
+    "copyrightStatement": "© 2026",
+    "programLogo": "/usr/share/icons/hicolor/512x512/apps/slozos-logo.png"
+}
