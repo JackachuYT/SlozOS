@@ -6,7 +6,7 @@
 
 **A custom gaming OS for Microsoft Surface Pro 1, 2 and Surface Book 1 — built on Bazzite**
 
-🎉 **SlozOS 1.2.2 is the full release** — macOS Tahoe Liquid Glass desktop, SlozOS Spotlight, and its own update channel.
+🎉 **SlozOS 1.2.3 is the full release** — macOS Tahoe Liquid Glass desktop, SlozOS Spotlight, and its own update channel.
 Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
@@ -45,6 +45,7 @@ Bazzite is built for gaming PCs with 16 GB+ of RAM. SlozOS re-tunes it for 2013�
 
 - **Memory:** compressed swap (zram) the size of RAM plus Steam Deck-style memory settings — a 4 GB Surface Pro holds far more before anything slows down
 - **Less background work:** file search indexes names only; no modem, key-remapper or hybrid-GPU daemons where there's nothing for them to do; boot doesn't wait for Wi-Fi; Steam doesn't sit in memory from login on the 4 GB models (it's one click away on the dock)
+- **Only what you're using:** the on-screen keyboard runs only while the Surface is a tablet (cover detached); on the 4 GB models phone linking and the XWayland screen-share helper start when you open them
 - **Easier on the graphics chip:** glass blur strength matched to each Surface's iGPU
 - **Small updates:** SlozOS's own changes download in megabytes — the heavy base only changes when Bazzite does
 
@@ -130,7 +131,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Suspend (lid-loop fix) | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.2.2 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sp2)
+[**⬇ Download SlozOS 1.2.3 SP2**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sp2)
 
 ---
 
@@ -164,7 +165,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Sensors & Battery | ✅ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.2.2 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sp1)
+[**⬇ Download SlozOS 1.2.3 SP1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sp1)
 
 ---
 
@@ -200,7 +201,7 @@ SlozOS comes in three editions — one for each supported Surface device:
 | Cameras | ❓ |
 | Performance Modes | ❌ |
 
-[**⬇ Download SlozOS 1.2.2 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sb1)
+[**⬇ Download SlozOS 1.2.3 SB1**](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sb1)
 
 ---
 
@@ -212,13 +213,13 @@ Each edition is split into 1900 MB parts (GitHub's 2 GiB per-file limit). Downlo
 
 | Edition | Release |
 |---------|---------|
-| Surface Pro 2 | [v1.2.2-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sp2) → `SlozOS-1.2.2-SP2-amd64.7z.001/002/003` |
-| Surface Pro 1 | [v1.2.2-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sp1) → `SlozOS-1.2.2-SP1-amd64.7z.001/002/003` |
-| Surface Book 1 | [v1.2.2-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.2-sb1) → `SlozOS-1.2.2-SB1-amd64.7z.001/002/003` |
+| Surface Pro 2 | [v1.2.3-sp2](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sp2) → `SlozOS-1.2.3-SP2-amd64.7z.001/002/003` |
+| Surface Pro 1 | [v1.2.3-sp1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sp1) → `SlozOS-1.2.3-SP1-amd64.7z.001/002/003` |
+| Surface Book 1 | [v1.2.3-sb1](https://github.com/JackachuYT/SlozOS/releases/tag/v1.2.3-sb1) → `SlozOS-1.2.3-SB1-amd64.7z.001/002/003` |
 
 Reassemble with [7-Zip](https://www.7-zip.org/):
 - **Windows:** right-click the `.001` file → 7-Zip → Extract Here
-- **Linux/macOS:** `7z x SlozOS-1.2.2-SP2-amd64.7z.001` (swap SP2 for your edition)
+- **Linux/macOS:** `7z x SlozOS-1.2.3-SP2-amd64.7z.001` (swap SP2 for your edition)
 
 ---
 
@@ -303,7 +304,7 @@ Every build also boots its edition in a QEMU/KVM virtual machine — same image 
 To try SlozOS on your own computer instead:
 
 ```bash
-tests/vm/run-vm.sh SlozOS-1.2.2-SP2-amd64.iso
+tests/vm/run-vm.sh SlozOS-1.2.3-SP2-amd64.iso
 ```
 
 That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there.
