@@ -23,7 +23,7 @@ Window {
     // ── State ───────────────────────────────────────────────────────────────
     // runner: KRunner plugin id used in single-runner mode ("" = clipboard)
     readonly property var categories: [
-        { name: "Applications", icon: "view-app-grid-symbolic",      runner: "krunner_services" },
+        { name: "Apps",         icon: "view-app-grid-symbolic",      runner: "krunner_services" },
         { name: "Files",        icon: "folder-symbolic",             runner: "baloosearch" },
         { name: "Settings",     icon: "preferences-system-symbolic", runner: "krunner_systemsettings" },
         { name: "Clipboard",    icon: "edit-paste-symbolic",         runner: "" }
@@ -32,11 +32,26 @@ Window {
     readonly property bool clipboardMode: category === 3
     readonly property string query: field.text
     property var clipItems: []
+    property var allApps: []                    // for the Apps grid (Applications category)
+    readonly property bool appsMode: category === 0
+    // Apps matching what's typed; names that start with it come first
+    readonly property var appMatches: {
+        const q = query.trim().toLowerCase()
+        if (!q) return allApps
+        const starts = [], contains = []
+        for (const a of allApps) {
+            const n = a.name.toLowerCase()
+            if (n.startsWith(q)) starts.push(a)
+            else if (n.indexOf(q) >= 0 || a.keywords.indexOf(q) >= 0) contains.push(a)
+        }
+        return starts.concat(contains)
+    }
     property bool navigated: false              // has the user moved the selection?
     property point lastPointer: Qt.point(-1, -1) // to tell real mouse moves from content moving under it
 
     // Which body the panel shows under the bar
     readonly property string body: clipboardMode ? "clipboard"
+        : appsMode ? "apps"
         : query.length > 0 ? "results"
         : category >= 0 ? "hint"
         : "categories"
@@ -51,9 +66,7 @@ Window {
     function open(text, cat) {
         category = (cat === undefined || cat === null) ? -1 : cat
         field.text = text || ""
-        if (clipboardMode) {
-            clipItems = Spotlight.clipboardHistory()
-        }
+        refreshCategory()
         Spotlight.place(root)
         lastPointer = Qt.point(-1, -1)
         visible = true
@@ -70,10 +83,13 @@ Window {
 
     function setCategory(i) {
         category = (category === i) ? -1 : i
-        if (clipboardMode) {
-            clipItems = Spotlight.clipboardHistory()
-        }
+        refreshCategory()
         field.forceActiveFocus()
+    }
+
+    function refreshCategory() {
+        if (clipboardMode) clipItems = Spotlight.clipboardHistory()
+        if (appsMode) allApps = Spotlight.applications()
     }
 
     function updateBlur() {
@@ -94,6 +110,11 @@ Window {
                 Spotlight.copyToClipboard(clipList.model[clipList.currentIndex])
                 close()
             }
+        } else if (body === "apps") {
+            if (appMatches.length > 0) {
+                Spotlight.launch(appMatches[Math.max(0, appsGrid.currentIndex)].id)
+                close()
+            }
         } else if (body === "categories") {
             setCategory(categoryList.currentIndex)
         }
@@ -102,6 +123,7 @@ Window {
     function currentList() {
         return body === "results" ? resultsList
              : body === "clipboard" ? clipList
+             : body === "apps" ? appsGrid
              : body === "categories" ? categoryList : null
     }
 
@@ -111,11 +133,13 @@ Window {
     Connections {
         target: Spotlight
         function onToggleRequested() { root.visible ? root.close() : root.open("", -1) }
+        // The dock's Apps button: open to the Apps grid, or close if it's already showing
+        function onAppsRequested() { (root.visible && root.appsMode) ? root.close() : root.open("", 0) }
     }
 
     Milou.ResultsModel {
         id: results
-        queryString: root.clipboardMode ? "" : root.query
+        queryString: (root.clipboardMode || root.appsMode) ? "" : root.query
         singleRunner: root.category >= 0 ? root.categories[root.category].runner : ""
         limit: 24
         // Results stream in from several runners and get re-sorted; keep the
@@ -233,6 +257,13 @@ Window {
                         else if (root.category >= 0) root.category = -1
                         else root.close()
                         event.accepted = true
+                    } else if (root.body === "apps" && (event.key === Qt.Key_Left || event.key === Qt.Key_Right
+                                                         || event.key === Qt.Key_Up || event.key === Qt.Key_Down)) {
+                        if (event.key === Qt.Key_Left) appsGrid.moveCurrentIndexLeft()
+                        else if (event.key === Qt.Key_Right) appsGrid.moveCurrentIndexRight()
+                        else if (event.key === Qt.Key_Up) appsGrid.moveCurrentIndexUp()
+                        else appsGrid.moveCurrentIndexDown()
+                        event.accepted = true
                     } else if (event.key === Qt.Key_Down && list) {
                         root.navigated = true; list.incrementCurrentIndex(); event.accepted = true
                     } else if (event.key === Qt.Key_Up && list) {
@@ -281,7 +312,8 @@ Window {
         Item {
             id: content
             anchors { fill: parent; margins: 8 }
-            implicitHeight: root.body === "results" ? resultsList.contentHeight
+            implicitHeight: root.body === "apps" ? Math.max(appsGrid.contentHeight, 52)
+                          : root.body === "results" ? resultsList.contentHeight
                           : root.body === "clipboard" ? Math.max(clipList.contentHeight, 52)
                           : root.body === "hint" ? 52
                           : categoryList.contentHeight
@@ -312,6 +344,62 @@ Window {
                 text: "Type to search " + (root.category >= 0 ? root.categories[root.category].name.toLowerCase() : "")
                 color: root.textSecondary
                 font { family: root.font; pixelSize: 15 }
+            }
+
+            // Apps grid (Tahoe's "Apps", which replaced Launchpad)
+            GridView {
+                id: appsGrid
+                anchors.fill: parent
+                visible: root.body === "apps"
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                highlightMoveDuration: 0
+                model: root.appMatches
+                cellWidth: Math.floor(width / 6)
+                cellHeight: 108
+                currentIndex: 0
+                delegate: Item {
+                    id: tile
+                    required property var modelData
+                    required property int index
+                    width: appsGrid.cellWidth
+                    height: appsGrid.cellHeight
+
+                    Rectangle {
+                        anchors { fill: parent; margins: 4 }
+                        radius: 16
+                        color: tile.GridView.isCurrentItem ? Qt.rgba(0.04, 0.52, 1, 0.85)
+                             : (tileMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent")
+                    }
+                    Kirigami.Icon {
+                        id: tileIcon
+                        source: tile.modelData.icon
+                        width: 56
+                        height: 56
+                        anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: 12 }
+                    }
+                    Text {
+                        anchors { top: tileIcon.bottom; topMargin: 8; left: parent.left; right: parent.right; leftMargin: 8; rightMargin: 8 }
+                        horizontalAlignment: Text.AlignHCenter
+                        text: tile.modelData.name
+                        elide: Text.ElideRight
+                        color: root.textPrimary
+                        font { family: root.font; pixelSize: 12; weight: Font.Medium }
+                    }
+                    MouseArea {
+                        id: tileMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: { appsGrid.currentIndex = tile.index; root.activateCurrent() }
+                    }
+                }
+                Text {
+                    anchors.centerIn: parent
+                    visible: appsGrid.count === 0
+                    text: "No matching apps"
+                    color: root.textSecondary
+                    font { family: root.font; pixelSize: 15 }
+                }
             }
 
             // Search results, grouped by type

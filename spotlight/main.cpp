@@ -5,10 +5,12 @@
 // every installed KRunner plugin works here too.
 //
 //   slozos-spotlight            toggle the search bar (start it if needed)
+//   slozos-spotlight --apps     open straight to the Apps grid (the dock's Apps button)
 //   slozos-spotlight --daemon   start hidden in the background (autostart)
 //   slozos-spotlight --screenshot out.png [--query text] [--category n]
 //                               render once off-screen and save a PNG (testing)
 
+#include <QCollator>
 #include <QCommandLineParser>
 #include <QDBusInterface>
 #include <QDBusReply>
@@ -24,6 +26,9 @@
 #include <QScreen>
 #include <QTimer>
 
+#include <KApplicationTrader>
+#include <KIO/ApplicationLauncherJob>
+#include <KService>
 #include <KWindowEffects>
 #include <LayerShellQt/Window>
 
@@ -88,8 +93,38 @@ public:
         LayerShellQt::Window::get(window)->setMargins(QMargins(0, top, 0, 0));
     }
 
+    // Every app that would show in a launcher, sorted by name, for the Apps grid
+    Q_INVOKABLE QVariantList applications() const
+    {
+        KService::List apps = KApplicationTrader::query([](const KService::Ptr &s) {
+            return !s->noDisplay() && s->showOnCurrentPlatform()
+                && s->storageId() != QLatin1String("org.slozos.apps.desktop");
+        });
+        QCollator collator;
+        collator.setCaseSensitivity(Qt::CaseInsensitive);
+        std::sort(apps.begin(), apps.end(), [&collator](const KService::Ptr &a, const KService::Ptr &b) {
+            return collator.compare(a->name(), b->name()) < 0;
+        });
+        QVariantList out;
+        for (const KService::Ptr &s : apps) {
+            out.append(QVariantMap{{QStringLiteral("name"), s->name()},
+                                   {QStringLiteral("icon"), s->icon()},
+                                   {QStringLiteral("keywords"), (s->genericName() + QLatin1Char(' ') + s->keywords().join(QLatin1Char(' '))).toLower()},
+                                   {QStringLiteral("id"), s->storageId()}});
+        }
+        return out;
+    }
+
+    Q_INVOKABLE void launch(const QString &storageId) const
+    {
+        if (KService::Ptr service = KService::serviceByStorageId(storageId)) {
+            (new KIO::ApplicationLauncherJob(service))->start();
+        }
+    }
+
 Q_SIGNALS:
     void toggleRequested();
+    void appsRequested();
 };
 
 int main(int argc, char *argv[])
@@ -107,12 +142,13 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.addHelpOption();
     QCommandLineOption daemonOpt(QStringLiteral("daemon"), QStringLiteral("Start hidden in the background."));
+    QCommandLineOption appsOpt(QStringLiteral("apps"), QStringLiteral("Open to the Apps grid."));
     QCommandLineOption shotOpt(QStringLiteral("screenshot"), QStringLiteral("Render once and save to <file>."),
                                QStringLiteral("file"));
     QCommandLineOption queryOpt(QStringLiteral("query"), QStringLiteral("Query for --screenshot."), QStringLiteral("text"));
     QCommandLineOption catOpt(QStringLiteral("category"), QStringLiteral("Category for --screenshot."), QStringLiteral("n"),
                               QStringLiteral("-1"));
-    parser.addOptions({daemonOpt, shotOpt, queryOpt, catOpt});
+    parser.addOptions({daemonOpt, appsOpt, shotOpt, queryOpt, catOpt});
     parser.process(app);
     const bool screenshot = parser.isSet(shotOpt);
 
@@ -123,7 +159,7 @@ int main(int argc, char *argv[])
         probe.connectToServer(serverName);
         if (probe.waitForConnected(300)) {
             if (!parser.isSet(daemonOpt)) {
-                probe.write("toggle");
+                probe.write(parser.isSet(appsOpt) ? "apps" : "toggle");
                 probe.waitForBytesWritten(300);
             }
             return 0;
@@ -169,7 +205,10 @@ int main(int argc, char *argv[])
     QObject::connect(&server, &QLocalServer::newConnection, &server, [&server, &spotlight] {
         while (QLocalSocket *client = server.nextPendingConnection()) {
             QObject::connect(client, &QLocalSocket::readyRead, client, [client, &spotlight] {
-                if (client->readAll().contains("toggle")) {
+                const QByteArray msg = client->readAll();
+                if (msg.contains("apps")) {
+                    Q_EMIT spotlight.appsRequested();
+                } else if (msg.contains("toggle")) {
                     Q_EMIT spotlight.toggleRequested();
                 }
                 client->deleteLater();
@@ -177,7 +216,9 @@ int main(int argc, char *argv[])
         }
     });
 
-    if (!parser.isSet(daemonOpt)) {
+    if (parser.isSet(appsOpt)) {
+        Q_EMIT spotlight.appsRequested();
+    } else if (!parser.isSet(daemonOpt)) {
         Q_EMIT spotlight.toggleRequested();
     }
     return app.exec();

@@ -5,3 +5,7 @@ _launch=Meta+Space
 [services][org.kde.krunner.desktop]
 # KRunner stays available on its classic keys
 _launch=Alt+Space	Alt+F2	Search
+
+[plasmashell]
+# Alt+F1 belongs to the SlozOS logo menu, not Plasma's app-launcher widget
+activate application launcher=Meta,Meta\tAlt+F1,Activate Application Launcher

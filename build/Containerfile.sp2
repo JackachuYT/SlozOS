@@ -4,7 +4,7 @@ FROM ghcr.io/ublue-os/bazzite:stable AS spotlight
 RUN sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' /etc/yum.repos.d/terra*.repo 2>/dev/null || true && \
     dnf5 -y install --setopt=install_weak_deps=False \
         gcc-c++ cmake extra-cmake-modules qt6-qtbase-devel qt6-qtdeclarative-devel \
-        kf6-kwindowsystem-devel layer-shell-qt-devel
+        kf6-kwindowsystem-devel kf6-kservice-devel kf6-kio-devel layer-shell-qt-devel
 COPY spotlight /src/spotlight
 RUN cmake -S /src/spotlight -B /tmp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr && \
     cmake --build /tmp/build -j"$(nproc)" && \
@@ -53,7 +53,9 @@ COPY config/surface/01-surface-kargs.toml           /usr/lib/bootc/kargs.d/01-su
 RUN --mount=type=bind,source=.,target=/ctx \
     SLOZOS_HOSTNAME="slozos" \
     SLOZOS_NAME="SlozOS" \
-    SLOZOS_PRETTY_NAME="SlozOS 1.1 (Bazzite)" \
+    SLOZOS_PRETTY_NAME="SlozOS 1.1.3 (Bazzite)" \
+    SLOZOS_VERSION="1.1.3" \
+    SLOZOS_EDITION="Surface Pro 2" \
     bash /ctx/build/slozos-desktop.sh
 
 # SlozOS Spotlight (Meta+Space search bar) from stage 1; --help proves it links

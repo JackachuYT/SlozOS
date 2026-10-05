@@ -141,7 +141,7 @@ class Serial:
         self.sock.sendall(line.encode() + b"\r")
 
 
-DIAG = ("systemctl is-active graphical.target display-manager.service; "
+DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "
         "echo '--- failed units:'; systemctl --failed --no-legend --plain; "
         "echo '--- os:'; grep PRETTY_NAME /etc/os-release; echo SLOZOS-DIAG-''END")
 
@@ -261,6 +261,11 @@ def main():
         qmp.type_text("settings")
         time.sleep(4)
         qmp.screenshot(os.path.join(args.out, "08-spotlight-search.png"))
+        qmp.key("esc")             # clear the text
+        time.sleep(1)
+        qmp.key("ctrl", "1")       # Apps grid (same as the dock's Apps button)
+        time.sleep(4)
+        qmp.screenshot(os.path.join(args.out, "09-apps.png"))
         qmp.key("esc")
         qmp.key("esc")
         ok = True
