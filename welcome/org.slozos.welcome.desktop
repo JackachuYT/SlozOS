@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS Welcome
+GenericName=Setup
+Comment=Set up SlozOS: wallpaper, dock, apps, games and performance
+Exec=slozos-welcome
+Icon=slozos-logo
+Categories=System;Settings;

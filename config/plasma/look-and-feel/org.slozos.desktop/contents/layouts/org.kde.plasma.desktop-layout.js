@@ -21,7 +21,7 @@ for (var i = 0; i < existing.length; i++) {
 }
 
 // ── Menu bar (top) ───────────────────────────────────────────────────────────
-// [SlozOS logo menu] [App menu (global menu)] ........ [tray] [clock]
+// [SlozOS logo menu] [App menu (global menu)] ........ [tray] [Control Center] [clock]
 var menuBar = new Panel;
 menuBar.location = "top";
 menuBar.height = 2 * Math.round(gridUnit * 0.75);   // ~26 px at 100% scale
@@ -38,6 +38,7 @@ menuBar.addWidget("org.kde.plasma.appmenu");
 menuBar.addWidget("org.kde.plasma.panelspacer");
 
 var tray = menuBar.addWidget("org.kde.plasma.systemtray");
+menuBar.addWidget("org.slozos.controlcenter");          // Control Center
 
 var clock = menuBar.addWidget("org.kde.plasma.digitalclock");
 clock.currentConfigGroup = ["Appearance"];

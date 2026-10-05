@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SlozOS Welcome (first run)
+Exec=slozos-welcome --first-run
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=2

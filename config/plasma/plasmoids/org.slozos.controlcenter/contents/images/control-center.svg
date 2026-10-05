@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Two toggle switches, like the macOS Control Center glyph -->
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+  <path fill="#ffffff" fill-rule="evenodd" d="
+    M6,2.5 H16 A3.5,3.5 0 0 1 16,9.5 H6 A3.5,3.5 0 0 1 6,2.5 Z
+    M16,3.9 A2.1,2.1 0 1 0 16,8.1 A2.1,2.1 0 1 0 16,3.9 Z
+    M6,12.5 H16 A3.5,3.5 0 0 1 16,19.5 H6 A3.5,3.5 0 0 1 6,12.5 Z
+    M6,13.9 A2.1,2.1 0 1 0 6,18.1 A2.1,2.1 0 1 0 6,13.9 Z"/>
+</svg>

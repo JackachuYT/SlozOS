@@ -45,12 +45,14 @@ jobs:
             containerfile: build/Containerfile.sp2
             image_tag: slozos-sp2
             bazzite: bazzite
-            iso_name: SlozOS-1.2.3-SP2-amd64
+            iso_name: SlozOS-1.3-SP2-amd64
             artifact: SlozOS-SP2-ISO
-            release_tag: v1.2.3-sp2
-            release_title: "SlozOS 1.2.3 — Surface Pro 2"
+            release_tag: v1.3-sp2
+            release_title: "SlozOS 1.3 — Surface Pro 2"
             release_notes: |
-              🎉 **SlozOS 1.2.3 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
+              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
+
+              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
 
               **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
 
@@ -77,21 +79,23 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.3-SP2-amd64.7z.001
+              7z x SlozOS-1.3-SP2-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.3-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.3-SP2-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sp1
             display_name: Surface Pro 1
             containerfile: build/Containerfile.sp1
             image_tag: slozos-sp1
             bazzite: bazzite
-            iso_name: SlozOS-1.2.3-SP1-amd64
+            iso_name: SlozOS-1.3-SP1-amd64
             artifact: SlozOS-SP1-ISO
-            release_tag: v1.2.3-sp1
-            release_title: "SlozOS 1.2.3 — Surface Pro 1"
+            release_tag: v1.3-sp1
+            release_title: "SlozOS 1.3 — Surface Pro 1"
             release_notes: |
-              🎉 **SlozOS 1.2.3 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+
+              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
 
               **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
 
@@ -118,21 +122,23 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.3-SP1-amd64.7z.001
+              7z x SlozOS-1.3-SP1-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.3-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
+              Flash `SlozOS-1.3-SP1-amd64.iso` with Balena Etcher. Boot the Surface with **Volume Down + Power**.
 
           - device: sb1
             display_name: Surface Book 1
             containerfile: build/Containerfile.sb1
             image_tag: slozos-sb1
             bazzite: bazzite-nvidia
-            iso_name: SlozOS-1.2.3-SB1-amd64
+            iso_name: SlozOS-1.3-SB1-amd64
             artifact: SlozOS-SB1-ISO
-            release_tag: v1.2.3-sb1
-            release_title: "SlozOS 1.2.3 — Surface Book 1"
+            release_tag: v1.3-sb1
+            release_title: "SlozOS 1.3 — Surface Book 1"
             release_notes: |
-              🎉 **SlozOS 1.2.3 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              🎉 **SlozOS 1.3 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+
+              **New in 1.3:** a macOS-style **Control Center** in the menu bar (Wi-Fi, Bluetooth, Airplane Mode, Focus, power mode, brightness, sound, quick actions) and **SlozOS Welcome**, a first-run setup app (wallpaper, dock, one-click apps and games, Performance Mode, Steam at login).
 
               **New in 1.2.3:** even more free memory — the on-screen keyboard (~260 MB) only runs in tablet mode, and on the 4 GB Surface Pros KDE Connect and the XWayland video bridge start on demand instead of at login.
 
@@ -160,13 +166,13 @@ jobs:
 
               The ISO (~5.5 GB) is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.2.3-SB1-amd64.7z.001
+              7z x SlozOS-1.3-SB1-amd64.7z.001
               ```
-              Flash `SlozOS-1.2.3-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
+              Flash `SlozOS-1.3-SB1-amd64.iso` with Balena Etcher. Boot with **Volume Down + Power**.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.2.3"
+      SLOZOS_VERSION: "1.3"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise
