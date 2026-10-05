@@ -45,16 +45,18 @@ jobs:
             bazzite: bazzite
             edition: Standard
             image_tag: slozos
-            iso_name: SlozOS-1.4-amd64
+            iso_name: SlozOS-1.4.1-amd64
             artifact: SlozOS-ISO
-            release_tag: v1.4-standard
-            release_title: "SlozOS 1.4"
+            release_tag: v1.4.1-standard
+            release_title: "SlozOS 1.4.1"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sp1 slozos-sp2"
             release_notes: |
-              SlozOS 1.4 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
+              SlozOS 1.4.1 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
 
-              **New in 1.4 — SlozOS for every PC.** No longer just for Surface: SlozOS now installs on almost any 64-bit PC, laptop or handheld. It checks your hardware at boot — PCs with less RAM get the light profile automatically, Surface Pro/Book fixes switch on only on Surfaces, and the glass effects match your graphics chip.
+              **New in 1.4.1 — the macOS Tahoe look, refreshed.** The whole desktop moves to the MacTahoe theme: macOS 26/27-style app icons, Liquid Glass dock, window buttons and cursors. Control Center is redesigned to match, with glass pill tiles, wide volume and brightness sliders, power/lock/screenshot buttons and a Game Mode tile that opens Steam Big Picture. Hardware video decoding is now set up on more Intel GPUs, so video uses less CPU.
+
+              SlozOS runs on almost any 64-bit PC, laptop or handheld, and adapts to your hardware at boot.
 
               **Surface owners:** Surface Pro 1 and Pro 2 use this edition (the Surface Book 1 uses SlozOS NVIDIA). Existing Surface installs move over automatically with their next update.
 
@@ -62,25 +64,27 @@ jobs:
 
               The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.4-amd64.7z.001
+              7z x SlozOS-1.4.1-amd64.7z.001
               ```
-              Flash `SlozOS-1.4-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.1-amd64.iso` with Balena Etcher and boot from the USB stick.
 
           - device: nvidia
             display_name: SlozOS NVIDIA
             bazzite: bazzite-nvidia
             edition: NVIDIA
             image_tag: slozos-nvidia
-            iso_name: SlozOS-1.4-NVIDIA-amd64
+            iso_name: SlozOS-1.4.1-NVIDIA-amd64
             artifact: SlozOS-NVIDIA-ISO
-            release_tag: v1.4-nvidia
-            release_title: "SlozOS 1.4 — NVIDIA"
+            release_tag: v1.4.1-nvidia
+            release_title: "SlozOS 1.4.1 — NVIDIA"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sb1"
             release_notes: |
-              SlozOS 1.4 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
+              SlozOS 1.4.1 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
 
-              **New in 1.4 — SlozOS for every PC.** No longer just for Surface: SlozOS now installs on almost any 64-bit PC, laptop or handheld. It checks your hardware at boot — PCs with less RAM get the light profile automatically, Surface Pro/Book fixes switch on only on Surfaces, and the glass effects match your graphics chip.
+              **New in 1.4.1 — the macOS Tahoe look, refreshed.** The whole desktop moves to the MacTahoe theme: macOS 26/27-style app icons, Liquid Glass dock, window buttons and cursors. Control Center is redesigned to match, with glass pill tiles, wide volume and brightness sliders, power/lock/screenshot buttons and a Game Mode tile that opens Steam Big Picture. Hardware video decoding is now set up on more Intel GPUs, so video uses less CPU.
+
+              SlozOS runs on almost any 64-bit PC, laptop or handheld, and adapts to your hardware at boot.
 
               **Surface owners:** the Surface Book 1 uses this edition (Surface Pro 1/2 use the standard one). Existing Surface installs move over automatically with their next update.
 
@@ -88,13 +92,13 @@ jobs:
 
               The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.4-NVIDIA-amd64.7z.001
+              7z x SlozOS-1.4.1-NVIDIA-amd64.7z.001
               ```
-              Flash `SlozOS-1.4-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.1-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.4"
+      SLOZOS_VERSION: "1.4.1"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise

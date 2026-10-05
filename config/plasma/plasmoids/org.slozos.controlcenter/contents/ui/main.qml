@@ -78,167 +78,123 @@ PlasmoidItem {
     }
 
     // ── Panel ────────────────────────────────────────────────────────────────
+    // Laid out like MacTahoe's Control Center: round shortcut buttons, wide
+    // slider bars, and a two-column grid of pill tiles. A tile turns white
+    // when its toggle is on.
+    function launch(cmd) { exec.connectSource(cmd); root.expanded = false }
+    readonly property var profiles: ["power-saver", "balanced", "performance"]
+    readonly property var profileNames: ({ "power-saver": "Power Saver", "balanced": "Balanced", "performance": "Performance" })
+    readonly property var profileIcons: ({ "power-saver": "battery-profile-powersave-symbolic",
+                                           "balanced": "battery-profile-balanced-symbolic",
+                                           "performance": "battery-profile-performance-symbolic" })
+    readonly property string keyboardCmd: "sh -c 'k=$(gdbus call --session --dest org.kde.KWin --object-path /VirtualKeyboard --method org.freedesktop.DBus.Properties.Get org.kde.kwin.VirtualKeyboard enabled | grep -q true && echo false || echo true); gdbus call --session --dest org.kde.KWin --object-path /VirtualKeyboard --method org.freedesktop.DBus.Properties.Set org.kde.kwin.VirtualKeyboard enabled \"<$k>\"'"
+
     fullRepresentation: Item {
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 21
-        Layout.preferredHeight: column.implicitHeight + Kirigami.Units.largeSpacing * 2
+        readonly property real gap: Kirigami.Units.largeSpacing
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 22
+        Layout.preferredHeight: column.implicitHeight + gap * 2
         Layout.minimumWidth: Layout.preferredWidth
         Layout.minimumHeight: Layout.preferredHeight
 
         ColumnLayout {
             id: column
-            anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-            spacing: Kirigami.Units.largeSpacing
+            anchors { fill: parent; margins: parent.gap }
+            spacing: parent.gap
 
-            // Connectivity + Focus/Power
+            // Shortcut buttons
             RowLayout {
+                Layout.fillWidth: true
                 spacing: Kirigami.Units.largeSpacing
-                Layout.fillWidth: true
-
-                Tile {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    Layout.preferredHeight: connCol.implicitHeight + Kirigami.Units.largeSpacing * 2
-                    ColumnLayout {
-                        id: connCol
-                        anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-                        spacing: Kirigami.Units.largeSpacing
-                        ToggleRow {
-                            icon: root.st.wifi ? "network-wireless-symbolic" : "network-wireless-disconnected-symbolic"
-                            title: "Wi-Fi"
-                            subtitle: root.st.wifi ? (root.st.ssid || "Not connected") : "Off"
-                            checked: root.st.wifi
-                            onToggled: root.run("wifi " + (root.st.wifi ? "off" : "on"))
-                        }
-                        ToggleRow {
-                            icon: "network-bluetooth-symbolic"
-                            title: "Bluetooth"
-                            subtitle: root.st.bluetooth ? "On" : "Off"
-                            checked: root.st.bluetooth
-                            onToggled: root.run("bluetooth " + (root.st.bluetooth ? "off" : "on"))
-                        }
-                        ToggleRow {
-                            icon: "network-flightmode-on-symbolic"
-                            title: "Airplane Mode"
-                            subtitle: root.st.airplane ? "On" : "Off"
-                            checked: root.st.airplane
-                            onToggled: root.run("airplane " + (root.st.airplane ? "off" : "on"))
-                        }
-                    }
-                }
-
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: 1
-                    spacing: Kirigami.Units.largeSpacing
-
-                    Tile {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: focusRow.implicitHeight + Kirigami.Units.largeSpacing * 2
-                        ToggleRow {
-                            id: focusRow
-                            anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-                            icon: "notifications-disabled-symbolic"
-                            title: "Focus"
-                            subtitle: root.focusOn ? "Do Not Disturb" : "Off"
-                            checked: root.focusOn
-                            onToggled: root.setFocus(!root.focusOn)
-                        }
-                    }
-
-                    Tile {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        visible: root.st.profile !== ""
-                        ColumnLayout {
-                            anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-                            spacing: Kirigami.Units.smallSpacing
-                            PlasmaComponents.Label { text: "Power Mode"; font.weight: Font.DemiBold }
-                            RowLayout {
-                                spacing: Kirigami.Units.smallSpacing
-                                Repeater {
-                                    model: [ { id: "power-saver", icon: "battery-profile-powersave-symbolic", label: "Saver" },
-                                             { id: "balanced",    icon: "battery-profile-balanced-symbolic",  label: "Balanced" },
-                                             { id: "performance", icon: "battery-profile-performance-symbolic", label: "Boost" } ]
-                                    delegate: Round {
-                                        required property var modelData
-                                        icon: modelData.icon
-                                        checked: root.st.profile === modelData.id
-                                        tooltip: modelData.label
-                                        onClicked: root.run("profile " + modelData.id)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                Round { icon: "camera-photo-symbolic"; tooltip: "Screenshot"; onClicked: root.launch("spectacle") }
+                Round { icon: "preferences-system-symbolic"; tooltip: "System Settings"; onClicked: root.launch("systemsettings") }
+                Round { icon: "system-lock-screen-symbolic"; tooltip: "Lock Screen"; onClicked: root.launch("loginctl lock-session") }
+                Item { Layout.fillWidth: true }
+                Round {
+                    icon: "system-shutdown-symbolic"; tooltip: "Power Off…"
+                    onClicked: root.launch("gdbus call --session --dest org.kde.LogoutPrompt --object-path /LogoutPrompt --method org.kde.LogoutPrompt.promptAll")
                 }
             }
 
-            // Display
-            Tile {
-                Layout.fillWidth: true
-                Layout.preferredHeight: displayCol.implicitHeight + Kirigami.Units.largeSpacing * 2
-                visible: root.st.brightness >= 0
-                SliderBlock {
-                    id: displayCol
-                    anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-                    title: "Display"
-                    icon: "brightness-high-symbolic"
-                    value: root.st.brightness
-                    onMovedTo: v => root.run("brightness " + v)
-                }
-            }
-
-            // Sound
-            Tile {
-                Layout.fillWidth: true
-                Layout.preferredHeight: soundCol.implicitHeight + Kirigami.Units.largeSpacing * 2
+            // Sliders
+            SliderBar {
                 visible: root.st.volume >= 0
-                SliderBlock {
-                    id: soundCol
-                    anchors { fill: parent; margins: Kirigami.Units.largeSpacing }
-                    title: "Sound"
-                    icon: root.st.muted || root.st.volume === 0 ? "audio-volume-muted-symbolic" : "audio-volume-high-symbolic"
-                    value: root.st.volume
-                    onMovedTo: v => root.run("volume " + v)
-                    onIconClicked: root.run("volume mute")
-                }
+                icon: root.st.muted || root.st.volume === 0 ? "audio-volume-muted-symbolic" : "audio-volume-high-symbolic"
+                value: root.st.muted ? 0 : root.st.volume
+                onMovedTo: v => root.run("volume " + v)
+                onIconClicked: root.run("volume mute")
+                onMore: root.launch("systemsettings kcm_pulseaudio")
+            }
+            SliderBar {
+                visible: root.st.brightness >= 0
+                icon: "brightness-high-symbolic"
+                value: root.st.brightness
+                onMovedTo: v => root.run("brightness " + v)
+                onMore: root.launch("systemsettings kcm_kscreen")
             }
 
-            // Quick actions
-            RowLayout {
+            // Toggles
+            GridLayout {
                 Layout.fillWidth: true
-                spacing: Kirigami.Units.largeSpacing
-                Repeater {
-                    model: [ { icon: "spectacle", label: "Screenshot", cmd: "spectacle" },
-                             { icon: "input-keyboard-virtual", label: "Keyboard",
-                               cmd: "sh -c 'k=$(gdbus call --session --dest org.kde.KWin --object-path /VirtualKeyboard --method org.freedesktop.DBus.Properties.Get org.kde.kwin.VirtualKeyboard enabled | grep -q true && echo false || echo true); gdbus call --session --dest org.kde.KWin --object-path /VirtualKeyboard --method org.freedesktop.DBus.Properties.Set org.kde.kwin.VirtualKeyboard enabled \"<$k>\"'" },
-                             { icon: "preferences-desktop-display", label: "Displays", cmd: "systemsettings kcm_kscreen" },
-                             { icon: "preferences-system", label: "Settings", cmd: "systemsettings" } ]
-                    delegate: Tile {
-                        id: quick
-                        required property var modelData
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: Kirigami.Units.gridUnit * 3.6
-                        ColumnLayout {
-                            anchors.centerIn: parent
-                            spacing: Kirigami.Units.smallSpacing
-                            Kirigami.Icon {
-                                source: quick.modelData.icon
-                                Layout.alignment: Qt.AlignHCenter
-                                Layout.preferredWidth: Kirigami.Units.iconSizes.medium
-                                Layout.preferredHeight: Kirigami.Units.iconSizes.medium
-                            }
-                            PlasmaComponents.Label {
-                                text: quick.modelData.label
-                                font: Kirigami.Theme.smallFont
-                                Layout.alignment: Qt.AlignHCenter
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: { exec.connectSource(quick.modelData.cmd); root.expanded = false }
-                        }
-                    }
+                columns: 2
+                rowSpacing: Kirigami.Units.largeSpacing
+                columnSpacing: Kirigami.Units.largeSpacing
+
+                Pill {
+                    icon: root.st.wifi ? "network-wireless-symbolic" : "network-wireless-disconnected-symbolic"
+                    title: "Wi-Fi"
+                    subtitle: root.st.wifi ? (root.st.ssid || "Not connected") : "Off"
+                    checked: root.st.wifi
+                    split: true
+                    onToggled: root.run("wifi " + (root.st.wifi ? "off" : "on"))
+                    onMore: root.launch("systemsettings kcm_networkmanagement")
+                }
+                Pill {
+                    icon: "network-bluetooth-symbolic"
+                    title: "Bluetooth"
+                    subtitle: root.st.bluetooth ? "On" : "Off"
+                    checked: root.st.bluetooth
+                    split: true
+                    onToggled: root.run("bluetooth " + (root.st.bluetooth ? "off" : "on"))
+                    onMore: root.launch("systemsettings kcm_bluetooth")
+                }
+                Pill {
+                    visible: root.st.profile !== ""
+                    icon: root.profileIcons[root.st.profile] || "battery-profile-balanced-symbolic"
+                    title: "Power Mode"
+                    subtitle: root.profileNames[root.st.profile] || ""
+                    checked: root.st.profile === "performance"
+                    split: true
+                    // tap cycles Saver → Balanced → Performance
+                    onToggled: root.run("profile " + root.profiles[(root.profiles.indexOf(root.st.profile) + 1) % 3])
+                    onMore: root.launch("systemsettings kcm_powerdevilprofilesconfig")
+                }
+                Pill {
+                    icon: "notifications-disabled-symbolic"
+                    title: "Focus"
+                    subtitle: root.focusOn ? "Do Not Disturb" : ""
+                    checked: root.focusOn
+                    onToggled: root.setFocus(!root.focusOn)
+                }
+                Pill {
+                    icon: "network-flightmode-on-symbolic"
+                    title: "Airplane Mode"
+                    checked: root.st.airplane
+                    onToggled: root.run("airplane " + (root.st.airplane ? "off" : "on"))
+                }
+                Pill {
+                    icon: "input-keyboard-virtual-symbolic"
+                    title: "Keyboard"
+                    subtitle: "On-screen"
+                    onToggled: root.launch(root.keyboardCmd)
+                }
+                Pill {
+                    Layout.columnSpan: 2
+                    icon: "input-gaming-symbolic"
+                    title: "Game Mode"
+                    subtitle: "Steam Big Picture"
+                    split: true
+                    onToggled: root.launch("steam steam://open/bigpicture")
+                    onMore: root.launch("steam")
                 }
             }
         }
@@ -246,82 +202,148 @@ PlasmoidItem {
 
     // ── Building blocks ──────────────────────────────────────────────────────
     // Colours derive from the theme's text colour, so tiles read as glass on
-    // the dark SlozOS theme and still work on a light one
+    // the dark theme and still work on a light one
     readonly property color fg: Kirigami.Theme.textColor
     function tint(a) { return Qt.rgba(fg.r, fg.g, fg.b, a) }
+    readonly property real pillHeight: Kirigami.Units.gridUnit * 3.2
 
-    component Tile: Rectangle {
-        radius: 18
-        color: root.tint(0.07)
-        border.color: root.tint(0.10)
+    // Liquid-glass surface: translucent fill, a brighter top edge, hairline border
+    component Glass: Rectangle {
+        property bool lit: false                    // white "on" state
+        property bool hovered: false
+        radius: height / 2
+        color: lit ? Qt.rgba(1, 1, 1, 0.94) : root.tint(hovered ? 0.16 : 0.10)
+        border.color: lit ? "transparent" : root.tint(0.14)
         border.width: 1
+        Behavior on color { ColorAnimation { duration: 140 } }
+        Rectangle {                                 // specular highlight
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 1 }
+            height: parent.height / 2
+            radius: parent.radius
+            visible: !parent.lit
+            gradient: Gradient {
+                GradientStop { position: 0; color: root.tint(0.08) }
+                GradientStop { position: 1; color: "transparent" }
+            }
+        }
     }
 
-    component Round: Rectangle {
+    component Round: Glass {
         id: round
         property string icon
-        property bool checked
         property string tooltip
         signal clicked
-        implicitWidth: Kirigami.Units.gridUnit * 2
+        implicitWidth: Kirigami.Units.gridUnit * 2.4
         implicitHeight: implicitWidth
-        radius: width / 2
-        color: checked ? root.accent : root.tint(roundMouse.containsMouse ? 0.20 : 0.12)
-        Behavior on color { ColorAnimation { duration: 120 } }
+        hovered: roundMouse.containsMouse
         Kirigami.Icon {
             anchors.centerIn: parent
-            width: parent.width * 0.55
+            width: Kirigami.Units.iconSizes.small
             height: width
             source: round.icon
             isMask: true
-            color: round.checked ? "white" : root.fg
+            color: root.fg
         }
-        MouseArea {
-            id: roundMouse
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: round.clicked()
-        }
+        MouseArea { id: roundMouse; anchors.fill: parent; hoverEnabled: true; onClicked: round.clicked() }
         PlasmaComponents.ToolTip { text: round.tooltip; visible: round.tooltip !== "" && roundMouse.containsMouse }
     }
 
-    component ToggleRow: RowLayout {
-        id: toggle
+    component Chevron: Kirigami.Icon {
+        property color tone: root.fg
+        implicitWidth: Kirigami.Units.iconSizes.small
+        implicitHeight: implicitWidth
+        source: "go-next-symbolic"
+        isMask: true
+        color: tone
+        opacity: 0.8
+    }
+
+    // split: the round icon toggles and the rest of the tile opens more
+    // settings (Wi-Fi, Bluetooth…). Otherwise the whole tile is one toggle.
+    component Pill: Glass {
+        id: pill
         property string icon
         property string title
         property string subtitle
         property bool checked
+        property bool split: false
         signal toggled
-        spacing: Kirigami.Units.smallSpacing * 2
-        Round {
-            icon: toggle.icon
-            checked: toggle.checked
-            onClicked: toggle.toggled()
+        signal more
+        Layout.fillWidth: true
+        Layout.preferredWidth: 1
+        implicitHeight: root.pillHeight
+        lit: checked && !split
+        hovered: pillMouse.containsMouse
+        readonly property color ink: lit ? root.accent : root.fg
+
+        MouseArea {
+            id: pillMouse
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: pill.split ? pill.more() : pill.toggled()
         }
-        ColumnLayout {
-            spacing: 0
-            Layout.fillWidth: true
-            PlasmaComponents.Label { text: toggle.title; font.weight: Font.DemiBold; elide: Text.ElideRight; Layout.fillWidth: true }
-            PlasmaComponents.Label { text: toggle.subtitle; opacity: 0.6; font: Kirigami.Theme.smallFont; elide: Text.ElideRight; Layout.fillWidth: true }
+        RowLayout {
+            anchors { fill: parent; leftMargin: Kirigami.Units.smallSpacing * 2; rightMargin: Kirigami.Units.largeSpacing }
+            spacing: Kirigami.Units.smallSpacing * 2
+            Rectangle {                             // icon circle
+                Layout.preferredWidth: pill.height - Kirigami.Units.smallSpacing * 4
+                Layout.preferredHeight: Layout.preferredWidth
+                radius: width / 2
+                color: pill.split && pill.checked ? Qt.rgba(1, 1, 1, 0.94)
+                     : pill.split ? root.tint(iconMouse.containsMouse ? 0.22 : 0.14) : "transparent"
+                Behavior on color { ColorAnimation { duration: 140 } }
+                Kirigami.Icon {
+                    anchors.centerIn: parent
+                    width: Kirigami.Units.iconSizes.small
+                    height: width
+                    source: pill.icon
+                    isMask: true
+                    color: pill.split && pill.checked ? root.accent : pill.ink
+                }
+                MouseArea {
+                    id: iconMouse
+                    anchors.fill: parent
+                    enabled: pill.split
+                    hoverEnabled: true
+                    onClicked: pill.toggled()
+                }
+            }
+            ColumnLayout {
+                spacing: 0
+                Layout.fillWidth: true
+                PlasmaComponents.Label {
+                    text: pill.title; color: pill.ink; font.weight: Font.DemiBold
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                }
+                PlasmaComponents.Label {
+                    visible: text !== ""
+                    text: pill.subtitle; color: pill.ink; opacity: 0.65; font: Kirigami.Theme.smallFont
+                    elide: Text.ElideRight; Layout.fillWidth: true
+                }
+            }
+            Chevron { visible: pill.split; tone: pill.ink }
         }
     }
 
-    component SliderBlock: ColumnLayout {
-        id: block
-        property string title
+    component SliderBar: Glass {
+        id: bar
         property string icon
         property int value
         signal movedTo(int v)
         signal iconClicked
-        spacing: Kirigami.Units.smallSpacing
-        PlasmaComponents.Label { text: block.title; font.weight: Font.DemiBold }
+        signal more
+        Layout.fillWidth: true
+        implicitHeight: root.pillHeight
         RowLayout {
-            spacing: Kirigami.Units.smallSpacing
+            anchors { fill: parent; leftMargin: Kirigami.Units.largeSpacing * 1.5; rightMargin: Kirigami.Units.largeSpacing }
+            spacing: Kirigami.Units.largeSpacing
             Kirigami.Icon {
-                source: block.icon
+                source: bar.icon
+                isMask: true
+                color: root.fg
                 Layout.preferredWidth: Kirigami.Units.iconSizes.small
                 Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                MouseArea { anchors.fill: parent; onClicked: block.iconClicked() }
+                MouseArea { anchors.fill: parent; onClicked: bar.iconClicked() }
             }
             PlasmaComponents.Slider {
                 id: slider
@@ -329,8 +351,11 @@ PlasmoidItem {
                 from: 0; to: 100; stepSize: 1
                 onMoved: debounce.restart()
                 // follow the system value, except while the user is dragging
-                Binding on value { value: block.value; when: !slider.pressed }
-                Timer { id: debounce; interval: 120; onTriggered: block.movedTo(Math.round(slider.value)) }
+                Binding on value { value: bar.value; when: !slider.pressed }
+                Timer { id: debounce; interval: 120; onTriggered: bar.movedTo(Math.round(slider.value)) }
+            }
+            Chevron {
+                MouseArea { anchors.fill: parent; anchors.margins: -6; onClicked: bar.more() }
             }
         }
     }

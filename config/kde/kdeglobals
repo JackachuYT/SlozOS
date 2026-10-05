@@ -15,7 +15,7 @@ TerminalService=org.kde.konsole.desktop
 activeFont=Inter,10,-1,5,600,0,0,0,0,0,0,0,0,0,0,1
 
 [Icons]
-Theme=WhiteSur-dark
+Theme=MacTahoe-dark
 
 [KDE]
 # Global theme: SlozOS Liquid Glass (its layout.js builds the menu bar + dock)

@@ -7,6 +7,7 @@
 #   • Steam at login: the user's choice in SlozOS Welcome wins; without one,
 #     "full" PCs start it, "light" PCs don't
 #   • Prism Launcher's Java heap: sized to this PC's RAM, once
+#   • 1.4.1: accounts made before the MacTahoe switch move off WhiteSur, once
 set -u
 PROFILE=$(cat /run/slozos/profile 2>/dev/null || echo full)
 PREF="${XDG_CONFIG_HOME:-$HOME/.config}/slozos"
@@ -39,4 +40,23 @@ if [[ -f $CFG && ! -f $PREF/prism-heap-set ]] && grep -q '^MaxMemAlloc=2048$' "$
     else                          HEAP=2048; fi
     sed -i "s/^MaxMemAlloc=2048$/MaxMemAlloc=$HEAP/" "$CFG"
     touch "$PREF/prism-heap-set"
+fi
+
+# SlozOS 1.4.1 replaced the WhiteSur themes with MacTahoe; WhiteSur is no longer
+# installed, so accounts still pointing at it are switched over (once)
+C="${XDG_CONFIG_HOME:-$HOME/.config}"
+if [[ ! -f $PREF/mactahoe-migrated ]] && grep -qs WhiteSur "$C/kdeglobals" "$C/plasmarc" "$C/kwinrc" "$C/kcminputrc" "$C/Kvantum/kvantum.kvconfig"; then
+    kwriteconfig6 --file kdeglobals --group Icons --key Theme MacTahoe-dark
+    command -v /usr/libexec/plasma-changeicons >/dev/null && /usr/libexec/plasma-changeicons MacTahoe-dark
+    plasma-apply-desktoptheme MacTahoe-Dark >/dev/null 2>&1
+    plasma-apply-cursortheme MacTahoe-dark-cursors >/dev/null 2>&1
+    kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae
+    kwriteconfig6 --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__MacTahoe-Dark
+    mkdir -p "$C/Kvantum"; kwriteconfig6 --file "$C/Kvantum/kvantum.kvconfig" --group General --key theme MacTahoeDark
+    for f in "$C/gtk-3.0/settings.ini" "$C/gtk-4.0/settings.ini"; do
+        [[ -f $f ]] && sed -i -e 's/WhiteSur-\(dark-\)\{0,1\}cursors/MacTahoe-dark-cursors/' \
+                              -e 's/WhiteSur-[A-Za-z-]*/MacTahoe-dark/' "$f"
+    done
+    qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1
+    touch "$PREF/mactahoe-migrated"
 fi

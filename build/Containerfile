@@ -26,7 +26,7 @@ ARG EDITION=Standard
 ARG IMAGE=ghcr.io/jackachuyt/slozos
 ARG VERSION=dev
 
-# Base layer: packages, WhiteSur themes, boot splash (already present when
+# Base layer: packages, MacTahoe themes, boot splash (already present when
 # BASE is the published SlozOS base image)
 RUN --mount=type=bind,source=.,target=/ctx \
     [ -f /usr/share/slozos/.base-layer ] || bash /ctx/build/slozos-base.sh

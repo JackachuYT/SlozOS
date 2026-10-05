@@ -1,9 +1,9 @@
 # SlozOS KWin defaults — macOS-style window chrome and effects.
 
 [org.kde.kdecoration2]
-# WhiteSur Liquid (dark) Aurorae decoration: traffic-light buttons on the left
+# MacTahoe (dark) Aurorae decoration: macOS 26/27 traffic-light buttons on the left
 library=org.kde.kwin.aurorae
-theme=__aurorae__svg__WhiteSurLiquid-dark
+theme=__aurorae__svg__MacTahoe-Dark
 ButtonsOnLeft=XIA
 ButtonsOnRight=
 BorderSize=None
