@@ -5,6 +5,8 @@
 # SlozOS
 
 **A custom gaming OS for Microsoft Surface Pro 1, 2 and Surface Book 1 — built on Bazzite**
+
+🎉 **SlozOS 1.2.1 is the full release** — macOS Tahoe Liquid Glass desktop, SlozOS Spotlight, and its own update channel.
 Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)

@@ -47,9 +47,9 @@ jobs:
             iso_name: SlozOS-1.2.1-SP2-amd64
             artifact: SlozOS-SP2-ISO
             release_tag: v1.2.1-sp2
-            release_title: "SlozOS 1.2.1 — Surface Pro 2"
+            release_title: "SlozOS 1.2.1 — Surface Pro 2 · Full Release"
             release_notes: |
-              SlozOS 1.2.1 for the **Microsoft Surface Pro 2** (2013, Haswell).
+              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Pro 2** (2013, Haswell).
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -83,9 +83,9 @@ jobs:
             iso_name: SlozOS-1.2.1-SP1-amd64
             artifact: SlozOS-SP1-ISO
             release_tag: v1.2.1-sp1
-            release_title: "SlozOS 1.2.1 — Surface Pro 1"
+            release_title: "SlozOS 1.2.1 — Surface Pro 1 · Full Release"
             release_notes: |
-              SlozOS 1.2.1 for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
+              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Pro 1** (2013, Ivy Bridge).
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -119,9 +119,9 @@ jobs:
             iso_name: SlozOS-1.2.1-SB1-amd64
             artifact: SlozOS-SB1-ISO
             release_tag: v1.2.1-sb1
-            release_title: "SlozOS 1.2.1 — Surface Book 1"
+            release_title: "SlozOS 1.2.1 — Surface Book 1 · Full Release"
             release_notes: |
-              SlozOS 1.2.1 for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
+              🎉 **SlozOS 1.2.1 is the full release of SlozOS** for the **Microsoft Surface Book 1** (2015, Skylake + NVIDIA GTX 940M).
 
               **New in 1.2.1:** Fixes System Update (new installs now really switch to SlozOS updates), one **SlozOS Updater** with SlozOS branding and release notes, instead of two.
 
@@ -271,7 +271,23 @@ jobs:
           gh release create ${{ matrix.release_tag }} \
             --title "$RELEASE_TITLE" \
             --notes "$RELEASE_NOTES" \
+            --latest=${{ matrix.device == 'sp2' }} \
             output/${{ matrix.iso_name }}.7z.*
+
+      - name: Remove older releases of this edition
+        if: env.PUBLISH == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Installs update through SlozOS's update images, so only the newest
+          # ISO per edition is kept. Runs only after the new release uploaded.
+          gh release list --limit 200 --json tagName --jq '.[].tagName' \
+            | grep -E -- '-${{ matrix.device }}$' \
+            | grep -vx -- '${{ matrix.release_tag }}' \
+            | while read -r tag; do
+                echo "Deleting old release $tag"
+                gh release delete "$tag" --yes --cleanup-tag
+              done
 
       # ── VM test: boot the same image in QEMU/KVM, log in, screenshot ────────
       # Skipped when the ISO was reused — the PR run already tested it.
