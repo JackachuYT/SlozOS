@@ -12,7 +12,7 @@ for d in /sys/bus/pci/devices/*; do
     [[ $(cat "$d/class" 2>/dev/null) == 0x03* ]] || continue
     drv=$(basename "$(readlink "$d/driver" 2>/dev/null)" 2>/dev/null)
     name=$(lspci -s "${d##*/}" 2>/dev/null | cut -d: -f3- | sed 's/^ //')
-    echo "  ${name:-${d##*/}}  →  driver: ${drv:-none}"
+    echo "  ${name:-${d##*/}}  ->  driver: ${drv:-none}"
 done
 echo "  SlozOS mode: $(cat /run/slozos/graphics 2>/dev/null || echo unknown)"
 

@@ -1,5 +1,6 @@
 // SlozOS logo menu — the top-left menu, laid out like macOS's Apple menu.
 import QtQuick
+import QtQuick.Layouts
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.extras as PlasmaExtras
@@ -20,6 +21,26 @@ PlasmoidItem {
     toolTipMainText: "SlozOS"
     toolTipSubText: ""
 
+    // Alt+F1 ("activate application launcher") may expand the widget's popup
+    // instead of emitting activated(), depending on the Plasma version. The
+    // popup is empty, so never let it show: open the menu instead.
+    onExpandedChanged: if (expanded) collapseThenOpen.start()
+    // Collapse outside the change handler, then open the menu once the popup
+    // has gone (closing the popup would dismiss a menu opened before it)
+    Timer {
+        id: collapseThenOpen
+        interval: 1
+        onTriggered: {
+            root.expanded = false
+            menuAfterCollapse.start()
+        }
+    }
+    Timer { id: menuAfterCollapse; interval: 150; onTriggered: root.openMenu() }
+
+    function openMenu() {
+        if (menu.status !== PlasmaExtras.Menu.Open) menu.openRelative()
+    }
+
     function run(command) {
         executable.connectSource(command)
     }
@@ -35,13 +56,13 @@ PlasmoidItem {
 
     Connections {
         target: Plasmoid
-        function onActivated() { menu.openRelative() }
+        function onActivated() { root.openMenu() }
     }
 
     compactRepresentation: MouseArea {
         id: button
         hoverEnabled: true
-        onClicked: menu.openRelative()
+        onClicked: root.openMenu()
 
         Rectangle {   // soft highlight while hovered / open, like the macOS menu bar
             anchors.fill: parent
@@ -60,7 +81,10 @@ PlasmoidItem {
         Component.onCompleted: menu.visualParent = button
     }
 
-    fullRepresentation: Item {}
+    fullRepresentation: Item {
+        Layout.preferredWidth: 0
+        Layout.preferredHeight: 0
+    }
 
     // Text after a tab shows as a right-aligned shortcut hint in the menu
     PlasmaExtras.Menu {
