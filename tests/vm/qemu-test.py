@@ -82,6 +82,12 @@ class QMP:
     def key(self, *names):
         self.cmd("send-key", keys=[{"type": "qcode", "data": n} for n in names])
 
+    def move(self, fx, fy):
+        """Move the pointer (usb-tablet) to a fraction of the screen size."""
+        self.cmd("input-send-event", events=[
+            {"type": "abs", "data": {"axis": "x", "value": int(fx * 32767)}},
+            {"type": "abs", "data": {"axis": "y", "value": int(fy * 32767)}}])
+
 
 def accel():
     if os.access("/dev/kvm", os.R_OK | os.W_OK):
@@ -294,6 +300,15 @@ def main():
         qmp.screenshot(os.path.join(args.out, "09-apps.png"))
         qmp.key("esc")
         qmp.key("esc")
+        time.sleep(2)
+
+        # Hover the middle of the SlozOS Dock: icons should magnify
+        qmp.move(0.5, 0.95)
+        time.sleep(1)
+        qmp.move(0.52, 0.95)
+        time.sleep(2)
+        qmp.screenshot(os.path.join(args.out, "10-dock.png"))
+        qmp.move(0.5, 0.4)
         ok = True
         return 0
     finally:
