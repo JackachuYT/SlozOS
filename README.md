@@ -109,7 +109,7 @@ Already running a Surface edition (SP1/SP2/SB1)? Nothing to do — it moves to t
 
 Get your edition from [**Releases**](https://github.com/JackachuYT/SlozOS/releases). Each ISO is split into 1900 MB parts (GitHub allows 2 GB per file) — download **all** parts into one folder, then combine them with [7-Zip](https://www.7-zip.org/):
 
-- **Windows:** right-click the `.001` file → 7-Zip → Extract Here
+- **Windows:** right-click the `.001` file → 7-Zip → Extract Here (on Windows 11, click **Show more options** first). Typing `7z` in a terminal won't work, because 7-Zip doesn't add itself to the command line on Windows; use `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.3-amd64.7z.001` in PowerShell if you prefer a command
 - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.3-amd64.7z.001`
 - **Linux:** `7z x SlozOS-1.4.3-amd64.7z.001`
 

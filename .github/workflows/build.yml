@@ -64,10 +64,11 @@ jobs:
 
               **Also included:** the MacTahoe look and redesigned Control Center from 1.4.1, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
-              The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
-              ```
-              7z x SlozOS-1.4.3-amd64.7z.001
-              ```
+              The ISO is split into 1900 MB parts. Download **all** parts into one folder, then reassemble:
+              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.3-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.3-amd64.7z.001`
+              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.3-amd64.7z.001`
+              - **Linux:** `7z x SlozOS-1.4.3-amd64.7z.001`
+
               Flash `SlozOS-1.4.3-amd64.iso` with Balena Etcher and boot from the USB stick.
 
           - device: nvidia
@@ -94,10 +95,11 @@ jobs:
 
               **Also included:** the MacTahoe look and redesigned Control Center from 1.4.1, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
-              The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
-              ```
-              7z x SlozOS-1.4.3-NVIDIA-amd64.7z.001
-              ```
+              The ISO is split into 1900 MB parts. Download **all** parts into one folder, then reassemble:
+              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.3-NVIDIA-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.3-NVIDIA-amd64.7z.001`
+              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.3-NVIDIA-amd64.7z.001`
+              - **Linux:** `7z x SlozOS-1.4.3-NVIDIA-amd64.7z.001`
+
               Flash `SlozOS-1.4.3-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
 
     env:
