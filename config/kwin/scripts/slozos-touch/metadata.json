@@ -1,0 +1,13 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Authors": [ { "Name": "SlozOS" } ],
+        "Description": "Touchscreen edge swipes: swipe in from the left edge to open the Apps grid",
+        "EnabledByDefault": true,
+        "Id": "slozos-touch",
+        "License": "GPL-3.0",
+        "Name": "SlozOS Touch Gestures",
+        "Version": "1.0"
+    },
+    "X-Plasma-API": "javascript"
+}

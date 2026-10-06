@@ -9,9 +9,16 @@
 //   slozos-spotlight --daemon   start hidden in the background (autostart)
 //   slozos-spotlight --screenshot out.png [--query text] [--category n]
 //                               render once off-screen and save a PNG (testing)
+//
+// Also on D-Bus as org.slozos.Spotlight (/Spotlight: Toggle, ShowApps), used
+// by the touchscreen edge swipe. Game controllers work too (see Gamepads).
 
 #include <QCollator>
 #include <QCommandLineParser>
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusReply>
 #include <QGuiApplication>
@@ -32,6 +39,8 @@
 #include <KWindowEffects>
 #include <LayerShellQt/Window>
 
+#include <SDL3/SDL.h>
+
 #include <unistd.h>
 
 static bool onWayland()
@@ -42,8 +51,15 @@ static bool onWayland()
 class Spotlight : public QObject
 {
     Q_OBJECT
+    Q_CLASSINFO("D-Bus Interface", "org.slozos.Spotlight")
 public:
     using QObject::QObject;
+
+public Q_SLOTS:
+    Q_SCRIPTABLE void Toggle() { Q_EMIT toggleRequested(); }
+    Q_SCRIPTABLE void ShowApps() { Q_EMIT appsRequested(); }
+
+public:
 
     // Klipper (Plasma's clipboard manager) history, newest first
     Q_INVOKABLE QStringList clipboardHistory() const
@@ -127,6 +143,142 @@ Q_SIGNALS:
     void appsRequested();
 };
 
+// Game controllers, through SDL3. The Guide (Xbox/PS/Home) button opens the
+// Apps grid; while Spotlight is open the D-pad or left stick moves, A opens,
+// B goes back and LB/RB switch category.
+//
+// Steam does all of this itself when it's running (its desktop controller
+// layout types arrow keys, Enter and Escape, and the Guide button belongs to
+// Steam), so everything here pauses while Steam is open.
+class Gamepads : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(bool active MEMBER m_active WRITE setActive)
+public:
+    explicit Gamepads(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+        // leave SIGTERM/SIGINT to Qt, or logging out would wait on us
+        SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+        // evdev only: SDL's HIDAPI drivers send init/LED/rumble packets, which
+        // would disturb controllers a game or Steam is using
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+        if (!SDL_Init(SDL_INIT_GAMEPAD)) {
+            qWarning("Gamepads unavailable: %s", SDL_GetError());
+            return;
+        }
+        m_ok = true;
+        connect(&m_timer, &QTimer::timeout, this, &Gamepads::poll);
+        m_timer.start(50);
+        m_steamCheck.start();
+    }
+    ~Gamepads() override
+    {
+        if (m_ok) {
+            SDL_Quit();
+        }
+    }
+
+    void setActive(bool active)
+    {
+        m_active = active;
+        m_held.clear();
+        m_timer.setInterval(active ? 16 : 50);
+    }
+
+Q_SIGNALS:
+    // "guide", "a", "b", "lb", "rb", "up", "down", "left", "right"
+    void pressed(const QString &button);
+
+private:
+    static bool steamRunning()
+    {
+        const QStringList pids = QDir(QStringLiteral("/proc")).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const QString &pid : pids) {
+            QFile comm(QStringLiteral("/proc/%1/comm").arg(pid));
+            if (comm.open(QIODevice::ReadOnly) && comm.readAll().trimmed() == "steam") {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    QString direction() const
+    {
+        constexpr int deadzone = 16000;
+        for (SDL_Gamepad *pad : m_pads) {
+            if (SDL_GetGamepadButton(pad, SDL_GAMEPAD_BUTTON_DPAD_UP)) return QStringLiteral("up");
+            if (SDL_GetGamepadButton(pad, SDL_GAMEPAD_BUTTON_DPAD_DOWN)) return QStringLiteral("down");
+            if (SDL_GetGamepadButton(pad, SDL_GAMEPAD_BUTTON_DPAD_LEFT)) return QStringLiteral("left");
+            if (SDL_GetGamepadButton(pad, SDL_GAMEPAD_BUTTON_DPAD_RIGHT)) return QStringLiteral("right");
+            const int x = SDL_GetGamepadAxis(pad, SDL_GAMEPAD_AXIS_LEFTX);
+            const int y = SDL_GetGamepadAxis(pad, SDL_GAMEPAD_AXIS_LEFTY);
+            if (qMax(qAbs(x), qAbs(y)) > deadzone) {
+                return qAbs(x) > qAbs(y) ? (x < 0 ? QStringLiteral("left") : QStringLiteral("right"))
+                                         : (y < 0 ? QStringLiteral("up") : QStringLiteral("down"));
+            }
+        }
+        return {};
+    }
+
+    void poll()
+    {
+        if (m_steamCheck.elapsed() > 2000) {
+            m_steam = steamRunning();
+            m_steamCheck.restart();
+        }
+        SDL_Event e;
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_EVENT_GAMEPAD_ADDED) {
+                if (SDL_Gamepad *pad = SDL_OpenGamepad(e.gdevice.which)) {
+                    m_pads.append(pad);
+                }
+            } else if (e.type == SDL_EVENT_GAMEPAD_REMOVED) {
+                if (SDL_Gamepad *pad = SDL_GetGamepadFromID(e.gdevice.which)) {
+                    m_pads.removeAll(pad);
+                    SDL_CloseGamepad(pad);
+                }
+            } else if (e.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN && !m_steam) {
+                switch (e.gbutton.button) {
+                case SDL_GAMEPAD_BUTTON_GUIDE: Q_EMIT pressed(QStringLiteral("guide")); break;
+                case SDL_GAMEPAD_BUTTON_SOUTH: if (m_active) Q_EMIT pressed(QStringLiteral("a")); break;
+                case SDL_GAMEPAD_BUTTON_EAST: if (m_active) Q_EMIT pressed(QStringLiteral("b")); break;
+                case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER: if (m_active) Q_EMIT pressed(QStringLiteral("lb")); break;
+                case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: if (m_active) Q_EMIT pressed(QStringLiteral("rb")); break;
+                default: break;
+                }
+            }
+        }
+        if (!m_active || m_steam) {
+            return;
+        }
+        // Directions repeat while held, like a key: first after 400 ms, then every 120 ms
+        const QString dir = direction();
+        if (dir != m_held) {
+            m_held = dir;
+            if (!dir.isEmpty()) {
+                Q_EMIT pressed(dir);
+                m_repeat.start();
+                m_nextRepeat = 400;
+            }
+        } else if (!dir.isEmpty() && m_repeat.elapsed() >= m_nextRepeat) {
+            Q_EMIT pressed(dir);
+            m_nextRepeat = m_repeat.elapsed() + 120;
+        }
+    }
+
+    bool m_ok = false;
+    bool m_active = false;
+    bool m_steam = false;
+    QList<SDL_Gamepad *> m_pads;
+    QTimer m_timer;
+    QElapsedTimer m_steamCheck;
+    QElapsedTimer m_repeat;
+    qint64 m_nextRepeat = 0;
+    QString m_held;
+};
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -134,6 +286,9 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain(QStringLiteral("slozos.org"));
     app.setDesktopFileName(QStringLiteral("org.slozos.spotlight"));
     app.setQuitOnLastWindowClosed(false);
+    // A daemon with no visible window: finished KIO/KRunner jobs must not
+    // count as "nothing left to do" and quit the app
+    app.setQuitLockEnabled(false);
     // Outside a Plasma session (e.g. --screenshot in CI) no icon theme is set
     if (QIcon::themeName().isEmpty() || QIcon::themeName() == QLatin1String("hicolor")) {
         QIcon::setThemeName(QStringLiteral("breeze-dark"));
@@ -167,8 +322,10 @@ int main(int argc, char *argv[])
     }
 
     Spotlight spotlight;
+    Gamepads *gamepads = screenshot ? nullptr : new Gamepads(&app);
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("Spotlight"), &spotlight);
+    engine.rootContext()->setContextProperty(QStringLiteral("Gamepads"), gamepads);
     engine.load(QUrl(QStringLiteral("qrc:/Main.qml")));
     if (engine.rootObjects().isEmpty()) {
         return 1;
@@ -198,6 +355,10 @@ int main(int argc, char *argv[])
         });
         return app.exec();
     }
+
+    QDBusConnection::sessionBus().registerObject(QStringLiteral("/Spotlight"), &spotlight,
+                                                 QDBusConnection::ExportScriptableSlots);
+    QDBusConnection::sessionBus().registerService(QStringLiteral("org.slozos.Spotlight"));
 
     QLocalServer::removeServer(serverName);
     QLocalServer server;

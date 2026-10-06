@@ -148,6 +148,8 @@ METRICS = ("echo '=== boot'; systemd-analyze 2>/dev/null | head -2; "
            "echo '=== top processes (RSS MiB)'; ps -eo rss=,comm= --sort=-rss | head -25 | awk '{printf \"%6.0f  %s\\n\", $1/1024, $2}'; "
            "echo '=== running services'; systemctl list-units --type=service --state=running --no-legend --plain | wc -l; "
            "echo '=== disk'; df -h / /var 2>/dev/null | tail -2; "
+           # CI VMs have no GPU, so this should report software mode (llvmpipe)
+           "echo '=== graphics'; slozos-graphics 2>&1; "
            "echo SLOZOS-METRICS-''END")
 
 DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "

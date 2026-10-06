@@ -1,0 +1,47 @@
+#!/usr/bin/bash
+# slozos-graphics — is 3D/2D/video acceleration working on this PC?
+#
+# Lists the graphics chips and their drivers, then what the desktop (OpenGL),
+# games (Vulkan) and video playback (VA-API) are actually running on.
+# Anything ending in "llvmpipe" or "software" means the CPU is doing the work.
+set -uo pipefail
+say() { printf '\033[1m%s\033[0m\n' "$*"; }
+
+say "Graphics chips"
+for d in /sys/bus/pci/devices/*; do
+    [[ $(cat "$d/class" 2>/dev/null) == 0x03* ]] || continue
+    drv=$(basename "$(readlink "$d/driver" 2>/dev/null)" 2>/dev/null)
+    name=$(lspci -s "${d##*/}" 2>/dev/null | cut -d: -f3- | sed 's/^ //')
+    echo "  ${name:-${d##*/}}  →  driver: ${drv:-none}"
+done
+echo "  SlozOS mode: $(cat /run/slozos/graphics 2>/dev/null || echo unknown)"
+
+say "Desktop (OpenGL)"
+info=$(qdbus-qt6 org.kde.KWin /KWin supportInformation 2>/dev/null)
+if [[ -n $info ]]; then
+    grep -E '^(Compositing Type|OpenGL renderer string|OpenGL version string):' <<<"$info" | sed 's/^/  /'
+elif command -v eglinfo >/dev/null; then
+    eglinfo -B 2>/dev/null | grep -m2 -E 'OpenGL (core profile )?renderer|OpenGL version' | sed 's/^ */  /'
+else
+    echo "  (log in to the desktop to see this)"
+fi
+
+say "Games (Vulkan)"
+if command -v vulkaninfo >/dev/null; then
+    vulkaninfo --summary 2>/dev/null | grep -E '^\s*(deviceName|driverName|apiVersion)' | sed 's/^ */  /' \
+        || echo "  no Vulkan device"
+else
+    echo "  vulkaninfo not installed"
+fi
+
+say "Video playback (VA-API)"
+if command -v vainfo >/dev/null; then
+    out=$(vainfo --display drm 2>&1)
+    if grep -q 'Driver version' <<<"$out"; then
+        grep -m1 'Driver version' <<<"$out" | sed 's/.*Driver version: /  driver: /'
+        echo "  decodes: $(grep VLD <<<"$out" | grep -oE 'VAProfile(H264|HEVC|VP8|VP9|AV1|MPEG2|VC1|JPEG)' \
+            | sed 's/VAProfile//' | sort -u | tr '\n' ' ')"
+    else
+        echo "  no hardware video decoding (CPU decodes video)"
+    fi
+fi

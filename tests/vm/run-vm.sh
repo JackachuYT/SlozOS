@@ -9,6 +9,11 @@
 # Fast on Intel/AMD Linux (KVM) and Intel Macs (HVF). On Apple Silicon Macs
 # it has to emulate an x86 CPU in software, so expect a very slow desktop.
 # Needs ~25 GB free: the ISO plus up to 20 GB for the virtual disk.
+#
+# 3D: on a Linux host with a GPU the VM gets 3D acceleration (virtio-gpu +
+# virgl), so the glass effects run on your graphics card. Elsewhere it falls
+# back to a plain display and SlozOS switches to software mode (no blur).
+# Force either with GL=on / GL=off.
 set -euo pipefail
 
 VM_DIR=${VM_DIR:-"$HOME/.slozos-vm"}
@@ -37,6 +42,19 @@ else
     ACCEL=(-accel tcg,thread=multi -cpu max)
 fi
 
+GL=${GL:-auto}
+if [[ $GL == auto ]]; then
+    GL=off
+    [[ $(uname -s) == Linux ]] && compgen -G '/dev/dri/renderD*' >/dev/null \
+        && qemu-system-x86_64 -device help 2>/dev/null | grep -q virtio-vga-gl && GL=on
+fi
+if [[ $GL == on ]]; then
+    echo "3D acceleration: on (virtio-gpu + virgl)"
+    DISPLAY_ARGS=(-device virtio-vga-gl -display gtk,gl=on,show-cursor=on)
+else
+    DISPLAY_ARGS=(-device virtio-vga -display default,show-cursor=on)
+fi
+
 BOOT=()
 case "${1:-}" in
     *.iso)
@@ -54,7 +72,7 @@ exec qemu-system-x86_64 -machine q35 "${ACCEL[@]}" -m "$MEM" -smp "$CPUS" \
     -drive "if=pflash,format=raw,file=$VM_DIR/vars.fd" \
     -drive "file=$DISK,if=virtio,format=qcow2" \
     "${BOOT[@]}" \
-    -device virtio-vga -display default,show-cursor=on \
+    "${DISPLAY_ARGS[@]}" \
     -device qemu-xhci -device usb-tablet -device usb-kbd \
     -nic user,model=virtio-net-pci \
     -name SlozOS

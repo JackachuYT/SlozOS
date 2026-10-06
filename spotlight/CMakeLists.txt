@@ -11,11 +11,12 @@ find_package(KF6WindowSystem REQUIRED)
 find_package(KF6Service REQUIRED)
 find_package(KF6KIO REQUIRED)
 find_package(LayerShellQt REQUIRED)
+find_package(SDL3 REQUIRED CONFIG)
 
 add_executable(slozos-spotlight main.cpp spotlight.qrc)
 target_link_libraries(slozos-spotlight PRIVATE
     Qt6::Gui Qt6::Quick Qt6::Qml Qt6::Network Qt6::DBus
-    KF6::WindowSystem KF6::Service KF6::KIOGui LayerShellQt::Interface)
+    KF6::WindowSystem KF6::Service KF6::KIOGui LayerShellQt::Interface SDL3::SDL3)
 
 install(TARGETS slozos-spotlight DESTINATION bin)
 install(FILES org.slozos.spotlight.desktop org.slozos.apps.desktop DESTINATION share/applications)

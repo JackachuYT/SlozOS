@@ -9,7 +9,9 @@
 #           bridge start on demand; lighter glass blur
 #   full  — everything at login, full effects
 #
-# Writes only to /run (fresh each boot) and /etc/xdg/kwinrc (blur default).
+# and the graphics mode (see the Graphics section)
+#
+# Writes only to /run (fresh each boot) and /etc/xdg/kwinrc (effect defaults).
 set -uo pipefail
 
 dmi() { cat "/sys/class/dmi/id/$1" 2>/dev/null; }
@@ -58,24 +60,42 @@ fi
 MEM_KB=$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)
 if (( MEM_KB < 7 * 1024 * 1024 )); then PROFILE=light; else PROFILE=full; fi
 
-# Glass blur by graphics chip: lighter on old Intel iGPUs (Sandy/Ivy Bridge →
-# Skylake), full strength on anything newer or discrete
+# ── Graphics ─────────────────────────────────────────────────────────────────
+# Read from PCI (always there this early) rather than DRM, which appears only
+# once the GPU driver has loaded.
+#   hardware — a real GPU (Intel/AMD/NVIDIA) or a VM with 3D (virtio-gpu virgl)
+#   software — a VM display without 3D: everything is drawn by the CPU
+#              (llvmpipe), so the glass effects are switched off
 BLUR=10
-for d in /sys/class/drm/card*/device; do
-    [[ $(cat "$d/vendor" 2>/dev/null) == 0x8086 ]] || continue
-    case "$(cat "$d/device" 2>/dev/null)" in
-        0x01*)                         BLUR=6 ;;   # Sandy/Ivy Bridge (HD 2000–4000)
-        0x04*|0x0a*|0x0d*|0x16*|0x19*) BLUR=8 ;;   # Haswell, Broadwell, Skylake
+GRAPHICS=software
+for d in /sys/bus/pci/devices/*; do
+    [[ $(cat "$d/class" 2>/dev/null) == 0x03* ]] || continue
+    vendor=$(cat "$d/vendor" 2>/dev/null)
+    case "$vendor" in
+        0x8086)
+            GRAPHICS=hardware
+            case "$(cat "$d/device" 2>/dev/null)" in   # lighter blur on old iGPUs
+                0x01*)                         (( BLUR > 6 )) && BLUR=6 ;;   # Sandy/Ivy Bridge
+                0x04*|0x0a*|0x0d*|0x16*|0x19*) (( BLUR > 8 )) && BLUR=8 ;;   # Haswell → Skylake
+            esac ;;
+        0x10de|0x1002) GRAPHICS=hardware; DISCRETE=true ;;
+        0x1af4) # virtio-gpu: 3D only with virgl/venus, which gives it a render node
+            for _ in $(seq 30); do compgen -G '/dev/dri/card*' >/dev/null && break; sleep 0.1; done
+            compgen -G '/dev/dri/renderD*' >/dev/null && GRAPHICS=hardware ;;
     esac
 done
-for d in /sys/class/drm/card*/device; do        # a discrete GPU wins
-    case "$(cat "$d/vendor" 2>/dev/null)" in 0x10de|0x1002) BLUR=10 ;; esac
-done
+[[ ${DISCRETE:-false} == true ]] && BLUR=10        # a discrete GPU wins
 [[ $PROFILE == light && $BLUR -gt 8 ]] && BLUR=8
 
 mkdir -p /run/slozos
-echo "$PROFILE" > /run/slozos/profile
-# system-wide default; a user's own blur setting still wins
-kwriteconfig6 --file /etc/xdg/kwinrc --group Effect-blur --key BlurStrength "$BLUR" 2>/dev/null \
-    || printf '[Effect-blur]\nBlurStrength=%s\n' "$BLUR" >> /etc/xdg/kwinrc
-echo "Profile: $PROFILE ($(( MEM_KB / 1024 )) MB RAM), blur $BLUR"
+echo "$PROFILE"  > /run/slozos/profile
+echo "$GRAPHICS" > /run/slozos/graphics
+# System-wide defaults (a user's own settings still win)
+kw() { kwriteconfig6 --file /etc/xdg/kwinrc --group "$1" --key "$2" "$3" 2>/dev/null \
+           || printf '[%s]\n%s=%s\n' "$1" "$2" "$3" >> /etc/xdg/kwinrc; }
+kw Effect-blur BlurStrength "$BLUR"
+GLASS=$([[ $GRAPHICS == hardware ]] && echo true || echo false)
+kw Plugins blurEnabled      "$GLASS"
+kw Plugins contrastEnabled  "$GLASS"
+kw Plugins magiclampEnabled "$GLASS"
+echo "Profile: $PROFILE ($(( MEM_KB / 1024 )) MB RAM), graphics $GRAPHICS, blur $BLUR"

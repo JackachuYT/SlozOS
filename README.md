@@ -6,7 +6,7 @@
 
 **A macOS Tahoe-style gaming OS for any PC — built on Bazzite**
 
-🎉 **SlozOS 1.4.1 — the MacTahoe look, a new Control Center, for every PC.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
+🎉 **SlozOS 1.4.2 — touchscreen and game controller support, and smarter graphics, for every PC.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
 Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
@@ -30,9 +30,11 @@ SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out
 - 🍎 **Menu bar** along the top — SlozOS logo menu (About, System Settings, Spotlight, Sleep / Restart / Shut Down, Lock, Log Out), global app menu, system tray and clock
 - 🚀 **Floating dock** that hugs its icons, with an **Apps** button (Spotlight's app grid, like Tahoe) and Trash, and tucks away when a window needs the space
 - 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
-- 🎛️ **Control Center** next to the clock, in MacTahoe's glass style: Wi-Fi, Bluetooth, power mode, Focus (Do Not Disturb), Airplane Mode, on-screen Keyboard, Game Mode (Steam Big Picture), volume and brightness sliders, and Screenshot, Settings, Lock and Power buttons
+- 🎛️ **Control Center** next to the clock, in MacTahoe's glass style: Wi-Fi, Bluetooth, power mode, Focus (Do Not Disturb), Airplane Mode, on-screen Keyboard, Tablet Mode, Game Mode (Steam Big Picture), volume and brightness sliders, and Screenshot, Settings, Lock and Power buttons
 - 👋 **SlozOS Welcome** on first login: pick a wallpaper, set the dock, install apps and games in one click, and choose Performance Mode
 - 🔍 **SlozOS Spotlight** on **Meta + Space**: a glass search bar for apps, files, settings and your clipboard history (Ctrl+1–4 jumps straight to each)
+- 👆 **Touchscreen gestures:** swipe in from the left edge for the Apps grid, swipe up from the bottom for Overview; Tablet Mode (automatic on 2-in-1s, or from Control Center) brings up the on-screen keyboard
+- 🎮 **Game controllers:** press the Guide (Xbox / PS / Home) button for the Apps grid, then use the D-pad or stick to pick, **A** to open, **B** to go back and **LB / RB** to switch category. When Steam is open it handles the controller instead
 - 🧞 **Genie-style minimise** and a Cmd-Tab-style app switcher
 - 🎨 macOS dark palette and system blue accent, MacTahoe icons and cursors (the macOS 26/27 look), Inter font
 - 🦥 SlozOS boot splash, login and lock screen wallpaper
@@ -47,7 +49,8 @@ SlozOS checks your PC at every boot and tunes itself — no settings to dig thro
 
 - **Light profile (under ~7 GB of RAM):** Steam, phone linking (KDE Connect) and the XWayland screen-share helper start when you open them instead of at login, and the glass blur is lighter
 - **Full profile (7 GB+):** everything starts at login with full effects
-- **Graphics-aware glass:** blur strength matched to your GPU — lighter on older Intel graphics, full on newer and discrete GPUs
+- **Graphics-aware glass:** blur strength matched to your GPU — lighter on older Intel graphics, full on newer and discrete GPUs. Without a 3D GPU (e.g. some virtual machines) the glass effects switch off so the desktop stays smooth
+- **3D, 2D and video acceleration:** games and the desktop run on your GPU (Mesa for Intel/AMD, NVIDIA's driver on the NVIDIA edition), and video plays with hardware decoding. Run `slozos-graphics` in a terminal to see what your PC is using
 - **Memory, everywhere:** compressed swap (zram) the size of your RAM plus Steam Deck-style memory settings; file search indexes names only; boot doesn't wait for Wi-Fi
 - **2-in-1s and tablets:** the on-screen keyboard runs only in tablet mode (keyboard detached)
 - **Device fixes only where needed:** Surface Pro 1/2 lid fix, deep sleep on Surfaces, and Marvell Wi-Fi stability — applied automatically on that hardware, nowhere else
@@ -107,8 +110,8 @@ Already running a Surface edition (SP1/SP2/SB1)? Nothing to do — it moves to t
 Get your edition from [**Releases**](https://github.com/JackachuYT/SlozOS/releases). Each ISO is split into 1900 MB parts (GitHub allows 2 GB per file) — download **all** parts into one folder, then combine them with [7-Zip](https://www.7-zip.org/):
 
 - **Windows:** right-click the `.001` file → 7-Zip → Extract Here
-- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.1-amd64.7z.001`
-- **Linux:** `7z x SlozOS-1.4.1-amd64.7z.001`
+- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.2-amd64.7z.001`
+- **Linux:** `7z x SlozOS-1.4.2-amd64.7z.001`
 
 ### Step 2 — Flash to USB
 
@@ -152,10 +155,10 @@ ISOs are built by GitHub Actions, **once per change**: a pull request builds eac
 
 ```bash
 # Standard (Intel/AMD)
-sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.1 .
+sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.2 .
 
 # NVIDIA
-sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.1 \
+sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.2 \
   --build-arg BAZZITE=ghcr.io/ublue-os/bazzite-nvidia:stable \
   --build-arg EDITION=NVIDIA --build-arg IMAGE=ghcr.io/jackachuyt/slozos-nvidia .
 
@@ -176,10 +179,10 @@ Every build also boots its edition in a QEMU/KVM virtual machine — same image 
 To try SlozOS on your own computer instead:
 
 ```bash
-tests/vm/run-vm.sh SlozOS-1.4.1-amd64.iso
+tests/vm/run-vm.sh SlozOS-1.4.2-amd64.iso
 ```
 
-That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there.
+That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there. On a Linux PC with a GPU the VM gets 3D acceleration (virgl) automatically.
 
 ---
 

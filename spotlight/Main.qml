@@ -120,6 +120,46 @@ Window {
         }
     }
 
+    // Escape / controller B: clear the text, then leave the category, then close
+    function back() {
+        if (field.text.length > 0) field.text = ""
+        else if (category >= 0) category = -1
+        else close()
+    }
+
+    function move(dir) {
+        const list = currentList()
+        if (!list) return
+        navigated = true
+        if (body === "apps") {
+            if (dir === "left") appsGrid.moveCurrentIndexLeft()
+            else if (dir === "right") appsGrid.moveCurrentIndexRight()
+            else if (dir === "up") appsGrid.moveCurrentIndexUp()
+            else appsGrid.moveCurrentIndexDown()
+        } else if (dir === "down") {
+            list.incrementCurrentIndex()
+        } else if (dir === "up") {
+            list.decrementCurrentIndex()
+        }
+    }
+
+    // Game controller (see Gamepads in main.cpp)
+    function gamepad(button) {
+        if (button === "guide") {
+            (visible && appsMode) ? close() : open("", 0)
+        } else if (button === "a") {
+            activateCurrent()
+        } else if (button === "b") {
+            back()
+        } else if (button === "lb") {
+            setCategory(category <= 0 ? categories.length - 1 : category - 1)
+        } else if (button === "rb") {
+            setCategory((category + 1) % categories.length)
+        } else {
+            move(button)
+        }
+    }
+
     function currentList() {
         return body === "results" ? resultsList
              : body === "clipboard" ? clipList
@@ -128,7 +168,13 @@ Window {
     }
 
     onHeightChanged: updateBlur()
+    onVisibleChanged: if (Gamepads) Gamepads.active = visible
     onActiveChanged: if (!active && visible) close()   // click elsewhere = dismiss
+
+    Connections {
+        target: Gamepads
+        function onPressed(button) { root.gamepad(button) }
+    }
 
     Connections {
         target: Spotlight
@@ -253,21 +299,14 @@ Window {
                     const list = root.currentList()
                     const ctrl = event.modifiers & Qt.ControlModifier
                     if (event.key === Qt.Key_Escape) {
-                        if (text.length > 0) text = ""
-                        else if (root.category >= 0) root.category = -1
-                        else root.close()
-                        event.accepted = true
+                        root.back(); event.accepted = true
                     } else if (root.body === "apps" && (event.key === Qt.Key_Left || event.key === Qt.Key_Right
                                                          || event.key === Qt.Key_Up || event.key === Qt.Key_Down)) {
-                        if (event.key === Qt.Key_Left) appsGrid.moveCurrentIndexLeft()
-                        else if (event.key === Qt.Key_Right) appsGrid.moveCurrentIndexRight()
-                        else if (event.key === Qt.Key_Up) appsGrid.moveCurrentIndexUp()
-                        else appsGrid.moveCurrentIndexDown()
+                        root.move(event.key === Qt.Key_Left ? "left" : event.key === Qt.Key_Right ? "right"
+                                  : event.key === Qt.Key_Up ? "up" : "down")
                         event.accepted = true
-                    } else if (event.key === Qt.Key_Down && list) {
-                        root.navigated = true; list.incrementCurrentIndex(); event.accepted = true
-                    } else if (event.key === Qt.Key_Up && list) {
-                        root.navigated = true; list.decrementCurrentIndex(); event.accepted = true
+                    } else if ((event.key === Qt.Key_Down || event.key === Qt.Key_Up) && list) {
+                        root.move(event.key === Qt.Key_Down ? "down" : "up"); event.accepted = true
                     } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                         root.activateCurrent(); event.accepted = true
                     } else if (event.key === Qt.Key_Backspace && text.length === 0 && root.category >= 0) {
