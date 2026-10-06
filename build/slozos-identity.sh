@@ -164,6 +164,23 @@ install -Dm644 "$CTX/config/slozos/updater/config.ini" /etc/bazzite-updater/conf
 sed "s/@SLOZOS_VERSION@/$SLOZOS_VERSION/" "$CTX/config/slozos/updater/KAboutData_OS.json" \
     > /etc/bazzite-updater/KAboutData_OS.json
 
+# uupd (the updater's engine): no Brew step. SlozOS doesn't set Homebrew up,
+# and uupd re-enables its Brew module even after Brew fails to initialise, so
+# every update "failed" on Brew — and uupd-manual.service restarts a failed
+# update after 60 s (up to 3 times), re-running System and Flatpak updates
+# over and over. `brew` itself still works for anyone who installs it.
+python3 - <<'PYEOF'
+import json, os
+path = "/etc/uupd/config.json"
+try:
+    cfg = json.load(open(path))
+except (OSError, ValueError):
+    cfg = {}
+cfg.setdefault("modules", {}).setdefault("brew", {})["disable"] = True
+os.makedirs(os.path.dirname(path), exist_ok=True)
+json.dump(cfg, open(path, "w"), indent=4)
+PYEOF
+
 # Hide Bazzite's own docs/forum shortcuts (SlozOS Help replaces them) and its
 # news popups (they announce Bazzite releases, not SlozOS ones)
 set_desktop_key() {  # set_desktop_key FILE KEY VALUE — inside [Desktop Entry]

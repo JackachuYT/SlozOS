@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Dock
+Comment=The SlozOS dock
+Exec=/usr/bin/slozos-dock
+Icon=view-app-grid
+NoDisplay=true
+OnlyShowIn=KDE;
+# KWin only shares the window list with clients that ask for it here
+X-KDE-Wayland-Interfaces=org_kde_plasma_window_management,org_kde_kwin_blur

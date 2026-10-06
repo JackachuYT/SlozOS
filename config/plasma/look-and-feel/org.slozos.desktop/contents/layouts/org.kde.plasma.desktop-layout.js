@@ -21,10 +21,11 @@ for (var i = 0; i < existing.length; i++) {
 }
 
 // ── Menu bar (top) ───────────────────────────────────────────────────────────
-// [SlozOS logo menu] [App menu (global menu)] ........ [tray] [Control Center] [clock]
+// Laid out like MacTahoe's top bar, plus the macOS menus on the left:
+// [SlozOS logo menu] [App menu] ...... [clock] ...... [tray] [Control Center pill]
 var menuBar = new Panel;
 menuBar.location = "top";
-menuBar.height = 2 * Math.round(gridUnit * 0.75);   // ~26 px at 100% scale
+menuBar.height = 2 * Math.round(gridUnit * 0.85);   // ~30 px at 100% scale
 menuBar.floating = false;
 menuBar.hiding = "none";
 menuBar.lengthMode = "fill";
@@ -37,9 +38,6 @@ logoMenu.writeConfig("global", "Alt+F1");
 menuBar.addWidget("org.kde.plasma.appmenu");
 menuBar.addWidget("org.kde.plasma.panelspacer");
 
-var tray = menuBar.addWidget("org.kde.plasma.systemtray");
-menuBar.addWidget("org.slozos.controlcenter");          // Control Center
-
 var clock = menuBar.addWidget("org.kde.plasma.digitalclock");
 clock.currentConfigGroup = ["Appearance"];
 clock.writeConfig("showDate", true);
@@ -48,38 +46,28 @@ clock.writeConfig("dateFormat", "custom");
 clock.writeConfig("customDateFormat", "ddd d MMM");   // "Mon 5 Oct"
 clock.writeConfig("showSeconds", 0);                // never
 clock.writeConfig("autoFontAndSize", false);
-clock.writeConfig("fontWeight", 500);
+clock.writeConfig("fontWeight", 600);
 
-// ── Dock (bottom, floating, hugs its icons) ──────────────────────────────────
-// [Apps] [pinned apps + running apps] | [Trash]   (Apps opens Spotlight's app grid, like Tahoe)
-var dock = new Panel;
-dock.location = "bottom";
-dock.height = 2 * Math.round(gridUnit * 1.6);       // ~58 px at 100% scale
-dock.floating = true;
-dock.lengthMode = "fit";
-dock.alignment = "center";
-// Small screens: tuck the dock away when a window would overlap it
-dock.hiding = "dodgewindows";
+menuBar.addWidget("org.kde.plasma.panelspacer");
 
-var tasks = dock.addWidget("org.kde.plasma.icontasks");
-tasks.currentConfigGroup = ["General"];
-tasks.writeConfig("launchers", [
-    "applications:org.slozos.apps.desktop",
-    "preferred://filemanager",
-    "preferred://browser",
-    "applications:steam.desktop",
-    "applications:net.lutris.Lutris.desktop",
-    "applications:io.github.kolunmi.Bazaar.desktop",
-    "applications:org.kde.konsole.desktop",
-    "applications:systemsettings.desktop"
-]);
-tasks.writeConfig("showOnlyCurrentScreen", false);
-tasks.writeConfig("showOnlyCurrentDesktop", false);
-tasks.writeConfig("showOnlyCurrentActivity", false);
-tasks.writeConfig("groupingStrategy", 1);           // one icon per app, like the Dock
-tasks.writeConfig("indicateAudioStreams", true);
-tasks.writeConfig("iconSpacing", 1);
-tasks.writeConfig("maxStripes", 1);
+// Wi-Fi, sound, battery, Bluetooth and brightness live in Control Center (its
+// menu-bar pill shows their status), so the tray keeps only everything else.
+// Hidden items are still one click away in the tray's arrow menu.
+var tray = menuBar.addWidget("org.kde.plasma.systemtray");
+var trayContainment = desktopById(tray.readConfig("SystrayContainmentId"));
+if (trayContainment) {
+    trayContainment.currentConfigGroup = ["General"];
+    trayContainment.writeConfig("hiddenItems", [
+        "org.kde.plasma.networkmanagement",
+        "org.kde.plasma.volume",
+        "org.kde.plasma.battery",
+        "org.kde.plasma.bluetooth",
+        "org.kde.plasma.brightness",
+        "org.kde.plasma.manage-inputmethod",
+        "org.kde.plasma.clipboard"
+    ]);
+}
 
-dock.addWidget("org.kde.plasma.marginsseparator");
-dock.addWidget("org.kde.plasma.trash");
+menuBar.addWidget("org.slozos.controlcenter");          // Control Center
+
+// The dock is the SlozOS Dock app (slozos-dock), not a Plasma panel.

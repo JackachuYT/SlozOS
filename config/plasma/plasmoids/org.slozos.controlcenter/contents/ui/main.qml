@@ -20,7 +20,7 @@ PlasmoidItem {
 
     preferredRepresentation: compactRepresentation
     toolTipMainText: "Control Center"
-    toolTipSubText: ""
+    toolTipSubText: status.batteryPercent >= 0 ? "Battery " + status.batteryPercent + "%" : ""
     Plasmoid.icon: Qt.resolvedUrl("../images/control-center.svg")
 
     // ── Backend ──────────────────────────────────────────────────────────────
@@ -31,16 +31,26 @@ PlasmoidItem {
         onNewData: (source, data) => {
             if (source === "slozos-cc state") {
                 try { root.st = JSON.parse(data["stdout"]) } catch (e) {}
+            } else if (source === "slozos-cc status") {
+                // empty output happens if asked before the session is ready: retry
+                try { root.status = JSON.parse(data["stdout"]) } catch (e) { statusRetry.restart() }
             } else {
                 refreshSoon.restart()
             }
             disconnectSource(source)
         }
     }
-    function refresh() { exec.connectSource("slozos-cc state") }
+    function refresh() { exec.connectSource("slozos-cc state"); exec.connectSource("slozos-cc status") }
     function run(args) { exec.connectSource("slozos-cc " + args) }
 
     Timer { id: refreshSoon; interval: 400; onTriggered: root.refresh() }
+    // the menu-bar pill: network / sound / battery, kept fresh while closed too
+    property var status: ({ net: "network-wireless-offline-symbolic", sound: "", battery: "", batteryPercent: -1 })
+    Timer { interval: 15000; repeat: true; running: true
+            onTriggered: exec.connectSource("slozos-cc status") }
+    Timer { id: statusRetry; interval: 2000; running: true
+            onTriggered: exec.connectSource("slozos-cc status") }
+    onExpandedChanged: if (!expanded) refreshSoon.restart()
     Timer { interval: 2500; repeat: true; running: root.expanded; triggeredOnStart: true; onTriggered: root.refresh() }
 
     NotificationManager.Settings { id: notificationSettings }
@@ -57,23 +67,41 @@ PlasmoidItem {
     }
 
     // ── Menu-bar button ──────────────────────────────────────────────────────
+    // Like MacTahoe's top bar: the status icons sit together in one pill
     compactRepresentation: MouseArea {
         id: button
         hoverEnabled: true
         onClicked: root.expanded = !root.expanded
+        Layout.minimumWidth: pill.width + 4
+        Layout.preferredWidth: pill.width + 4
+
         Rectangle {
-            anchors.fill: parent
-            anchors.margins: 1
-            radius: height / 2
-            color: root.tint(root.expanded ? 0.18 : (button.containsMouse ? 0.10 : 0))
-        }
-        Kirigami.Icon {
+            id: pill
             anchors.centerIn: parent
-            width: Math.round(Math.min(parent.width, parent.height) * 0.7)
-            height: width
-            source: Qt.resolvedUrl("../images/control-center.svg")
-            isMask: true
-            color: Kirigami.Theme.textColor
+            height: Math.round(parent.height * 0.78)
+            width: icons.implicitWidth + height * 0.9
+            radius: height / 2
+            color: root.tint(root.expanded ? 0.26 : (button.containsMouse ? 0.20 : 0.13))
+            border.width: 1
+            border.color: root.tint(0.14)
+            Behavior on color { ColorAnimation { duration: 120 } }
+
+            Row {
+                id: icons
+                anchors.centerIn: parent
+                spacing: Math.round(pill.height * 0.32)
+                Repeater {
+                    model: [root.status.net, root.status.sound, root.status.battery].filter(i => i)
+                    delegate: Kirigami.Icon {
+                        required property string modelData
+                        width: Math.round(pill.height * 0.62)
+                        height: width
+                        source: modelData
+                        isMask: true
+                        color: Kirigami.Theme.textColor
+                    }
+                }
+            }
         }
     }
 
