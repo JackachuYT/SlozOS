@@ -95,6 +95,17 @@ merge "$SKEL/kscreenlockerrc" "$SRC/kscreenlockerrc"
 install -Dm644 "$CTX/spotlight/slozos-spotlight-autostart.desktop" /etc/xdg/autostart/slozos-spotlight.desktop
 install -Dm644 "$CTX/spotlight/org.slozos.spotlight.desktop"       /usr/share/kglobalaccel/org.slozos.spotlight.desktop
 
+# SlozOS Dock (binary + .desktop from the apps stage) replaces Plasma's bottom
+# panel: started at login, early, so it's there with the desktop
+install -Dm644 "$CTX/dock/slozos-dock-autostart.desktop" /etc/xdg/autostart/slozos-dock.desktop
+mkdir -p /usr/share/slozos
+# For accounts made before 1.4.4 (see slozos-session): the layout script minus
+# its wallpaper part, to rebuild the menu bar and drop the old Plasma dock
+sed '/^\/\/ ── Wallpaper/,/^\/\/ Start from a clean slate/{/^\/\/ Start from a clean slate/!d}' \
+    /usr/share/plasma/look-and-feel/org.slozos.desktop/contents/layouts/org.kde.plasma.desktop-layout.js \
+    > /usr/share/slozos/menubar-layout.js
+grep -q 'wallpaperPlugin' /usr/share/slozos/menubar-layout.js && { echo "menubar-layout.js still sets the wallpaper"; exit 1; }
+
 # SlozOS Welcome runs on first login (binary from the apps stage) and takes
 # over from Bazzite's Portal, which stays in the app menu as "SlozOS Portal"
 install -Dm644 "$CTX/welcome/slozos-welcome-firstrun.desktop" /etc/xdg/autostart/slozos-welcome-firstrun.desktop

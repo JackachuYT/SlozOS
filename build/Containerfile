@@ -31,9 +31,10 @@ ARG VERSION=dev
 RUN --mount=type=bind,source=.,target=/ctx \
     [ -f /usr/share/slozos/.base-layer ] || bash /ctx/build/slozos-base.sh
 
-# SlozOS Spotlight, Welcome + Updater from stage 1; --help proves they link
+# SlozOS Spotlight, Dock, Welcome + Updater from stage 1; --help proves they link
 COPY --from=apps /out/usr/ /usr/
 RUN QT_QPA_PLATFORM=offscreen slozos-spotlight --help >/dev/null && \
+    QT_QPA_PLATFORM=offscreen slozos-dock --help >/dev/null && \
     QT_QPA_PLATFORM=offscreen slozos-welcome --help >/dev/null && \
     QT_QPA_PLATFORM=offscreen bazzite-updater --help >/dev/null
 

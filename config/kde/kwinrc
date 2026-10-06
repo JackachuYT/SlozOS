@@ -19,6 +19,12 @@ wobblywindowsEnabled=false
 diminactiveEnabled=false
 translucencyEnabled=false
 
+[Round-Corners]
+# All four window corners rounded (KWin effect "shapecorners", built in the
+# apps stage); 20 px matches the MacTahoe title bar's own corners
+Size=20
+InactiveCornerRadius=20
+
 [Effect-blur]
 # BlurStrength is set per GPU at boot (slozos-hardware → /etc/xdg/kwinrc)
 NoiseStrength=3

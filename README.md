@@ -6,7 +6,7 @@
 
 **A macOS Tahoe-style gaming OS for any PC — built on Bazzite**
 
-🎉 **SlozOS 1.4.3 — touchscreen and game controller support, and smarter graphics, for every PC.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
+🎉 **SlozOS 1.4.4 — the MacTahoe dock with magnification, a new top bar, and rounded windows.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
 Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
@@ -27,9 +27,9 @@ SlozOS is a bootable gaming Linux distribution built on **[Bazzite](https://bazz
 
 SlozOS dresses Bazzite's KDE Plasma up as **macOS Tahoe with Liquid Glass**, out of the box on first login:
 
-- 🍎 **Menu bar** along the top — SlozOS logo menu (About, System Settings, Spotlight, Sleep / Restart / Shut Down, Lock, Log Out), global app menu, system tray and clock
-- 🚀 **Floating dock** that hugs its icons, with an **Apps** button (Spotlight's app grid, like Tahoe) and Trash, and tucks away when a window needs the space
-- 🚦 **Traffic-light window buttons** on the left, centred titles, frosted-glass blur everywhere
+- 🍎 **Menu bar** along the top, laid out like MacTahoe's: SlozOS logo menu (About, System Settings, Spotlight, Sleep / Restart / Shut Down, Lock, Log Out) and the app menu on the left, the clock in the middle, and Wi-Fi, sound and battery in one Control Center pill on the right
+- 🚀 **SlozOS Dock** in MacTahoe's Liquid Glass style: icons magnify as you move across them, dots show running apps (grey when minimised), name bubbles, launch bounce, right-click to keep apps in the Dock or quit them. **Apps** button (Spotlight's app grid) on the left, Trash on the right, and it tucks away when a window needs the space
+- 🚦 **Traffic-light window buttons** on the left, centred titles, all four window corners rounded, frosted-glass blur everywhere
 - 🎛️ **Control Center** next to the clock, in MacTahoe's glass style: Wi-Fi, Bluetooth, power mode, Focus (Do Not Disturb), Airplane Mode, on-screen Keyboard, Tablet Mode, Game Mode (Steam Big Picture), volume and brightness sliders, and Screenshot, Settings, Lock and Power buttons
 - 👋 **SlozOS Welcome** on first login: pick a wallpaper, set the dock, install apps and games in one click, and choose Performance Mode
 - 🔍 **SlozOS Spotlight** on **Meta + Space**: a glass search bar for apps, files, settings and your clipboard history (Ctrl+1–4 jumps straight to each)
@@ -109,9 +109,9 @@ Already running a Surface edition (SP1/SP2/SB1)? Nothing to do — it moves to t
 
 Get your edition from [**Releases**](https://github.com/JackachuYT/SlozOS/releases). Each ISO is split into 1900 MB parts (GitHub allows 2 GB per file) — download **all** parts into one folder, then combine them with [7-Zip](https://www.7-zip.org/):
 
-- **Windows:** right-click the `.001` file → 7-Zip → Extract Here (on Windows 11, click **Show more options** first). Typing `7z` in a terminal won't work, because 7-Zip doesn't add itself to the command line on Windows; use `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.3-amd64.7z.001` in PowerShell if you prefer a command
-- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.3-amd64.7z.001`
-- **Linux:** `7z x SlozOS-1.4.3-amd64.7z.001`
+- **Windows:** right-click the `.001` file → 7-Zip → Extract Here (on Windows 11, click **Show more options** first). Typing `7z` in a terminal won't work, because 7-Zip doesn't add itself to the command line on Windows; use `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.4-amd64.7z.001` in PowerShell if you prefer a command
+- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.4-amd64.7z.001`
+- **Linux:** `7z x SlozOS-1.4.4-amd64.7z.001`
 
 ### Step 2 — Flash to USB
 
@@ -155,10 +155,10 @@ ISOs are built by GitHub Actions, **once per change**: a pull request builds eac
 
 ```bash
 # Standard (Intel/AMD)
-sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.3 .
+sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.4 .
 
 # NVIDIA
-sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.3 \
+sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.4 \
   --build-arg BAZZITE=ghcr.io/ublue-os/bazzite-nvidia:stable \
   --build-arg EDITION=NVIDIA --build-arg IMAGE=ghcr.io/jackachuyt/slozos-nvidia .
 
@@ -179,7 +179,7 @@ Every build also boots its edition in a QEMU/KVM virtual machine — same image 
 To try SlozOS on your own computer instead:
 
 ```bash
-tests/vm/run-vm.sh SlozOS-1.4.3-amd64.iso
+tests/vm/run-vm.sh SlozOS-1.4.4-amd64.iso
 ```
 
 That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there. On a Linux PC with a GPU the VM gets 3D acceleration (virgl) automatically.
@@ -192,6 +192,7 @@ That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to
 - [**linux-surface**](https://github.com/linux-surface/linux-surface) — Surface kernel patches & feature matrix
 - [**bootc-image-builder**](https://github.com/osbuild/bootc-image-builder) — ISO generation
 - [**MacTahoe KDE theme, icons and cursors**](https://github.com/vinceliuice/MacTahoe-kde) by Vince Liuice (LGPL-3.0 / GPL-3.0) — the macOS 26/27 Liquid Glass look
+- [**KDE Rounded Corners**](https://github.com/matinlotfali/KDE-Rounded-Corners) by Matin Lotfaliei (GPL-3.0) — rounded corners on every window
 
 ---
 

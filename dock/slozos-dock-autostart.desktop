@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Dock
+Exec=/usr/bin/slozos-dock
+OnlyShowIn=KDE;
+NoDisplay=true
+X-KDE-autostart-phase=1

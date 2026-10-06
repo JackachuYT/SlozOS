@@ -108,9 +108,9 @@ Window {
                     title: "Hide the dock when a window needs the space"
                     subtitle: "Recommended on small screens and tablets"
                     checked: true
+                    // the SlozOS Dock watches this file and applies it at once
                     onToggled: on => Sys.runAsync("dock",
-                        "$(command -v qdbus-qt6 || command -v qdbus6 || echo qdbus) org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript " +
-                        "'panels().forEach(function (p) { if (p.location == \"bottom\") p.hiding = \"" + (on ? "dodgewindows" : "none") + "\" })'")
+                        "kwriteconfig6 --file \"$HOME/.config/slozos/dockrc\" --group General --key autoHide " + (on ? "true" : "false"))
                 }
             }
         }

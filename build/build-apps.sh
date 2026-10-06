@@ -5,15 +5,20 @@
 # the Containerfile copies /out/usr into the OS image.
 #
 #   • SlozOS Spotlight (spotlight/)
+#   • SlozOS Dock (dock/) — the MacTahoe-style dock with magnification
 #   • SlozOS Welcome (welcome/) — first-run setup app
 #   • SlozOS Updater — Bazzite's graphical updater (rfrench3/bazzite-updater,
 #     GPL-2.0-or-later), pinned and rebuilt with SlozOS naming. Its window
 #     title is compiled in, so configuration alone can't rename it.
+#   • Rounded window corners — KDE-Rounded-Corners (matinlotfali, GPL-3.0), a
+#     KWin effect that rounds all four corners (MacTahoe's title bar only
+#     rounds the top two), built against this image's own KWin
 # ──────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 CTX=${CTX:-/ctx}
 
 UPDATER_SHA=9e7654f91f747561d14d24dc243973edb408606c   # 2026-10-04
+ROUNDCORNERS_SHA=c1178d94ff2ec0db8d4d9a9782a3eb06aec13ce6   # 2026-09-23, Plasma 6.7
 
 sed -i 's/^enabled[[:space:]]*=[[:space:]]*1/enabled=0/' /etc/yum.repos.d/terra*.repo 2>/dev/null || true
 # disable_excludes: Bazzite blocks Fedora's mesa-* packages (it ships its own
@@ -30,6 +35,11 @@ dnf5 -y install --setopt=install_weak_deps=False --setopt=disable_excludes='*' \
 cmake -S "$CTX/spotlight" -B /tmp/spotlight -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build /tmp/spotlight -j"$(nproc)"
 DESTDIR=/out cmake --install /tmp/spotlight
+
+# ── SlozOS Dock ──────────────────────────────────────────────────────────────
+cmake -S "$CTX/dock" -B /tmp/dock -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build /tmp/dock -j"$(nproc)"
+DESTDIR=/out cmake --install /tmp/dock
 
 # ── SlozOS Welcome ───────────────────────────────────────────────────────────
 cmake -S "$CTX/welcome" -B /tmp/welcome -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
@@ -51,3 +61,22 @@ cmake -S . -B /tmp/updater-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREF
 cmake --build /tmp/updater-build -j"$(nproc)"
 DESTDIR=/out cmake --install /tmp/updater-build
 rm -rf /out/etc        # its config lives in the OS image (see slozos-identity.sh)
+
+# ── Rounded window corners (KWin effect) ─────────────────────────────────────
+# A KWin plugin must be built against the exact KWin it loads into, so only
+# headers matching the installed kwin are accepted. If they aren't available
+# the effect is skipped (square bottom corners) rather than risking a KWin
+# that won't load it.
+KWIN_EVR=$(rpm -q --qf '%{VERSION}-%{RELEASE}' kwin)
+if dnf5 -y install --setopt=install_weak_deps=False --setopt=disable_excludes='*' \
+        "kwin-devel-$KWIN_EVR" libdrm-devel mesa-libgbm-devel libepoxy-devel wayland-devel \
+        libxkbcommon-devel qt6-qtbase-private-devel kf6-kcmutils-devel kf6-kconfigwidgets-devel; then
+    mkdir -p /tmp/roundcorners
+    curl -fsSL --retry 5 "https://github.com/matinlotfali/KDE-Rounded-Corners/archive/$ROUNDCORNERS_SHA.tar.gz" \
+        | tar -xz -C /tmp/roundcorners --strip-components=1
+    cmake -S /tmp/roundcorners -B /tmp/roundcorners-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+    cmake --build /tmp/roundcorners-build -j"$(nproc)"
+    DESTDIR=/out cmake --install /tmp/roundcorners-build
+else
+    echo "::warning::kwin-devel $KWIN_EVR not available — building without rounded window corners"
+fi

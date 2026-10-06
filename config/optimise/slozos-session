@@ -7,7 +7,8 @@
 #   • Steam at login: the user's choice in SlozOS Welcome wins; without one,
 #     "full" PCs start it, "light" PCs don't
 #   • Prism Launcher's Java heap: sized to this PC's RAM, once
-#   • 1.4.1/1.4.2: one-time moves for older accounts (MacTahoe, per-PC effects)
+#   • 1.4.1–1.4.4: one-time moves for older accounts (MacTahoe, per-PC
+#     effects, SlozOS Dock + new menu bar)
 set -u
 PROFILE=$(cat /run/slozos/profile 2>/dev/null || echo full)
 PREF="${XDG_CONFIG_HOME:-$HOME/.config}/slozos"
@@ -71,4 +72,17 @@ if [[ ! -f $PREF/effects-per-pc ]]; then
     done
     qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1
     touch "$PREF/effects-per-pc"
+fi
+
+# SlozOS 1.4.4: the dock is the SlozOS Dock app and the menu bar is laid out
+# like MacTahoe's. Accounts still on the old Plasma dock get the new menu bar
+# (wallpaper untouched) and lose the Plasma dock, once, when Plasma is up.
+APPLETS="$C/plasma-org.kde.plasma.desktop-appletsrc"
+if [[ ! -f $PREF/layout-1.4.4 ]] && grep -qs 'plugin=org.kde.plasma.icontasks' "$APPLETS"; then
+    (
+        QDBUS=$(command -v qdbus-qt6 || command -v qdbus6 || echo qdbus)
+        for _ in $(seq 60); do "$QDBUS" org.kde.plasmashell /PlasmaShell >/dev/null 2>&1 && break; sleep 1; done
+        "$QDBUS" org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
+            "$(cat /usr/share/slozos/menubar-layout.js)" >/dev/null && touch "$PREF/layout-1.4.4"
+    ) &
 fi

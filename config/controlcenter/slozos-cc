@@ -2,6 +2,7 @@
 # slozos-cc — backend for the SlozOS Control Center widget.
 #
 #   slozos-cc state                      → one line of JSON with everything
+#   slozos-cc status                     → just what the menu-bar pill shows (cheap)
 #   slozos-cc wifi on|off
 #   slozos-cc bluetooth on|off
 #   slozos-cc airplane on|off
@@ -49,6 +50,39 @@ profile() {
         | grep -o "'[^']*'" | tr -d "'"
 }
 
+# Menu-bar pill: network, sound and battery icons (symbolic icon names)
+net_icon() {
+    local wifi wired
+    wired=$(nmcli -t -f TYPE,STATE dev 2>/dev/null | grep -c '^ethernet:connected$')
+    wifi=$(nmcli -t -f IN-USE,SIGNAL dev wifi list --rescan no 2>/dev/null | sed -n 's/^\*://p' | head -1)
+    if [[ -n $wifi ]]; then
+        if   (( wifi >= 75 )); then echo network-wireless-signal-excellent-symbolic
+        elif (( wifi >= 50 )); then echo network-wireless-signal-good-symbolic
+        elif (( wifi >= 25 )); then echo network-wireless-signal-ok-symbolic
+        else                        echo network-wireless-signal-weak-symbolic; fi
+    elif (( wired > 0 )); then echo network-wired-symbolic
+    elif [[ $(wifi_on) == true ]]; then echo network-wireless-disconnected-symbolic
+    else echo network-wireless-offline-symbolic; fi
+}
+sound_icon() {
+    local v; v=$(volume)
+    if [[ -z $v ]]; then echo ""; return; fi
+    if [[ $(muted) == true || $v -eq 0 ]]; then echo audio-volume-muted-symbolic
+    elif (( v < 34 )); then echo audio-volume-low-symbolic
+    elif (( v < 67 )); then echo audio-volume-medium-symbolic
+    else echo audio-volume-high-symbolic; fi
+}
+battery() {  # → "<icon> <percent>", or nothing without a battery
+    local b; b=$(ls -d /sys/class/power_supply/BAT* 2>/dev/null | head -1)
+    [[ -n $b ]] || return
+    local cap status lvl
+    cap=$(cat "$b/capacity" 2>/dev/null || echo 0); status=$(cat "$b/status" 2>/dev/null)
+    lvl=$(( (cap + 5) / 10 * 10 )); (( lvl > 100 )) && lvl=100
+    local icon="battery-$(printf %03d $lvl)-symbolic"
+    [[ $status == Charging || $status == Full ]] && icon="battery-$(printf %03d $lvl)-charging-symbolic"
+    echo "$icon $cap"
+}
+
 tablet() { local m; m=$(kreadconfig6 --file kwinrc --group Input --key TabletMode 2>/dev/null); echo "${m:-auto}"; }
 
 case "${1:-state}" in
@@ -56,6 +90,10 @@ case "${1:-state}" in
         printf '{"wifi":%s,"ssid":"%s","bluetooth":%s,"airplane":%s,"brightness":%s,"volume":%s,"muted":%s,"profile":"%s","tablet":"%s"}\n' \
             "$(wifi_on)" "$(wifi_ssid | sed 's/["\\]/\\&/g')" "$(bt_on)" "$(airplane)" \
             "$(brightness)" "$(v=$(volume); echo "${v:--1}")" "$(muted)" "$(profile)" "$(tablet)" ;;
+    status)
+        read -r bi bp <<<"$(battery)"
+        printf '{"net":"%s","sound":"%s","battery":"%s","batteryPercent":%s}\n' \
+            "$(net_icon)" "$(sound_icon)" "$bi" "${bp:--1}" ;;
     wifi)       nmcli radio wifi "$2" ;;
     bluetooth)  [[ "$2" == on ]] && rfkill unblock bluetooth 2>/dev/null; bluetoothctl power "$2" >/dev/null ;;
     airplane)   if [[ "$2" == on ]]; then rfkill block all; else rfkill unblock all; fi ;;
