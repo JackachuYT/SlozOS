@@ -7,7 +7,7 @@
 #   • Steam at login: the user's choice in SlozOS Welcome wins; without one,
 #     "full" PCs start it, "light" PCs don't
 #   • Prism Launcher's Java heap: sized to this PC's RAM, once
-#   • 1.4.1: accounts made before the MacTahoe switch move off WhiteSur, once
+#   • 1.4.1/1.4.2: one-time moves for older accounts (MacTahoe, per-PC effects)
 set -u
 PROFILE=$(cat /run/slozos/profile 2>/dev/null || echo full)
 PREF="${XDG_CONFIG_HOME:-$HOME/.config}/slozos"
@@ -59,4 +59,16 @@ if [[ ! -f $PREF/mactahoe-migrated ]] && grep -qs WhiteSur "$C/kdeglobals" "$C/p
     done
     qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1
     touch "$PREF/mactahoe-migrated"
+fi
+
+# SlozOS 1.4.2: blur, contrast and magic lamp became per-PC defaults (off when
+# there's no 3D GPU, see slozos-hardware). Accounts made earlier carry a copy
+# of the old "always on" values that would override that; drop it once.
+if [[ ! -f $PREF/effects-per-pc ]]; then
+    for k in blurEnabled contrastEnabled magiclampEnabled; do
+        [[ $(kreadconfig6 --file kwinrc --group Plugins --key "$k") == true ]] \
+            && kwriteconfig6 --file kwinrc --group Plugins --key "$k" --delete
+    done
+    qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1
+    touch "$PREF/effects-per-pc"
 fi

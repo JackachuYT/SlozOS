@@ -10,11 +10,10 @@ BorderSize=None
 BorderSizeAuto=false
 
 [Plugins]
-blurEnabled=true
-contrastEnabled=true
-# macOS "Genie"-style minimise
-magiclampEnabled=true
+# Blur, contrast and the macOS "Genie"-style minimise (magic lamp) are switched
+# on per PC at boot by slozos-hardware (off when there's no 3D GPU)
 squashEnabled=false
+slozos-touchEnabled=true
 # Off: not macOS-like, and they cost GPU time on Haswell/Ivy Bridge iGPUs
 wobblywindowsEnabled=false
 diminactiveEnabled=false
@@ -28,6 +27,12 @@ NoiseStrength=3
 # No hot corner: the top-left corner holds the SlozOS menu, and a hot corner
 # there fires every time you reach for it. Meta+W / three-finger swipe still work.
 BorderActivate=9
+# Touchscreen: swipe up from the bottom edge (4 = bottom)
+TouchBorderActivate=4
+
+[TouchEdges]
+# The left edge belongs to the SlozOS touch script (swipe in → Apps grid)
+Left=None
 
 [Windows]
 ElectricBorderMaximize=true

@@ -21,6 +21,8 @@ set_desktop_key() {  # set_desktop_key FILE KEY VALUE — inside [Desktop Entry]
 install -Dm755 "$CTX/config/hardware/slozos-hardware"         /usr/libexec/slozos-hardware
 install -Dm644 "$CTX/config/hardware/slozos-hardware.service" /usr/lib/systemd/system/slozos-hardware.service
 systemctl enable slozos-hardware.service
+# `slozos-graphics`: shows whether 3D, 2D and video acceleration are in use
+install -Dm755 "$CTX/config/hardware/slozos-graphics"         /usr/bin/slozos-graphics
 # Marvell Wi-Fi stability (only touch Marvell adapters, harmless elsewhere)
 install -Dm644 "$CTX/config/hardware/81-mwifiex-no-autosuspend.rules" /usr/lib/udev/rules.d/81-mwifiex-no-autosuspend.rules
 install -Dm644 "$CTX/config/hardware/mwifiex.conf"                    /usr/lib/modprobe.d/mwifiex.conf

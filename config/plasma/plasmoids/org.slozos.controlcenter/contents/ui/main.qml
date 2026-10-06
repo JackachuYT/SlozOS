@@ -14,7 +14,7 @@ PlasmoidItem {
     id: root
 
     property var st: ({ wifi: false, ssid: "", bluetooth: false, airplane: false,
-                        brightness: -1, volume: -1, muted: false, profile: "" })
+                        brightness: -1, volume: -1, muted: false, profile: "", tablet: "auto" })
     readonly property color accent: "#0A84FF"
     readonly property bool focusOn: notificationSettings.notificationsInhibitedUntil > new Date()
 
@@ -188,10 +188,17 @@ PlasmoidItem {
                     onToggled: root.launch(root.keyboardCmd)
                 }
                 Pill {
-                    Layout.columnSpan: 2
+                    icon: "input-tablet-symbolic"
+                    title: "Tablet Mode"
+                    subtitle: ({ auto: "Automatic", on: "On", off: "Off" })[root.st.tablet] || "Automatic"
+                    checked: root.st.tablet === "on"
+                    // tap cycles Automatic → On → Off
+                    onToggled: root.run("tablet " + ({ auto: "on", on: "off", off: "auto" })[root.st.tablet || "auto"])
+                }
+                Pill {
                     icon: "input-gaming-symbolic"
                     title: "Game Mode"
-                    subtitle: "Steam Big Picture"
+                    subtitle: "Big Picture"
                     split: true
                     onToggled: root.launch("steam steam://open/bigpicture")
                     onMore: root.launch("steam")

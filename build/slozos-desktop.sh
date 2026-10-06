@@ -58,6 +58,9 @@ cp -r "$CTX/config/plasma/plasmoids/org.slozos.logomenu" /usr/share/plasma/plasm
 # Control Center (menu bar, next to the clock) + its backend
 cp -r "$CTX/config/plasma/plasmoids/org.slozos.controlcenter" /usr/share/plasma/plasmoids/
 install -Dm755 "$CTX/config/controlcenter/slozos-cc" /usr/bin/slozos-cc
+# Touchscreen edge swipes (KWin script, on by default)
+mkdir -p /usr/share/kwin/scripts
+cp -r "$CTX/config/kwin/scripts/slozos-touch" /usr/share/kwin/scripts/
 
 # Login screen: Bazzite 44 uses Plasma Login Manager (SDDM themes no longer
 # apply). It only supports a wallpaper, so set that.

@@ -8,6 +8,7 @@
 #   slozos-cc brightness <0-100>
 #   slozos-cc volume <0-100> | mute
 #   slozos-cc profile power-saver|balanced|performance
+#   slozos-cc tablet auto|on|off          (touch-friendly tablet mode)
 #
 # Uses the same services Plasma does (NetworkManager, BlueZ, PowerDevil,
 # PipeWire, power-profiles) through their command-line/D-Bus front ends.
@@ -48,11 +49,13 @@ profile() {
         | grep -o "'[^']*'" | tr -d "'"
 }
 
+tablet() { local m; m=$(kreadconfig6 --file kwinrc --group Input --key TabletMode 2>/dev/null); echo "${m:-auto}"; }
+
 case "${1:-state}" in
     state)
-        printf '{"wifi":%s,"ssid":"%s","bluetooth":%s,"airplane":%s,"brightness":%s,"volume":%s,"muted":%s,"profile":"%s"}\n' \
+        printf '{"wifi":%s,"ssid":"%s","bluetooth":%s,"airplane":%s,"brightness":%s,"volume":%s,"muted":%s,"profile":"%s","tablet":"%s"}\n' \
             "$(wifi_on)" "$(wifi_ssid | sed 's/["\\]/\\&/g')" "$(bt_on)" "$(airplane)" \
-            "$(brightness)" "$(v=$(volume); echo "${v:--1}")" "$(muted)" "$(profile)" ;;
+            "$(brightness)" "$(v=$(volume); echo "${v:--1}")" "$(muted)" "$(profile)" "$(tablet)" ;;
     wifi)       nmcli radio wifi "$2" ;;
     bluetooth)  [[ "$2" == on ]] && rfkill unblock bluetooth 2>/dev/null; bluetoothctl power "$2" >/dev/null ;;
     airplane)   if [[ "$2" == on ]]; then rfkill block all; else rfkill unblock all; fi ;;
@@ -64,5 +67,7 @@ case "${1:-state}" in
                 else wpctl set-mute @DEFAULT_AUDIO_SINK@ 0; wpctl set-volume @DEFAULT_AUDIO_SINK@ "$2%"; fi ;;
     profile)    gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles \
                     --method org.freedesktop.DBus.Properties.Set net.hadess.PowerProfiles ActiveProfile "<'$2'>" >/dev/null ;;
-    *)          echo "usage: slozos-cc state|wifi|bluetooth|airplane|brightness|volume|profile …" >&2; exit 2 ;;
+    tablet)     kwriteconfig6 --file kwinrc --group Input --key TabletMode "$2"
+                qdbus-qt6 org.kde.KWin /KWin reconfigure >/dev/null 2>&1 ;;
+    *)          echo "usage: slozos-cc state|wifi|bluetooth|airplane|brightness|volume|profile|tablet …" >&2; exit 2 ;;
 esac
