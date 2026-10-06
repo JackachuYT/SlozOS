@@ -101,10 +101,16 @@ rm -rf /usr/share/icons/MacTahoe-cursors /usr/share/icons/MacTahoe-dark-cursors
 cp -r "$SRC/MacTahoe-icon-theme/cursors/dist"      /usr/share/icons/MacTahoe-cursors
 cp -r "$SRC/MacTahoe-icon-theme/cursors/dist-dark" /usr/share/icons/MacTahoe-dark-cursors
 # No Apple trademarks in the OS: the "start-here" (app launcher) icons become
-# the SlozOS logo
+# the SlozOS logo, and the few icons drawn with the Apple logo on them (Disks,
+# the iMac-style "computer", Variety, the icon-settings page) are removed so
+# those fall back to Breeze. Aliases pointing at them are dropped with them.
+APPLE_LOGO_ICONS=('start-here*' 'folder-apple*' gnome-disks computer variety variety-slideshow preferences-desktop-icons)
 for t in MacTahoe MacTahoe-dark MacTahoe-light; do
     [ -d "/usr/share/icons/$t" ] || continue
-    find -L "/usr/share/icons/$t" \( -name 'start-here*' -o -name 'folder-apple*' \) -exec rm -f {} + 2>/dev/null || true
+    for n in "${APPLE_LOGO_ICONS[@]}"; do
+        find "/usr/share/icons/$t" \( -name "$n.svg" -o -name "$n.png" -o -name "$n-symbolic.svg" \) -delete
+    done
+    find "/usr/share/icons/$t" -xtype l -delete     # aliases left dangling
     install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.png" "/usr/share/icons/$t/places/scalable/start-here.png"
     gtk-update-icon-cache -f -q "/usr/share/icons/$t" 2>/dev/null || true
 done
