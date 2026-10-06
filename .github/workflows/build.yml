@@ -45,16 +45,18 @@ jobs:
             bazzite: bazzite
             edition: Standard
             image_tag: slozos
-            iso_name: SlozOS-1.4.2-amd64
+            iso_name: SlozOS-1.4.3-amd64
             artifact: SlozOS-ISO
-            release_tag: v1.4.2-standard
-            release_title: "SlozOS 1.4.2"
+            release_tag: v1.4.3-standard
+            release_title: "SlozOS 1.4.3"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sp1 slozos-sp2"
             release_notes: |
-              SlozOS 1.4.2 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
+              SlozOS 1.4.3 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
 
-              **New in 1.4.2 — touch and controllers.** Swipe in from the left edge of a touchscreen for the Apps grid, or up from the bottom for Overview; a new Tablet Mode tile in Control Center. Press the Guide button on an Xbox, PlayStation or other controller to open the Apps grid and pick a game with the D-pad, A and B. Graphics: the glass effects now switch off automatically when there's no 3D GPU (e.g. in a VM), and `slozos-graphics` shows whether 3D, 2D and video acceleration are in use.
+              **New in 1.4.3 — fixes.** The SlozOS logo menu opens properly again with Alt+F1 (it showed an empty box), and the glass effects now switch off correctly in virtual machines without 3D graphics.
+
+              **From 1.4.2:** touchscreen swipes (left edge for Apps, bottom for Overview), a Tablet Mode tile, game controller support (Guide button opens Apps; D-pad, A and B to pick), and `slozos-graphics` to check 3D, 2D and video acceleration.
 
               SlozOS runs on almost any 64-bit PC, laptop or handheld, and adapts to your hardware at boot.
 
@@ -64,25 +66,27 @@ jobs:
 
               The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.4.2-amd64.7z.001
+              7z x SlozOS-1.4.3-amd64.7z.001
               ```
-              Flash `SlozOS-1.4.2-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.3-amd64.iso` with Balena Etcher and boot from the USB stick.
 
           - device: nvidia
             display_name: SlozOS NVIDIA
             bazzite: bazzite-nvidia
             edition: NVIDIA
             image_tag: slozos-nvidia
-            iso_name: SlozOS-1.4.2-NVIDIA-amd64
+            iso_name: SlozOS-1.4.3-NVIDIA-amd64
             artifact: SlozOS-NVIDIA-ISO
-            release_tag: v1.4.2-nvidia
-            release_title: "SlozOS 1.4.2 — NVIDIA"
+            release_tag: v1.4.3-nvidia
+            release_title: "SlozOS 1.4.3 — NVIDIA"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sb1"
             release_notes: |
-              SlozOS 1.4.2 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
+              SlozOS 1.4.3 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
 
-              **New in 1.4.2 — touch and controllers.** Swipe in from the left edge of a touchscreen for the Apps grid, or up from the bottom for Overview; a new Tablet Mode tile in Control Center. Press the Guide button on an Xbox, PlayStation or other controller to open the Apps grid and pick a game with the D-pad, A and B. Graphics: the glass effects now switch off automatically when there's no 3D GPU (e.g. in a VM), and `slozos-graphics` shows whether 3D, 2D and video acceleration are in use.
+              **New in 1.4.3 — fixes.** The SlozOS logo menu opens properly again with Alt+F1 (it showed an empty box), and the glass effects now switch off correctly in virtual machines without 3D graphics.
+
+              **From 1.4.2:** touchscreen swipes (left edge for Apps, bottom for Overview), a Tablet Mode tile, game controller support (Guide button opens Apps; D-pad, A and B to pick), and `slozos-graphics` to check 3D, 2D and video acceleration.
 
               SlozOS runs on almost any 64-bit PC, laptop or handheld, and adapts to your hardware at boot.
 
@@ -92,13 +96,13 @@ jobs:
 
               The ISO is split into 1900 MB parts. Download all parts into one folder, then reassemble:
               ```
-              7z x SlozOS-1.4.2-NVIDIA-amd64.7z.001
+              7z x SlozOS-1.4.3-NVIDIA-amd64.7z.001
               ```
-              Flash `SlozOS-1.4.2-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.3-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.4.2"
+      SLOZOS_VERSION: "1.4.3"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise
