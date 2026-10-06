@@ -1,4 +1,4 @@
-# SlozOS base image: Bazzite + packages, WhiteSur themes and the boot splash.
+# SlozOS base image: Bazzite + packages, MacTahoe themes and the boot splash.
 #
 # Published as ghcr.io/jackachuyt/slozos-base-<edition>:<key> and only rebuilt
 # when Bazzite or the base inputs change (see the workflow). Every SlozOS

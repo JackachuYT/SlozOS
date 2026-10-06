@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 # ──────────────────────────────────────────────────────────────────────────────
 # SlozOS base layer — the parts that rarely change: packages, the pinned
-# WhiteSur theme set, and the boot splash (incl. the rebuilt initramfs).
+# MacTahoe theme set, and the boot splash (incl. the rebuilt initramfs).
 #
 #   RUN --mount=type=bind,source=.,target=/ctx bash /ctx/build/slozos-base.sh
 #
@@ -18,11 +18,11 @@ merge() { python3 "$CTX/build/ini-merge.py" "$@"; }
 log()   { echo "::group::$*"; }
 end()   { echo "::endgroup::"; }
 
-# ── Pinned upstream theme sources (GPL-3.0, github.com/vinceliuice) ──────────
-# Bump a SHA to pull in upstream fixes; pinning keeps builds reproducible.
-WHITESUR_KDE_SHA=cf4df59ce91004f7ea39358b1b8ff917d5c329f7      # 2026-08-07
-WHITESUR_ICONS_SHA=73d8040da51a9ed74e47c7366e7e9ff437601a5c    # 2026-09-10
-WHITESUR_CURSORS_SHA=e190baf618ed95ee217d2fd45589bd309b37672b  # 2025-04-05
+# ── Pinned upstream theme sources (github.com/vinceliuice) ──────────────────
+# MacTahoe: the macOS 26/27 (Tahoe → Golden Gate) Liquid Glass look.
+# KDE theme LGPL-3.0, icons + cursors GPL-3.0. Bump a SHA for upstream fixes.
+MACTAHOE_KDE_SHA=cbf6a1f71b591d143184855d62f6272ce533e7c3     # 2026-08-16
+MACTAHOE_ICONS_SHA=839848b9a8a38a92a6936e30c4abe35cc6f2546d   # 2026-09-10
 
 SRC=$(mktemp -d)
 trap 'rm -rf "$SRC"' EXIT
@@ -57,38 +57,55 @@ rpm-ostree install --idempotent --assumeyes \
     jetbrains-mono-fonts-all
 end
 
-# ── macOS Tahoe themes: WhiteSur Liquid (window chrome, panels, widgets) ─────
-log "WhiteSur KDE"
-fetch WhiteSur-kde "$WHITESUR_KDE_SHA"
-# Running as root installs system-wide into /usr/share. Dark variants only.
-( cd "$SRC/WhiteSur-kde" && HOME=/tmp bash ./install.sh --color dark )
-# Kvantum resolves a theme by directory name, but upstream ships the Liquid
-# variant inside WhiteSur/ — give it its own directory so `WhiteSurLiquidDark`
-# actually resolves.
-mkdir -p /usr/share/Kvantum/WhiteSurLiquidDark
-cp "$SRC/WhiteSur-kde/Kvantum/WhiteSur/WhiteSurLiquidDark.kvconfig" \
-   "$SRC/WhiteSur-kde/Kvantum/WhiteSur/WhiteSurLiquidDark.svg" \
-   /usr/share/Kvantum/WhiteSurLiquidDark/
-# Upstream's Liquid Plasma theme reuses the "WhiteSur-dark" id/name, so System
-# Settings would list two identical "WhiteSur-dark" entries. Give it its own.
-sed -i -e 's/"Id": "WhiteSur-dark"/"Id": "WhiteSurLiquid-dark"/' \
-       -e 's/"Name": "WhiteSur-dark"/"Name": "WhiteSur Liquid Dark"/' \
-    /usr/share/plasma/desktoptheme/WhiteSurLiquid-dark/metadata.json
-for p in /usr/share/aurorae/themes/WhiteSurLiquid-dark \
-         /usr/share/plasma/desktoptheme/WhiteSurLiquid-dark \
-         /usr/share/Kvantum/WhiteSurLiquidDark/WhiteSurLiquidDark.kvconfig; do
+# ── Hardware video decode (VA-API) on every GPU ──────────────────────────────
+# Bazzite's Mesa covers AMD (radeonsi) and NVIDIA ships its own; make sure
+# both Intel drivers are present — iHD (Broadwell → today) and i965 (Sandy
+# Bridge → Haswell, e.g. Surface Pro 1/2) — without fighting whichever
+# package the base already uses for them. vainfo checks it from a terminal.
+log "Video acceleration"
+VA_PKGS=(libva-utils)
+[ -e /usr/lib64/dri/iHD_drv_video.so ] || VA_PKGS+=(libva-intel-media-driver)
+rpm-ostree install --idempotent --assumeyes "${VA_PKGS[@]}"
+# i965 isn't in Fedora (it's in RPM Fusion); Universal Blue images normally
+# carry it already — try, but never fail the build over it
+if [ ! -e /usr/lib64/dri/i965_drv_video.so ]; then
+    rpm-ostree install --idempotent --assumeyes libva-intel-driver \
+        || echo "::warning::i965 VA-API driver unavailable — older Intel GPUs decode video in software"
+fi
+ls /usr/lib64/dri/*_drv_video.so 2>/dev/null || true
+end
+
+# ── macOS 27-style themes: MacTahoe (window chrome, panels, widgets, icons) ─
+log "MacTahoe KDE"
+fetch MacTahoe-kde "$MACTAHOE_KDE_SHA"
+# Running as root installs system-wide into /usr/share. Light + dark variants
+# (SlozOS defaults to dark; Welcome can switch).
+( cd "$SRC/MacTahoe-kde" && HOME=/tmp bash ./install.sh )
+# Kvantum resolves themes by directory name; give each variant its own dir so
+# MacTahoe / MacTahoeDark both resolve explicitly
+for v in MacTahoe MacTahoeDark; do
+    mkdir -p "/usr/share/Kvantum/$v"
+    cp "$SRC/MacTahoe-kde/Kvantum/MacTahoe/$v.kvconfig" "$SRC/MacTahoe-kde/Kvantum/MacTahoe/$v.svg" "/usr/share/Kvantum/$v/"
+done
+for p in /usr/share/aurorae/themes/MacTahoe-Dark /usr/share/aurorae/themes/MacTahoe-Light \
+         /usr/share/plasma/desktoptheme/MacTahoe-Dark /usr/share/plasma/desktoptheme/MacTahoe-Light \
+         /usr/share/Kvantum/MacTahoeDark/MacTahoeDark.kvconfig; do
     [ -e "$p" ] || { echo "missing expected theme file: $p" >&2; exit 1; }
 done
 end
 
-log "WhiteSur icons + cursors"
-fetch WhiteSur-icon-theme "$WHITESUR_ICONS_SHA"
-# -p swaps the Apple logo for the KDE logo (no Apple trademarks in the OS)
-( cd "$SRC/WhiteSur-icon-theme" && bash ./install.sh --kde-plasma --dest /usr/share/icons --theme default )
-fetch WhiteSur-cursors "$WHITESUR_CURSORS_SHA"
-rm -rf /usr/share/icons/WhiteSur-cursors
-cp -r "$SRC/WhiteSur-cursors/dist" /usr/share/icons/WhiteSur-cursors
-for t in WhiteSur WhiteSur-dark; do
+log "MacTahoe icons + cursors"
+fetch MacTahoe-icon-theme "$MACTAHOE_ICONS_SHA"
+( cd "$SRC/MacTahoe-icon-theme" && bash ./install.sh --dest /usr/share/icons --theme default )
+rm -rf /usr/share/icons/MacTahoe-cursors /usr/share/icons/MacTahoe-dark-cursors
+cp -r "$SRC/MacTahoe-icon-theme/cursors/dist"      /usr/share/icons/MacTahoe-cursors
+cp -r "$SRC/MacTahoe-icon-theme/cursors/dist-dark" /usr/share/icons/MacTahoe-dark-cursors
+# No Apple trademarks in the OS: the "start-here" (app launcher) icons become
+# the SlozOS logo
+for t in MacTahoe MacTahoe-dark MacTahoe-light; do
+    [ -d "/usr/share/icons/$t" ] || continue
+    find -L "/usr/share/icons/$t" \( -name 'start-here*' -o -name 'folder-apple*' \) -exec rm -f {} + 2>/dev/null || true
+    install -Dm644 "$CTX/assets/logo/slozos-logo-symbolic.png" "/usr/share/icons/$t/places/scalable/start-here.png"
     gtk-update-icon-cache -f -q "/usr/share/icons/$t" 2>/dev/null || true
 done
 end

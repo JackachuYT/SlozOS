@@ -2,17 +2,17 @@
 ColorScheme=SlozOS
 
 [kdeglobals][Icons]
-Theme=WhiteSur-dark
+Theme=MacTahoe-dark
 
 [kdeglobals][KDE]
 widgetStyle=kvantum
 
 [kcminputrc][Mouse]
-cursorTheme=WhiteSur-cursors
+cursorTheme=MacTahoe-dark-cursors
 
 [kwinrc][org.kde.kdecoration2]
 library=org.kde.kwin.aurorae
-theme=__aurorae__svg__WhiteSurLiquid-dark
+theme=__aurorae__svg__MacTahoe-Dark
 ButtonsOnLeft=XIA
 ButtonsOnRight=
 
@@ -20,4 +20,4 @@ ButtonsOnRight=
 LayoutName=big_icons
 
 [plasmarc][Theme]
-name=WhiteSurLiquid-dark
+name=MacTahoe-Dark
