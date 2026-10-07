@@ -6,7 +6,7 @@
 
 **A macOS Tahoe-style gaming OS for any PC — built on Bazzite**
 
-🎉 **SlozOS 1.4.4 — the MacTahoe dock with magnification, a new top bar, and rounded windows.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
+🎉 **SlozOS 1.4.5 — the MacTahoe dock with magnification, a new top bar, and rounded windows.** Desktops, laptops, handhelds and 2-in-1s, from 4 GB tablets to gaming rigs.
 Sorry everyone! I didn't reallise I was commiting from my GitHub alt account so if you see JackachuCode, thats just me xD
 
 [![Build SlozOS ISOs](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml/badge.svg)](https://github.com/JackachuYT/SlozOS/actions/workflows/build.yml)
@@ -109,9 +109,9 @@ Already running a Surface edition (SP1/SP2/SB1)? Nothing to do — it moves to t
 
 Get your edition from [**Releases**](https://github.com/JackachuYT/SlozOS/releases). Each ISO is split into 1900 MB parts (GitHub allows 2 GB per file) — download **all** parts into one folder, then combine them with [7-Zip](https://www.7-zip.org/):
 
-- **Windows:** right-click the `.001` file → 7-Zip → Extract Here (on Windows 11, click **Show more options** first). Typing `7z` in a terminal won't work, because 7-Zip doesn't add itself to the command line on Windows; use `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.4-amd64.7z.001` in PowerShell if you prefer a command
-- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.4-amd64.7z.001`
-- **Linux:** `7z x SlozOS-1.4.4-amd64.7z.001`
+- **Windows:** right-click the `.001` file → 7-Zip → Extract Here (on Windows 11, click **Show more options** first). Typing `7z` in a terminal won't work, because 7-Zip doesn't add itself to the command line on Windows; use `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.5-amd64.7z.001` in PowerShell if you prefer a command
+- **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.5-amd64.7z.001`
+- **Linux:** `7z x SlozOS-1.4.5-amd64.7z.001`
 
 ### Step 2 — Flash to USB
 
@@ -155,10 +155,10 @@ ISOs are built by GitHub Actions, **once per change**: a pull request builds eac
 
 ```bash
 # Standard (Intel/AMD)
-sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.4 .
+sudo podman build -t localhost/slozos:latest -f build/Containerfile --build-arg VERSION=1.4.5 .
 
 # NVIDIA
-sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.4 \
+sudo podman build -t localhost/slozos-nvidia:latest -f build/Containerfile --build-arg VERSION=1.4.5 \
   --build-arg BAZZITE=ghcr.io/ublue-os/bazzite-nvidia:stable \
   --build-arg EDITION=NVIDIA --build-arg IMAGE=ghcr.io/jackachuyt/slozos-nvidia .
 
@@ -179,7 +179,7 @@ Every build also boots its edition in a QEMU/KVM virtual machine — same image 
 To try SlozOS on your own computer instead:
 
 ```bash
-tests/vm/run-vm.sh SlozOS-1.4.4-amd64.iso
+tests/vm/run-vm.sh SlozOS-1.4.5-amd64.iso
 ```
 
 That installs into a virtual disk; run `tests/vm/run-vm.sh` with no arguments to boot it again. It's fast on Intel/AMD Linux and Intel Macs. Apple Silicon Macs have to emulate the x86 CPU, so expect it to be very slow there. On a Linux PC with a GPU the VM gets 3D acceleration (virgl) automatically.

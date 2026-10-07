@@ -77,12 +77,23 @@ fi
 # SlozOS 1.4.4: the dock is the SlozOS Dock app and the menu bar is laid out
 # like MacTahoe's. Accounts still on the old Plasma dock get the new menu bar
 # (wallpaper untouched) and lose the Plasma dock, once, when Plasma is up.
+#
+# SlozOS 1.4.5: tidy the tray (items Control Center covers), once — this has
+# to run with Plasma up, after the tray has created its settings.
 APPLETS="$C/plasma-org.kde.plasma.desktop-appletsrc"
-if [[ ! -f $PREF/layout-1.4.4 ]] && grep -qs 'plugin=org.kde.plasma.icontasks' "$APPLETS"; then
+NEED_LAYOUT=false; NEED_TRAY=false
+[[ ! -f $PREF/layout-1.4.4 ]] && grep -qs 'plugin=org.kde.plasma.icontasks' "$APPLETS" && NEED_LAYOUT=true
+[[ ! -f $PREF/tray-items-1 ]] && NEED_TRAY=true
+if $NEED_LAYOUT || $NEED_TRAY; then
     (
         QDBUS=$(command -v qdbus-qt6 || command -v qdbus6 || echo qdbus)
+        plasma() { "$QDBUS" org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$1")" >/dev/null; }
         for _ in $(seq 60); do "$QDBUS" org.kde.plasmashell /PlasmaShell >/dev/null 2>&1 && break; sleep 1; done
-        "$QDBUS" org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
-            "$(cat /usr/share/slozos/menubar-layout.js)" >/dev/null && touch "$PREF/layout-1.4.4"
+        sleep 3   # let the panels (and the tray inside them) finish loading
+        if $NEED_LAYOUT; then
+            plasma /usr/share/slozos/menubar-layout.js && touch "$PREF/layout-1.4.4"
+            sleep 3
+        fi
+        plasma /usr/share/slozos/tray-items.js && touch "$PREF/tray-items-1"
     ) &
 fi
