@@ -156,6 +156,7 @@ METRICS = ("echo '=== boot'; systemd-analyze 2>/dev/null | head -2; "
            "echo '=== disk'; df -h / /var 2>/dev/null | tail -2; "
            # CI VMs have no GPU, so this should report software mode (llvmpipe)
            "echo '=== graphics'; slozos-graphics 2>&1; "
+           "echo '=== tray (hidden items)'; grep -h '^hiddenItems' ~/.config/plasma-org.kde.plasma.desktop-appletsrc; "
            "echo SLOZOS-METRICS-''END")
 
 DIAG = ("export SYSTEMD_PAGER=cat; systemctl is-active graphical.target display-manager.service; "

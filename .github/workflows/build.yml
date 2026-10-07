@@ -45,16 +45,18 @@ jobs:
             bazzite: bazzite
             edition: Standard
             image_tag: slozos
-            iso_name: SlozOS-1.4.4-amd64
+            iso_name: SlozOS-1.4.5-amd64
             artifact: SlozOS-ISO
-            release_tag: v1.4.4-standard
-            release_title: "SlozOS 1.4.4"
+            release_tag: v1.4.5-standard
+            release_title: "SlozOS 1.4.5"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sp1 slozos-sp2"
             release_notes: |
-              SlozOS 1.4.4 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
+              SlozOS 1.4.5 for PCs with **Intel or AMD graphics** — most desktops, laptops and AMD handhelds.
 
-              **New in 1.4.4 — the MacTahoe dock and top bar.** A brand-new SlozOS Dock in MacTahoe's Liquid Glass style, with macOS-style magnification, running-app dots, name bubbles, launch bounce and right-click menus (Keep in Dock, Quit, Empty Trash). The menu bar follows MacTahoe's layout: clock in the middle, and Wi-Fi, sound and battery together in one Control Center pill. All four window corners are now rounded. Fixes: the updater no longer fails on Brew (which also stopped it repeating System and Flatpak updates over and over).
+              **New in 1.4.5 — fixes.** Surface Pro 1 and 2 no longer get stuck going back to sleep every time they wake (Plasma's power manager now ignores the bogus "lid closed" these models report after waking). The menu bar's tray no longer repeats the Wi-Fi, sound, battery and brightness icons that Control Center already shows.
+
+              **From 1.4.4:** A brand-new SlozOS Dock in MacTahoe's Liquid Glass style, with macOS-style magnification, running-app dots, name bubbles, launch bounce and right-click menus (Keep in Dock, Quit, Empty Trash). The menu bar follows MacTahoe's layout: clock in the middle, and Wi-Fi, sound and battery together in one Control Center pill. All four window corners are now rounded. Fixes: the updater no longer fails on Brew (which also stopped it repeating System and Flatpak updates over and over).
 
               **From 1.4.2:** touchscreen swipes (left edge for Apps, bottom for Overview), a Tablet Mode tile, game controller support (Guide button opens Apps; D-pad, A and B to pick), and `slozos-graphics` to check 3D, 2D and video acceleration.
 
@@ -65,27 +67,29 @@ jobs:
               **Also included:** the MacTahoe look and redesigned Control Center from 1.4.1, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
               The ISO is split into 1900 MB parts. Download **all** parts into one folder, then reassemble:
-              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.4-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.4-amd64.7z.001`
-              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.4-amd64.7z.001`
-              - **Linux:** `7z x SlozOS-1.4.4-amd64.7z.001`
+              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.5-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.5-amd64.7z.001`
+              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.5-amd64.7z.001`
+              - **Linux:** `7z x SlozOS-1.4.5-amd64.7z.001`
 
-              Flash `SlozOS-1.4.4-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.5-amd64.iso` with Balena Etcher and boot from the USB stick.
 
           - device: nvidia
             display_name: SlozOS NVIDIA
             bazzite: bazzite-nvidia
             edition: NVIDIA
             image_tag: slozos-nvidia
-            iso_name: SlozOS-1.4.4-NVIDIA-amd64
+            iso_name: SlozOS-1.4.5-NVIDIA-amd64
             artifact: SlozOS-NVIDIA-ISO
-            release_tag: v1.4.4-nvidia
-            release_title: "SlozOS 1.4.4 — NVIDIA"
+            release_tag: v1.4.5-nvidia
+            release_title: "SlozOS 1.4.5 — NVIDIA"
             # old per-Surface update channels that keep receiving this edition
             legacy_images: "slozos-sb1"
             release_notes: |
-              SlozOS 1.4.4 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
+              SlozOS 1.4.5 for PCs with an **NVIDIA graphics card**, including hybrid Intel + NVIDIA laptops.
 
-              **New in 1.4.4 — the MacTahoe dock and top bar.** A brand-new SlozOS Dock in MacTahoe's Liquid Glass style, with macOS-style magnification, running-app dots, name bubbles, launch bounce and right-click menus (Keep in Dock, Quit, Empty Trash). The menu bar follows MacTahoe's layout: clock in the middle, and Wi-Fi, sound and battery together in one Control Center pill. All four window corners are now rounded. Fixes: the updater no longer fails on Brew (which also stopped it repeating System and Flatpak updates over and over).
+              **New in 1.4.5 — fixes.** Surface Pro 1 and 2 no longer get stuck going back to sleep every time they wake (Plasma's power manager now ignores the bogus "lid closed" these models report after waking). The menu bar's tray no longer repeats the Wi-Fi, sound, battery and brightness icons that Control Center already shows.
+
+              **From 1.4.4:** A brand-new SlozOS Dock in MacTahoe's Liquid Glass style, with macOS-style magnification, running-app dots, name bubbles, launch bounce and right-click menus (Keep in Dock, Quit, Empty Trash). The menu bar follows MacTahoe's layout: clock in the middle, and Wi-Fi, sound and battery together in one Control Center pill. All four window corners are now rounded. Fixes: the updater no longer fails on Brew (which also stopped it repeating System and Flatpak updates over and over).
 
               **From 1.4.2:** touchscreen swipes (left edge for Apps, bottom for Overview), a Tablet Mode tile, game controller support (Guide button opens Apps; D-pad, A and B to pick), and `slozos-graphics` to check 3D, 2D and video acceleration.
 
@@ -96,15 +100,15 @@ jobs:
               **Also included:** the MacTahoe look and redesigned Control Center from 1.4.1, SlozOS Welcome, Spotlight (Meta+Space), the Apps grid, the macOS Tahoe Liquid Glass desktop, Minecraft-ready gaming tuning and SlozOS's own update channel.
 
               The ISO is split into 1900 MB parts. Download **all** parts into one folder, then reassemble:
-              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.4-NVIDIA-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.4-NVIDIA-amd64.7z.001`
-              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.4-NVIDIA-amd64.7z.001`
-              - **Linux:** `7z x SlozOS-1.4.4-NVIDIA-amd64.7z.001`
+              - **Windows:** install [7-Zip](https://www.7-zip.org/), then right-click `SlozOS-1.4.5-NVIDIA-amd64.7z.001` → **7-Zip** → **Extract Here** (Windows 11: **Show more options** first). The `7z` command isn't added to the terminal on Windows; to use one anyway: `& "C:\Program Files\7-Zip\7z.exe" x SlozOS-1.4.5-NVIDIA-amd64.7z.001`
+              - **macOS:** open the `.001` file with [Keka](https://www.keka.io/), or `brew install sevenzip && 7zz x SlozOS-1.4.5-NVIDIA-amd64.7z.001`
+              - **Linux:** `7z x SlozOS-1.4.5-NVIDIA-amd64.7z.001`
 
-              Flash `SlozOS-1.4.4-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
+              Flash `SlozOS-1.4.5-NVIDIA-amd64.iso` with Balena Etcher and boot from the USB stick.
 
     env:
       PUBLISH: ${{ github.event_name != 'pull_request' }}
-      SLOZOS_VERSION: "1.4.4"
+      SLOZOS_VERSION: "1.4.5"
       # Installed systems update from here (see config/slozos/slozos-update-origin)
       IMAGE: ghcr.io/jackachuyt/${{ matrix.image_tag }}
       # The commit this build is of: the PR head for PRs, the pushed commit otherwise

@@ -50,24 +50,10 @@ clock.writeConfig("fontWeight", 600);
 
 menuBar.addWidget("org.kde.plasma.panelspacer");
 
-// Wi-Fi, sound, battery, Bluetooth and brightness live in Control Center (its
-// menu-bar pill shows their status), so the tray keeps only everything else.
-// Hidden items are still one click away in the tray's arrow menu.
-var tray = menuBar.addWidget("org.kde.plasma.systemtray");
-var trayContainment = desktopById(tray.readConfig("SystrayContainmentId"));
-if (trayContainment) {
-    trayContainment.currentConfigGroup = ["General"];
-    trayContainment.writeConfig("hiddenItems", [
-        "org.kde.plasma.networkmanagement",
-        "org.kde.plasma.volume",
-        "org.kde.plasma.battery",
-        "org.kde.plasma.bluetooth",
-        "org.kde.plasma.brightness",
-        "org.kde.plasma.manage-inputmethod",
-        "org.kde.plasma.clipboard"
-    ]);
-}
-
+// Wi-Fi, sound, battery, Bluetooth and brightness live in Control Center; the
+// tray hides them (/usr/share/slozos/tray-items.js, run by slozos-session —
+// the tray's own settings don't exist yet while this script runs)
+menuBar.addWidget("org.kde.plasma.systemtray");
 menuBar.addWidget("org.slozos.controlcenter");          // Control Center
 
 // The dock is the SlozOS Dock app (slozos-dock), not a Plasma panel.

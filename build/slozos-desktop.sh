@@ -105,6 +105,7 @@ sed '/^\/\/ ── Wallpaper/,/^\/\/ Start from a clean slate/{/^\/\/ Start from
     /usr/share/plasma/look-and-feel/org.slozos.desktop/contents/layouts/org.kde.plasma.desktop-layout.js \
     > /usr/share/slozos/menubar-layout.js
 grep -q 'wallpaperPlugin' /usr/share/slozos/menubar-layout.js && { echo "menubar-layout.js still sets the wallpaper"; exit 1; }
+install -Dm644 "$CTX/config/slozos/tray-items.js" /usr/share/slozos/tray-items.js
 
 # SlozOS Welcome runs on first login (binary from the apps stage) and takes
 # over from Bazzite's Portal, which stays in the app menu as "SlozOS Portal"

@@ -11,10 +11,12 @@
 #
 # and the graphics mode (see the Graphics section)
 #
-# Writes only to /run (fresh each boot) and /etc/xdg/kwinrc (effect defaults).
+# Writes only to /run (fresh each boot), /etc/xdg/kwinrc (effect defaults) and
+# /etc/xdg/powerdevilrc (Surface Pro 1/2 lid).
 set -uo pipefail
 
 dmi() { cat "/sys/class/dmi/id/$1" 2>/dev/null; }
+LID_FIX=false
 VENDOR=$(dmi sys_vendor)
 PRODUCT=$(dmi product_name)
 echo "Hardware: ${VENDOR:-?} ${PRODUCT:-?}"
@@ -43,11 +45,23 @@ if [[ $VENDOR == Microsoft* ]]; then
             printf '[Login]\nHandleLidSwitch=ignore\nHandleLidSwitchExternalPower=ignore\nHandleLidSwitchDocked=ignore\n' \
                 > /run/systemd/logind.conf.d/10-slozos-surface-lid.conf
             echo "Surface Pro 1/2: lid-switch fix on"
-            MARVELL=true; deep_sleep ;;
+            LID_FIX=true; MARVELL=true; deep_sleep ;;
         "Surface Book")
             MARVELL=true; deep_sleep ;;
     esac
 fi
+
+# Plasma's power manager (PowerDevil) handles the lid itself inside a session —
+# it holds logind's lid inhibitor, so the logind setting above only covers the
+# login screen. Without this, waking an SP1/SP2 sees "lid closed" and sleeps
+# again straight away, forever. System-wide default; a user's own choice wins.
+for profile in AC Battery LowBattery; do
+    if $LID_FIX; then
+        kwriteconfig6 --file /etc/xdg/powerdevilrc --group "$profile" --group SuspendAndShutdown --key LidAction 0
+    else   # this disk may have come from an SP1/SP2: put the default back
+        kwriteconfig6 --file /etc/xdg/powerdevilrc --group "$profile" --group SuspendAndShutdown --key LidAction --delete
+    fi
+done 2>/dev/null
 
 # Marvell Wi-Fi drops off when it power-saves; keep it awake (any PC)
 if has_marvell_wifi; then
